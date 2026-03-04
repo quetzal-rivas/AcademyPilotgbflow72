@@ -1,7 +1,7 @@
 "use client";
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Zap, Mic } from "lucide-react";
+import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Zap, Mic, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { GlobalChat } from "@/components/chat/global-chat";
@@ -12,6 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = [
     { title: "Overview", icon: LayoutDashboard, href: "/dashboard" },
     { title: "Lead Management", icon: Users, href: "/dashboard/leads" },
+    { title: "Conversations", icon: MessageSquare, href: "/dashboard/conversations" },
     { title: "Ad Deployment", icon: Megaphone, href: "/dashboard/ads" },
     { title: "Voice Dispatch", icon: Mic, href: "/dashboard/voice" },
     { title: "Integrations", icon: Settings, href: "/dashboard/settings" },
