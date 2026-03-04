@@ -1,0 +1,23 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-automation",
+      "description": "Abstract technology background showing automation and connectivity",
+      "imageUrl": "https://picsum.photos/seed/academia1/1200/800",
+      "imageHint": "technology automation"
+    },
+    {
+      "id": "dashboard-preview",
+      "description": "Sleek software dashboard interface",
+      "imageUrl": "https://picsum.photos/seed/academia2/800/600",
+      "imageHint": "dashboard software"
+    },
+    {
+      "id": "ai-marketing",
+      "description": "Digital marketing and AI concept",
+      "imageUrl": "https://picsum.photos/seed/academia3/600/400",
+      "imageHint": "digital marketing"
+    }
+  ]
+}
