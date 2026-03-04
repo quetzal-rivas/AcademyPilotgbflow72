@@ -8,3 +8,5 @@ import '@/ai/flows/publish-campaign.ts';
 import '@/ai/flows/test-meta-connection.ts';
 import '@/ai/flows/get-ad-images.ts';
 import '@/ai/flows/reasoning-based-agent-response.ts';
+import '@/ai/flows/global-chat-ai-assistant.ts';
+import '@/ai/flows/generate-lead-report-flow.ts';

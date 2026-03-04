@@ -4,6 +4,7 @@ import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, S
 import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Zap, Mic } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { GlobalChat } from "@/components/chat/global-chat";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -76,6 +77,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </main>
       </div>
+      <GlobalChat />
     </SidebarProvider>
   );
 }

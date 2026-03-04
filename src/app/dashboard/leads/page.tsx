@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { 
   Table, 
   TableBody, 
@@ -13,8 +12,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Download, MessageSquare, Phone, MoreVertical } from "lucide-react";
+import { Search, Filter, Download, MessageSquare, Phone, MoreVertical, ArrowUpDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { LeadHoverSummary } from "@/components/leads/lead-hover-summary";
 
 const initialLeads = [
   { id: 1, name: "Alice Johnson", email: "alice@example.com", phone: "+1 555-0101", status: "New", source: "Facebook Ad", date: "2024-05-20" },
@@ -26,21 +27,43 @@ const initialLeads = [
 
 export default function LeadManagement() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  const filteredLeads = initialLeads.filter(lead => 
-    lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredLeads = useMemo(() => {
+    let result = initialLeads.filter(lead => 
+      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (sortKey) {
+      result.sort((a: any, b: any) => {
+        if (a[sortKey] < b[sortKey]) return sortOrder === 'asc' ? -1 : 1;
+        if (a[sortKey] > b[sortKey]) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return result;
+  }, [searchTerm, sortKey, sortOrder]);
+
+  const toggleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortOrder('asc');
+    }
+  };
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-primary pl-6">
         <div>
-          <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter leading-none">Lead Management</h1>
-          <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-2">Database: Reviewing Potential Students</p>
+          <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter leading-none">Lead Registry</h1>
+          <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-2">Database: Analysis of High-Potential Students</p>
         </div>
         <Button className="bg-primary hover:bg-primary/90 rounded-none font-black uppercase tracking-widest text-xs px-8">
-          <Download className="mr-2 h-4 w-4" /> Export CSV
+          <Download className="mr-2 h-4 w-4" /> Tactical Export
         </Button>
       </div>
 
@@ -54,8 +77,8 @@ export default function LeadManagement() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="rounded-none font-black uppercase tracking-widest text-xs border-black hover:bg-black hover:text-white">
-          <Filter className="mr-2 h-4 w-4" /> Filter
+        <Button variant="outline" className="rounded-none font-black uppercase tracking-widest text-xs border-foreground hover:bg-foreground hover:text-background">
+          <Filter className="mr-2 h-4 w-4" /> Status Filter
         </Button>
       </div>
 
@@ -63,18 +86,33 @@ export default function LeadManagement() {
         <Table>
           <TableHeader className="bg-secondary/5">
             <TableRow className="border-b-2 border-b-border">
-              <TableHead className="font-black uppercase tracking-widest text-[10px]">Student Name</TableHead>
+              <TableHead onClick={() => toggleSort('name')} className="cursor-pointer font-black uppercase tracking-widest text-[10px]">
+                Student <ArrowUpDown className="inline ml-1 h-3 w-3" />
+              </TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px]">Contact Info</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px]">Source</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px]">Status</TableHead>
-              <TableHead className="font-black uppercase tracking-widest text-[10px]">Captured Date</TableHead>
+              <TableHead onClick={() => toggleSort('date')} className="cursor-pointer font-black uppercase tracking-widest text-[10px]">
+                Captured <ArrowUpDown className="inline ml-1 h-3 w-3" />
+              </TableHead>
               <TableHead className="text-right font-black uppercase tracking-widest text-[10px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredLeads.map((lead) => (
-              <TableRow key={lead.id} className="hover:bg-secondary/5 border-b border-border">
-                <TableCell className="font-black uppercase italic">{lead.name}</TableCell>
+              <TableRow key={lead.id} className="hover:bg-secondary/5 border-b border-border group">
+                <TableCell>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="font-black uppercase italic text-sm hover:text-primary transition-colors cursor-help underline underline-offset-4 decoration-primary/30 decoration-dashed">
+                        {lead.name}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0 border-none rounded-none w-auto" side="right" align="start">
+                      <LeadHoverSummary lead={lead} />
+                    </PopoverContent>
+                  </Popover>
+                </TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1 text-[11px] font-medium">
                     <span className="text-muted-foreground">{lead.email}</span>
@@ -107,9 +145,9 @@ export default function LeadManagement() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="rounded-none border-2 border-border">
-                        <DropdownMenuItem className="font-bold uppercase text-[10px] tracking-widest">View Details</DropdownMenuItem>
-                        <DropdownMenuItem className="font-bold uppercase text-[10px] tracking-widest">Edit Lead</DropdownMenuItem>
-                        <DropdownMenuItem className="text-primary font-bold uppercase text-[10px] tracking-widest">Delete</DropdownMenuItem>
+                        <DropdownMenuItem className="font-bold uppercase text-[10px] tracking-widest">Tactical Review</DropdownMenuItem>
+                        <DropdownMenuItem className="font-bold uppercase text-[10px] tracking-widest">Edit Profile</DropdownMenuItem>
+                        <DropdownMenuItem className="text-primary font-bold uppercase text-[10px] tracking-widest">Archive Lead</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -125,11 +163,10 @@ export default function LeadManagement() {
 
 function getStatusColor(status: string) {
   switch (status) {
-    case 'New': return 'bg-blue-500 text-white';
+    case 'New': return 'bg-blue-600 text-white';
     case 'Qualified': return 'bg-green-600 text-white';
     case 'Contacted': return 'bg-yellow-500 text-black';
     case 'Converted': return 'bg-primary text-white';
-    case 'Lost': return 'bg-black text-white';
-    default: return 'bg-secondary text-foreground';
+    default: return 'bg-muted text-foreground';
   }
 }
