@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -21,10 +20,8 @@ import {
   CalendarDays, 
   Zap, 
   UserCircle, 
-  MapPin, 
   ClipboardCheck,
   MessageSquare,
-  History,
   ShieldAlert,
   CreditCard
 } from "lucide-react";
@@ -34,13 +31,14 @@ import { LeadBillingCalendar } from "./lead-billing-calendar";
 import { LeadPaymentMethods } from "./lead-payment-methods";
 
 interface Lead {
-  id: number;
-  name: string;
+  id: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phone: string;
-  status: string;
-  source: string;
-  date: string;
+  phoneNumber: string;
+  qualificationStatus: string;
+  sourceType: string;
+  capturedAt: string;
   billingDay?: number;
   paymentHistory?: any[];
   savedPaymentMethods?: any[];
@@ -55,6 +53,8 @@ interface LeadProfileDialogProps {
 export function LeadProfileDialog({ lead, isOpen, onClose }: LeadProfileDialogProps) {
   if (!lead) return null;
 
+  const fullName = `${lead.firstName} ${lead.lastName}`;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-5xl h-[90vh] rounded-none border-4 border-border shadow-2xl p-0 overflow-hidden bg-background">
@@ -66,21 +66,21 @@ export function LeadProfileDialog({ lead, isOpen, onClose }: LeadProfileDialogPr
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
             <Avatar className="h-24 w-24 rounded-none border-4 border-white shadow-lg">
               <AvatarFallback className="rounded-none bg-white text-primary font-black italic text-3xl">
-                {lead.name.split(" ").map(n => n[0]).join("")}
+                {lead.firstName?.[0]}{lead.lastName?.[0]}
               </AvatarFallback>
             </Avatar>
             
             <div className="text-center md:text-left space-y-2">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                 <DialogTitle className="font-headline text-4xl font-black uppercase italic tracking-tighter">
-                  {lead.name}
+                  {fullName}
                 </DialogTitle>
                 <Badge className="bg-white text-primary font-black uppercase text-[10px] tracking-widest rounded-none px-3 py-1">
-                  {lead.status}
+                  {lead.qualificationStatus}
                 </Badge>
               </div>
               <DialogDescription className="text-white/80 font-bold uppercase tracking-widest text-[10px] flex items-center justify-center md:justify-start gap-2">
-                <UserCircle className="h-3 w-3" /> Tactical Matrix: ACT-00{lead.id}
+                <UserCircle className="h-3 w-3" /> Tactical Matrix: {lead.id.slice(0, 8)}
               </DialogDescription>
             </div>
           </div>
@@ -97,7 +97,13 @@ export function LeadProfileDialog({ lead, isOpen, onClose }: LeadProfileDialogPr
                     <ShieldAlert className="h-4 w-4" /> Tactical Intelligence
                   </h4>
                   <div className="rounded-none border-2 border-primary/20 bg-primary/5">
-                    <LeadHoverSummary lead={lead} />
+                    <LeadHoverSummary lead={{
+                      name: fullName,
+                      email: lead.email,
+                      status: lead.qualificationStatus,
+                      source: lead.sourceType,
+                      date: lead.capturedAt
+                    }} />
                   </div>
                 </div>
 
@@ -105,7 +111,7 @@ export function LeadProfileDialog({ lead, isOpen, onClose }: LeadProfileDialogPr
                   <h4 className="font-headline text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" /> Communication Logs
                   </h4>
-                  <LeadChat leadId={lead.id} leadName={lead.name} />
+                  <LeadChat leadId={lead.id} leadName={fullName} />
                 </div>
               </div>
 
@@ -115,8 +121,16 @@ export function LeadProfileDialog({ lead, isOpen, onClose }: LeadProfileDialogPr
                   <h4 className="font-headline text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
                     <CreditCard className="h-4 w-4" /> Financial Matrix
                   </h4>
-                  <LeadBillingCalendar lead={lead} />
-                  <LeadPaymentMethods lead={lead} />
+                  <LeadBillingCalendar lead={{
+                    id: Number(lead.id), // Interface expected number, but Firestore IDs are strings
+                    billingDay: lead.billingDay,
+                    paymentHistory: lead.paymentHistory
+                  } as any} />
+                  <LeadPaymentMethods lead={{
+                    id: Number(lead.id),
+                    name: fullName,
+                    savedPaymentMethods: lead.savedPaymentMethods
+                  } as any} />
                 </div>
 
                 <div className="space-y-4">
@@ -130,21 +144,21 @@ export function LeadProfileDialog({ lead, isOpen, onClose }: LeadProfileDialogPr
                     </div>
                     <div className="flex items-center gap-3">
                       <Phone className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-bold uppercase">{lead.phone}</span>
+                      <span className="text-xs font-bold uppercase">{lead.phoneNumber}</span>
                     </div>
                     <Separator className="bg-border" />
                     <div className="flex items-center gap-3">
                       <CalendarDays className="h-4 w-4 text-primary" />
                       <div className="flex flex-col">
                         <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Captured</span>
-                        <span className="text-[10px] font-bold uppercase">{lead.date}</span>
+                        <span className="text-[10px] font-bold uppercase">{lead.capturedAt ? new Date(lead.capturedAt).toLocaleDateString() : 'N/A'}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <Zap className="h-4 w-4 text-primary" />
                       <div className="flex flex-col">
                         <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Source</span>
-                        <span className="text-[10px] font-bold uppercase">{lead.source}</span>
+                        <span className="text-[10px] font-bold uppercase">{lead.sourceType}</span>
                       </div>
                     </div>
                   </Card>

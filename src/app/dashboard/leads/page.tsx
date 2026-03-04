@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -13,79 +12,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Download, MessageSquare, Phone, MoreVertical, ArrowUpDown } from "lucide-react";
+import { Search, Filter, Download, MessageSquare, Phone, MoreVertical, ArrowUpDown, Loader2, UserPlus } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LeadProfileDialog } from "@/components/leads/lead-profile-dialog";
-
-const initialLeads = [
-  { 
-    id: 1, 
-    name: "Alice Johnson", 
-    email: "alice@example.com", 
-    phone: "+1 555-0101", 
-    status: "New", 
-    source: "Facebook Ad", 
-    date: "2024-05-20",
-    billingDay: 15,
-    paymentHistory: [
-      { id: 'p1', date: '2024-04-15', amount: 150, status: 'paid', method: 'Visa' },
-      { id: 'p2', date: '2024-03-15', amount: 150, status: 'paid', method: 'Visa' }
-    ],
-    savedPaymentMethods: [
-      { id: 'pm1', last4: '4242', type: 'VISA', exp: '12/26', name: 'ALICE JOHNSON' }
-    ]
-  },
-  { 
-    id: 2, 
-    name: "Bob Smith", 
-    email: "bob@example.com", 
-    phone: "+1 555-0102", 
-    status: "Qualified", 
-    source: "WhatsApp", 
-    date: "2024-05-19",
-    billingDay: 1,
-    paymentHistory: [],
-    savedPaymentMethods: []
-  },
-  { 
-    id: 4, 
-    name: "Diana Prince", 
-    email: "diana@example.com", 
-    phone: "+1 555-0104", 
-    status: "Converted", 
-    source: "Messenger", 
-    date: "2024-05-18",
-    billingDay: 5,
-    paymentHistory: [
-      { id: 'p3', date: '2024-05-05', amount: 200, status: 'paid', method: 'Amex' }
-    ],
-    savedPaymentMethods: [
-      { id: 'pm2', last4: '1001', type: 'AMEX', exp: '08/27', name: 'DIANA PRINCE' }
-    ]
-  },
-  { 
-    id: 5, 
-    name: "Ethan Hunt", 
-    email: "ethan@example.com", 
-    phone: "+1 555-0105", 
-    status: "New", 
-    source: "Instagram Ad", 
-    date: "2024-05-18",
-    billingDay: 20
-  },
-  { 
-    id: 6, 
-    name: "Fiona Apple", 
-    email: "fiona@example.com", 
-    phone: "+1 555-0106", 
-    status: "Qualified", 
-    source: "Website", 
-    date: "2024-05-17",
-    billingDay: 10
-  },
-];
+import { useCollection, useUser, useMemoFirebase, useFirestore, addDocumentNonBlocking } from "@/firebase";
+import { collection, serverTimestamp } from "firebase/firestore";
 
 export default function LeadManagement() {
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -93,10 +28,20 @@ export default function LeadManagement() {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  // Memoize the collection reference
+  const leadsRef = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'leads');
+  }, [firestore, user]);
+
+  const { data: leads, isLoading: isLeadsLoading } = useCollection(leadsRef);
+
   const filteredLeads = useMemo(() => {
-    let result = [...initialLeads].filter(lead => 
-      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchTerm.toLowerCase())
+    if (!leads) return [];
+    let result = [...leads].filter(lead => 
+      lead.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     if (sortKey) {
@@ -107,7 +52,7 @@ export default function LeadManagement() {
       });
     }
     return result;
-  }, [searchTerm, sortKey, sortOrder]);
+  }, [leads, searchTerm, sortKey, sortOrder]);
 
   const toggleSort = (key: string) => {
     if (sortKey === key) {
@@ -123,16 +68,46 @@ export default function LeadManagement() {
     setIsProfileOpen(true);
   };
 
+  const handleAddSampleLead = () => {
+    if (!leadsRef) return;
+    addDocumentNonBlocking(leadsRef, {
+      firstName: "New",
+      lastName: "Prospect",
+      email: `prospect-${Date.now()}@example.com`,
+      phoneNumber: "+1 555-9999",
+      qualificationStatus: "New",
+      sourceType: "Manual",
+      sourceId: "system",
+      capturedAt: new Date().toISOString(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      userId: user?.uid,
+    });
+  };
+
+  if (isUserLoading || isLeadsLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-primary pl-6">
         <div>
           <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter leading-none text-foreground">Lead Registry</h1>
-          <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-2">Database: Analysis of High-Potential Students</p>
+          <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-2">Database: Live Tactical Analysis</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 rounded-none font-black uppercase tracking-widest text-xs px-8">
-          <Download className="mr-2 h-4 w-4" /> Tactical Export
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleAddSampleLead} variant="outline" className="rounded-none font-black uppercase tracking-widest text-xs px-6 border-primary text-primary hover:bg-primary hover:text-white">
+            <UserPlus className="mr-2 h-4 w-4" /> Initialize Lead
+          </Button>
+          <Button className="bg-primary hover:bg-primary/90 rounded-none font-black uppercase tracking-widest text-xs px-8">
+            <Download className="mr-2 h-4 w-4" /> Tactical Export
+          </Button>
+        </div>
       </div>
 
       <div className="flex items-center gap-4 bg-card p-4 rounded-none border border-border shadow-sm">
@@ -154,13 +129,13 @@ export default function LeadManagement() {
         <Table>
           <TableHeader className="bg-secondary/5">
             <TableRow className="border-b-2 border-b-border">
-              <TableHead onClick={() => toggleSort('name')} className="cursor-pointer font-black uppercase tracking-widest text-[10px] h-14">
+              <TableHead onClick={() => toggleSort('firstName')} className="cursor-pointer font-black uppercase tracking-widest text-[10px] h-14">
                 Student <ArrowUpDown className="inline ml-1 h-3 w-3" />
               </TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px]">Contact Info</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px]">Source</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px]">Status</TableHead>
-              <TableHead onClick={() => toggleSort('date')} className="cursor-pointer font-black uppercase tracking-widest text-[10px]">
+              <TableHead onClick={() => toggleSort('capturedAt')} className="cursor-pointer font-black uppercase tracking-widest text-[10px]">
                 Captured <ArrowUpDown className="inline ml-1 h-3 w-3" />
               </TableHead>
               <TableHead className="text-right font-black uppercase tracking-widest text-[10px]">Actions</TableHead>
@@ -174,26 +149,28 @@ export default function LeadManagement() {
                     onClick={() => handleLeadClick(lead)}
                     className="font-black uppercase italic text-sm hover:text-primary transition-all text-left underline underline-offset-4 decoration-primary/30 decoration-dashed hover:decoration-primary"
                   >
-                    {lead.name}
+                    {lead.firstName} {lead.lastName}
                   </button>
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1 text-[11px] font-medium uppercase">
                     <span className="text-muted-foreground">{lead.email}</span>
-                    <span className="font-bold">{lead.phone}</span>
+                    <span className="font-bold">{lead.phoneNumber}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="font-black text-[9px] uppercase tracking-widest border-primary text-primary rounded-none">
-                    {lead.source}
+                    {lead.sourceType}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge className={`font-black uppercase tracking-widest text-[9px] rounded-none ${getStatusColor(lead.status)}`}>
-                    {lead.status}
+                  <Badge className={`font-black uppercase tracking-widest text-[9px] rounded-none ${getStatusColor(lead.qualificationStatus)}`}>
+                    {lead.qualificationStatus}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground text-[11px] font-bold uppercase tracking-tighter">{lead.date}</TableCell>
+                <TableCell className="text-muted-foreground text-[11px] font-bold uppercase tracking-tighter">
+                  {lead.capturedAt ? new Date(lead.capturedAt).toLocaleDateString() : 'N/A'}
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary rounded-none" onClick={() => handleLeadClick(lead)}>
@@ -220,6 +197,13 @@ export default function LeadManagement() {
             ))}
           </TableBody>
         </Table>
+        {filteredLeads.length === 0 && (
+          <div className="text-center py-20 opacity-40">
+            <Search className="h-12 w-12 mx-auto mb-4 text-primary" />
+            <p className="font-headline text-xl font-black uppercase italic">No Strategic Leads Found</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest mt-2">Initialize a lead or adjust your filters to view tactical data</p>
+          </div>
+        )}
       </div>
 
       <LeadProfileDialog 
