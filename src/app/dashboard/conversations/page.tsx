@@ -2,16 +2,10 @@
 
 import React, { useState, useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bot, User, MessageSquare, Zap } from 'lucide-react';
-import {
- Select,
- SelectContent,
- SelectItem,
- SelectTrigger,
- SelectValue,
-} from "@/components/ui/select";
+import { Bot, User, MessageSquare, Zap, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 // Expanded mock data with chat histories
 const LEADS_WITH_HISTORY = [
@@ -163,5 +157,3 @@ export default function ConversationsPage() {
     </div>
   );
 }
-
-import { Users } from 'lucide-react';
