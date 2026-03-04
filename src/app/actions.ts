@@ -1,4 +1,3 @@
-
 "use server";
 
 import { generateCampaignStructure } from "@/ai/flows/generate-campaign-structure";
@@ -8,6 +7,7 @@ import { testMetaConnection } from "@/ai/flows/test-meta-connection";
 import { getAdImages } from "@/ai/flows/get-ad-images";
 import { reasoningBasedAgentResponse as reasoningBasedAgentResponseFlow, type ReasoningBasedAgentResponseInput } from '@/ai/flows/reasoning-based-agent-response';
 import { generateSystemPrompt } from "@/ai/flows/generate-system-prompt";
+import { chatAssistant as chatAssistantFlow, type ChatAssistantInput } from "@/ai/flows/global-chat-ai-assistant";
 import type { CampaignStructure, Campaign, PublishResult, AdImage } from "@/lib/types";
 import type { AgentProfile } from "@/lib/synth-types";
 
@@ -96,6 +96,11 @@ export async function getAdImagesAction(data: { adAccountID: string, apiKey: str
 
 export async function reasoningBasedAgentResponse(input: ReasoningBasedAgentResponseInput) {
   return reasoningBasedAgentResponseFlow(input);
+}
+
+// --- Chat Assistant Action ---
+export async function chatAssistantAction(input: ChatAssistantInput) {
+  return chatAssistantFlow(input);
 }
 
 // --- AgentSynth Actions ---
