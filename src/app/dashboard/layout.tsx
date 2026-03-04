@@ -1,8 +1,7 @@
-
 "use client";
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Zap } from "lucide-react";
+import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Zap, Mic } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -12,7 +11,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = [
     { title: "Overview", icon: LayoutDashboard, href: "/dashboard" },
     { title: "Lead Management", icon: Users, href: "/dashboard/leads" },
-    { title: "Ad Campaign Tool", icon: Megaphone, href: "/dashboard/ads" },
+    { title: "Ad Deployment", icon: Megaphone, href: "/dashboard/ads" },
+    { title: "Voice Dispatch", icon: Mic, href: "/dashboard/voice" },
     { title: "Integrations", icon: Settings, href: "/dashboard/settings" },
   ];
 

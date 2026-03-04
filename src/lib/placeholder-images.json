@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-bjj",
+      "description": "High-intensity Brazilian Jiu-Jitsu training session",
+      "imageUrl": "https://picsum.photos/seed/gbhero/1200/800",
+      "imageHint": "jiu-jitsu training"
+    },
+    {
+      "id": "jiu-jitsu-class",
+      "description": "Clean martial arts academy mats with students in gis",
+      "imageUrl": "https://picsum.photos/seed/gbclass/800/600",
+      "imageHint": "martial arts class"
+    },
+    {
+      "id": "bjj-instructor",
+      "description": "Professional BJJ instructor teaching techniques",
+      "imageUrl": "https://picsum.photos/seed/gbteach/600/400",
+      "imageHint": "martial arts instructor"
+    },
+    {
+      "id": "agent1",
+      "description": "Tactical AI Agent Avatar 1",
+      "imageUrl": "https://images.unsplash.com/photo-1633957897986-70e83293f3ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+      "imageHint": "robot avatar"
+    },
+    {
+      "id": "agent2",
+      "description": "Tactical AI Agent Avatar 2",
+      "imageUrl": "https://images.unsplash.com/photo-1732020858816-93c130ab8f49?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+      "imageHint": "robot avatar"
+    },
+    {
+      "id": "agent3",
+      "description": "Tactical AI Agent Avatar 3",
+      "imageUrl": "https://images.unsplash.com/photo-1625314887424-9f190599bd56?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+      "imageHint": "robot avatar"
+    }
+  ]
 }

@@ -5,6 +5,7 @@ import { enhanceImage } from "@/ai/flows/enhance-image";
 import { publishCampaign } from "@/ai/flows/publish-campaign";
 import { testMetaConnection } from "@/ai/flows/test-meta-connection";
 import { getAdImages } from "@/ai/flows/get-ad-images";
+import { reasoningBasedAgentResponse as reasoningBasedAgentResponseFlow, type ReasoningBasedAgentResponseInput } from '@/ai/flows/reasoning-based-agent-response';
 import type { CampaignStructure, Campaign, PublishResult, AdImage } from "@/lib/types";
 
 type CampaignActionState = {
@@ -94,4 +95,8 @@ export async function getAdImagesAction(data: { adAccountID: string, apiKey: str
     } catch (error: any) {
         return { status: "error", message: error.message };
     }
+}
+
+export async function reasoningBasedAgentResponse(input: ReasoningBasedAgentResponseInput) {
+  return reasoningBasedAgentResponseFlow(input);
 }
