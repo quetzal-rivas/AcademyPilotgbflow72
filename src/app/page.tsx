@@ -1,165 +1,226 @@
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { 
-  Megaphone, 
-  MessageSquare, 
-  Mic, 
-  CheckCircle, 
+  Trophy, 
+  Users, 
+  Shield, 
   ArrowRight, 
-  TrendingUp, 
-  ShieldCheck, 
+  MapPin, 
+  History, 
   Zap 
 } from 'lucide-react';
 
 export default function LandingPage() {
-  const heroImg = PlaceHolderImages.find(img => img.id === 'hero-automation');
-  const dashboardImg = PlaceHolderImages.find(img => img.id === 'dashboard-preview');
+  const heroImg = PlaceHolderImages.find(img => img.id === 'hero-bjj');
+  const classImg = PlaceHolderImages.find(img => img.id === 'jiu-jitsu-class');
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="h-8 w-8 text-primary" />
-            <span className="font-headline text-2xl font-bold tracking-tight">Academia Pilot</span>
+      <header className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-sm">
+        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Zap className="h-10 w-10 text-primary" />
+            <div className="flex flex-col leading-none">
+              <span className="font-headline text-2xl font-black tracking-tighter uppercase italic text-primary">Academia</span>
+              <span className="font-headline text-sm font-bold tracking-widest uppercase text-foreground">Pilot System</span>
+            </div>
           </div>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="#features" className="hover:text-accent transition-colors">Features</Link>
-            <Link href="#how-it-works" className="hover:text-accent transition-colors">How it Works</Link>
-            <Link href="/login" className="hover:text-accent transition-colors">Login</Link>
+          <nav className="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-widest">
+            <Link href="#programs" className="hover:text-primary transition-colors">Programs</Link>
+            <Link href="#philosophy" className="hover:text-primary transition-colors">Philosophy</Link>
+            <Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
           </nav>
-          <Button asChild className="bg-primary hover:bg-primary/90 text-white font-medium">
-            <Link href="/register">Get Started</Link>
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button asChild variant="ghost" className="hidden sm:inline-flex font-bold uppercase tracking-widest text-xs">
+              <Link href="/login">Find a School</Link>
+            </Button>
+            <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest px-6 rounded-none">
+              <Link href="/register">Free Trial</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
-      <main className="flex-grow pt-16">
+      <main className="flex-grow pt-20">
         {/* Hero Section */}
-        <section className="py-24 md:py-32 relative overflow-hidden">
-          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full z-0" />
+        <section className="relative h-[85vh] flex items-center overflow-hidden bg-black">
+          <div className="absolute inset-0 z-0">
+            <Image 
+              src={heroImg?.imageUrl || 'https://picsum.photos/seed/gbhero/1200/800'} 
+              alt="Jiu-Jitsu Training" 
+              fill 
+              className="object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-1000"
+              priority
+              data-ai-hint="jiu-jitsu training"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
+          </div>
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto text-center space-y-8">
-              <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider animate-in fade-in slide-in-from-bottom-4 duration-700">
-                Revolutionizing Academy Sales
+            <div className="max-w-2xl space-y-6">
+              <div className="inline-block bg-primary px-4 py-1 text-white text-xs font-black uppercase tracking-[0.3em] italic">
+                Organizing the World of Jiu-Jitsu
               </div>
-              <h1 className="font-headline text-5xl md:text-7xl font-bold leading-tight animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-                Scale Your Academy with <span className="text-accent">AI Automation</span>
+              <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-white tracking-tighter">
+                Jiu-Jitsu <br /> For <span className="text-primary">Everyone</span>
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-                Automate your marketing, qualify leads instantly via voice and chat, and manage your entire commercial pipeline with a single AI-powered platform.
+              <p className="text-xl text-white/80 max-w-lg font-medium leading-relaxed">
+                Join the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art, improve your health, and join our brotherhood.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 px-8 py-6 text-lg h-auto w-full sm:w-auto rounded-xl">
-                  Start Your Pilot <ArrowRight className="ml-2 h-5 w-5" />
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 px-10 py-8 text-lg font-black uppercase tracking-widest rounded-none h-auto">
+                  Find Your School <ArrowRight className="ml-2 h-6 w-6" />
                 </Button>
-                <Button size="lg" variant="outline" className="px-8 py-6 text-lg h-auto w-full sm:w-auto rounded-xl">
-                  View Demo
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-black px-10 py-8 text-lg font-black uppercase tracking-widest rounded-none h-auto bg-transparent">
+                  Our Legacy
                 </Button>
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="mt-20 rounded-2xl border border-border bg-card p-4 shadow-2xl animate-in fade-in zoom-in duration-1000 delay-500">
-              <div className="aspect-video relative rounded-xl overflow-hidden bg-muted">
+        {/* Programs Section */}
+        <section id="programs" className="py-24 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+              <div className="space-y-4">
+                <h2 className="font-headline text-sm font-black uppercase tracking-[0.4em] text-primary">Master the Art</h2>
+                <h3 className="font-headline text-5xl font-black uppercase tracking-tighter italic">Our Programs</h3>
+              </div>
+              <p className="text-muted-foreground max-w-md font-medium">
+                We offer structured programs for all ages and skill levels, ensuring a safe and productive learning environment.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-0 border border-border">
+              <ProgramCard 
+                title="GB¹ Fundamentals"
+                level="Beginner"
+                description="Designed for people with no martial arts experience. Build a strong foundation of BJJ basics."
+              />
+              <ProgramCard 
+                title="GB² Advanced"
+                level="Intermediate"
+                description="Take your training to the next level with more complex techniques and live sparring."
+                featured
+              />
+              <ProgramCard 
+                title="GB³ Black Belt"
+                level="Elite"
+                description="The ultimate expression of our system. Deep dive into the philosophy and advanced techniques."
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Core Values */}
+        <section id="philosophy" className="py-24 bg-muted/30 border-y border-border">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="relative aspect-square">
+                <div className="absolute -top-4 -left-4 w-full h-full border-4 border-primary z-0" />
                 <Image 
-                  src={dashboardImg?.imageUrl || 'https://picsum.photos/seed/academia2/800/600'} 
-                  alt="Dashboard Preview" 
+                  src={classImg?.imageUrl || 'https://picsum.photos/seed/gbclass/800/600'} 
+                  alt="Training Philosophy" 
                   fill 
-                  className="object-cover"
-                  data-ai-hint="dashboard software"
+                  className="object-cover relative z-10 shadow-2xl"
+                  data-ai-hint="martial arts class"
                 />
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section id="features" className="py-24 bg-secondary/30">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16 space-y-4">
-              <h2 className="font-headline text-3xl md:text-5xl font-bold">Powerful AI Features</h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Everything you need to automate your commercial process from lead capture to enrollment.</p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <FeatureCard 
-                icon={<Megaphone className="h-8 w-8 text-accent" />}
-                title="AI Ad Campaigns"
-                description="Generate optimized Meta ad copy and images instantly. Launch campaigns that convert without the creative headache."
-              />
-              <FeatureCard 
-                icon={<MessageSquare className="h-8 w-8 text-accent" />}
-                title="Omnichannel Assistants"
-                description="AI-driven agents for WhatsApp, Messenger, and SMS that capture and qualify leads 24/7."
-              />
-              <FeatureCard 
-                icon={<Mic className="h-8 w-8 text-accent" />}
-                title="AI Voice Qualification"
-                description="Advanced voice agents that handle inbound calls, qualify students, and book appointments automatically."
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works */}
-        <section id="how-it-works" className="py-24">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center gap-16">
-              <div className="flex-1 space-y-8">
-                <h2 className="font-headline text-4xl font-bold leading-tight">From Integration to <span className="text-primary">Automation</span> in Minutes</h2>
-                <div className="space-y-6">
-                  <Step icon={<TrendingUp />} title="Connect Your APIs" description="Securely link your Meta, Twilio, and ElevenLabs accounts to our centralized hub." />
-                  <Step icon={<CheckCircle />} title="Configure Your Agents" description="Customize how your AI agents talk to your potential students using our simple tools." />
-                  <Step icon={<ShieldCheck />} title="Monitor Performance" description="Track every lead and conversion through a unified dashboard with real-time metrics." />
+              <div className="space-y-10">
+                <div className="space-y-4">
+                  <h2 className="font-headline text-sm font-black uppercase tracking-[0.4em] text-primary">The GB Way</h2>
+                  <h3 className="font-headline text-5xl font-black uppercase tracking-tighter italic leading-none">Philosophy & Heritage</h3>
                 </div>
-                <Button className="mt-4 rounded-xl px-8 py-6 h-auto text-lg">Launch Your First Campaign</Button>
-              </div>
-              <div className="flex-1 relative">
-                <div className="aspect-square relative rounded-3xl overflow-hidden border border-border shadow-2xl">
-                   <Image 
-                    src={heroImg?.imageUrl || 'https://picsum.photos/seed/academia1/1200/800'} 
-                    alt="Automation Concept" 
-                    fill 
-                    className="object-cover"
-                    data-ai-hint="technology automation"
-                  />
+                
+                <div className="grid gap-8">
+                  <ValueItem icon={<Shield />} title="Safety First" description="We prioritize the physical and mental well-being of every student." />
+                  <ValueItem icon={<Users />} title="Brotherhood" description="Build lifelong friendships on and off the mats with our global community." />
+                  <ValueItem icon={<Trophy />} title="Excellence" description="Pursue the highest standards of technique and character development." />
                 </div>
+
+                <Button variant="link" className="p-0 h-auto text-primary font-black uppercase tracking-widest text-sm flex items-center gap-2">
+                  Read Our Full Philosophy <ArrowRight className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-24 bg-primary">
-          <div className="container mx-auto px-4 text-center text-white space-y-8">
-            <h2 className="font-headline text-4xl md:text-5xl font-bold">Ready to take off?</h2>
-            <p className="text-primary-foreground/80 text-xl max-w-2xl mx-auto">Join dozens of academies that have scaled their enrollment by 40% using Academia Pilot automation.</p>
-            <Button size="lg" variant="secondary" className="px-10 py-7 text-lg h-auto rounded-xl font-bold">
-              Get Started for Free
-            </Button>
+        {/* Global Reach */}
+        <section className="py-24 bg-black text-white text-center">
+          <div className="container mx-auto px-4 space-y-12">
+            <div className="max-w-3xl mx-auto space-y-4">
+              <History className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h2 className="font-headline text-5xl font-black uppercase tracking-tighter italic">One Team. One Shield.</h2>
+              <p className="text-xl text-white/60">With over 1,000 schools across 6 continents, Academia Pilot brings the Gracie Barra legacy to your neighborhood.</p>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-12 max-w-5xl mx-auto pt-8">
+              <div>
+                <div className="text-6xl font-black text-primary italic mb-2">1,000+</div>
+                <div className="uppercase tracking-[0.3em] text-xs font-bold text-white/40">Global Schools</div>
+              </div>
+              <div>
+                <div className="text-6xl font-black text-primary italic mb-2">35+</div>
+                <div className="uppercase tracking-[0.3em] text-xs font-bold text-white/40">Years of History</div>
+              </div>
+              <div>
+                <div className="text-6xl font-black text-primary italic mb-2">100k+</div>
+                <div className="uppercase tracking-[0.3em] text-xs font-bold text-white/40">Active Students</div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-background border-t border-border py-12">
+      <footer className="bg-black text-white border-t border-white/10 py-20">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="flex items-center gap-2">
-              <Zap className="h-6 w-6 text-primary" />
-              <span className="font-headline text-xl font-bold">Academia Pilot</span>
+          <div className="grid md:grid-cols-4 gap-12 mb-16">
+            <div className="space-y-6">
+              <div className="flex items-center gap-2">
+                <Zap className="h-8 w-8 text-primary" />
+                <span className="font-headline text-2xl font-black tracking-tighter uppercase italic">Academia</span>
+              </div>
+              <p className="text-white/40 text-sm leading-relaxed">
+                Dedicated to the development of Jiu-Jitsu for everyone. Carrying on the legacy through structured teaching and strong community values.
+              </p>
             </div>
-            <div className="flex gap-8 text-sm text-muted-foreground">
-              <Link href="#" className="hover:text-foreground">Privacy Policy</Link>
-              <Link href="#" className="hover:text-foreground">Terms of Service</Link>
-              <Link href="#" className="hover:text-foreground">Contact Us</Link>
+            <div className="space-y-6">
+              <h4 className="font-headline text-sm font-black uppercase tracking-widest">Explore</h4>
+              <ul className="space-y-3 text-sm text-white/60">
+                <li><Link href="#" className="hover:text-primary">Programs</Link></li>
+                <li><Link href="#" className="hover:text-primary">Instructors</Link></li>
+                <li><Link href="#" className="hover:text-primary">History</Link></li>
+                <li><Link href="#" className="hover:text-primary">Uniforms</Link></li>
+              </ul>
             </div>
-            <div className="text-sm text-muted-foreground">
-              © 2024 Academia Pilot. All rights reserved.
+            <div className="space-y-6">
+              <h4 className="font-headline text-sm font-black uppercase tracking-widest">Connect</h4>
+              <ul className="space-y-3 text-sm text-white/60">
+                <li><Link href="#" className="hover:text-primary">Find a School</Link></li>
+                <li><Link href="#" className="hover:text-primary">Franchising</Link></li>
+                <li><Link href="#" className="hover:text-primary">Support</Link></li>
+                <li><Link href="#" className="hover:text-primary">Contact</Link></li>
+              </ul>
+            </div>
+            <div className="space-y-6">
+              <h4 className="font-headline text-sm font-black uppercase tracking-widest">Newsletter</h4>
+              <p className="text-white/40 text-sm">Stay updated with the latest news and techniques.</p>
+              <div className="flex">
+                <input type="email" placeholder="Email Address" className="bg-white/5 border border-white/10 px-4 py-2 flex-grow text-sm focus:outline-none focus:border-primary" />
+                <Button className="bg-primary hover:bg-primary/90 rounded-none px-4">Join</Button>
+              </div>
+            </div>
+          </div>
+          <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-white/30 font-bold uppercase tracking-widest">
+            <p>© 2024 Academia Pilot System. All Rights Reserved.</p>
+            <div className="flex gap-8">
+              <Link href="#" className="hover:text-white">Privacy</Link>
+              <Link href="#" className="hover:text-white">Terms</Link>
+              <Link href="#" className="hover:text-white">Cookies</Link>
             </div>
           </div>
         </div>
@@ -168,27 +229,32 @@ export default function LandingPage() {
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+function ProgramCard({ title, level, description, featured = false }: { title: string, level: string, description: string, featured?: boolean }) {
   return (
-    <div className="bg-card p-8 rounded-2xl border border-border hover:border-primary/50 transition-all group">
-      <div className="mb-6 p-3 bg-secondary rounded-xl inline-block group-hover:scale-110 transition-transform">
-        {icon}
+    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 ${featured ? 'bg-primary text-white scale-105 z-10 shadow-2xl' : 'bg-white text-black hover:bg-muted'}`}>
+      <div className={`text-xs font-black uppercase tracking-[0.3em] ${featured ? 'text-white/70' : 'text-primary'}`}>
+        {level}
       </div>
-      <h3 className="font-headline text-xl font-bold mb-4">{title}</h3>
-      <p className="text-muted-foreground leading-relaxed">{description}</p>
+      <h4 className="font-headline text-3xl font-black uppercase italic tracking-tighter leading-none">{title}</h4>
+      <p className={`font-medium ${featured ? 'text-white/80' : 'text-muted-foreground'}`}>{description}</p>
+      <div className="mt-auto pt-6">
+        <Button variant={featured ? 'secondary' : 'outline'} className={`w-full font-black uppercase tracking-widest rounded-none h-12 ${!featured && 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
+          Details
+        </Button>
+      </div>
     </div>
   );
 }
 
-function Step({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+function ValueItem({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <div className="flex gap-4">
-      <div className="mt-1 h-10 w-10 flex-shrink-0 bg-primary/10 text-primary flex items-center justify-center rounded-lg">
+    <div className="flex gap-6 group">
+      <div className="mt-1 h-14 w-14 flex-shrink-0 bg-primary/10 text-primary flex items-center justify-center rounded-none group-hover:bg-primary group-hover:text-white transition-all duration-300">
         {icon}
       </div>
-      <div>
-        <h4 className="font-headline text-lg font-bold">{title}</h4>
-        <p className="text-muted-foreground">{description}</p>
+      <div className="space-y-1">
+        <h4 className="font-headline text-xl font-black uppercase italic tracking-tight">{title}</h4>
+        <p className="text-muted-foreground font-medium leading-tight">{description}</p>
       </div>
     </div>
   );
