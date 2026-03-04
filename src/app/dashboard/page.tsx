@@ -2,27 +2,25 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, Megaphone, MessageSquare, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Users, Megaphone, TrendingUp, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
 import { 
-  BarChart, 
-  Bar, 
+  AreaChart,
+  Area,
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area
+  ResponsiveContainer
 } from "recharts";
 
 const data = [
-  { name: 'Mon', leads: 12, campaigns: 4 },
-  { name: 'Tue', leads: 19, campaigns: 3 },
-  { name: 'Wed', leads: 15, campaigns: 5 },
-  { name: 'Thu', leads: 22, campaigns: 6 },
-  { name: 'Fri', leads: 30, campaigns: 8 },
-  { name: 'Sat', leads: 10, campaigns: 2 },
-  { name: 'Sun', leads: 8, campaigns: 2 },
+  { name: 'Mon', leads: 12 },
+  { name: 'Tue', leads: 19 },
+  { name: 'Wed', leads: 15 },
+  { name: 'Thu', leads: 22 },
+  { name: 'Fri', leads: 30 },
+  { name: 'Sat', leads: 10 },
+  { name: 'Sun', leads: 8 },
 ];
 
 export default function DashboardOverview() {
@@ -33,7 +31,7 @@ export default function DashboardOverview() {
         <p className="text-muted-foreground font-medium uppercase tracking-widest text-[10px] mt-2">Mission Control: Monitoring Performance</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard 
           title="Total Leads" 
           value="1,284" 
@@ -49,13 +47,6 @@ export default function DashboardOverview() {
           icon={<Megaphone className="h-5 w-5 text-primary" />} 
         />
         <StatsCard 
-          title="AI Conversations" 
-          value="3,412" 
-          change="-2.4%" 
-          positive={false} 
-          icon={<MessageSquare className="h-5 w-5 text-primary" />} 
-        />
-        <StatsCard 
           title="Conversion Rate" 
           value="8.4%" 
           change="+1.2%" 
@@ -68,7 +59,7 @@ export default function DashboardOverview() {
         <Card className="lg:col-span-2 bg-card border-border shadow-md rounded-none">
           <CardHeader>
             <CardTitle className="font-headline text-xl font-black uppercase italic">Lead Generation Performance</CardTitle>
-            <CardDescription className="text-[10px] uppercase font-bold tracking-widest">Captured leads across all automation channels</CardDescription>
+            <CardDescription className="text-[10px] uppercase font-bold tracking-widest">Captured leads via AI-optimized campaigns</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -100,13 +91,13 @@ export default function DashboardOverview() {
           <CardContent>
             <div className="space-y-6">
               {[
-                { user: "Sarah Miller", action: "Qualified via WhatsApp", time: "2m ago", type: "chat" },
                 { user: "Ad Campaign Alpha", action: "12 new leads generated", time: "15m ago", type: "ad" },
-                { user: "Messenger Bot", action: "Replied to 4 inquiries", time: "1h ago", type: "chat" },
-                { user: "Michael Chen", action: "Appointment booked via WhatsApp", time: "3h ago", type: "chat" },
+                { user: "Facebook Lead Gen", action: "Campaign 'Elite' launched", time: "2h ago", type: "ad" },
+                { user: "Lead Export", action: "Data synced to CRM", time: "4h ago", type: "system" },
+                { user: "System", action: "API Security check complete", time: "6h ago", type: "system" },
               ].map((activity, i) => (
                 <div key={i} className="flex items-start gap-4">
-                  <div className={`mt-1 h-2 w-2 rounded-none rotate-45 ${activity.type === 'chat' ? 'bg-primary' : 'bg-foreground'}`} />
+                  <div className={`mt-1 h-2 w-2 rounded-none rotate-45 ${activity.type === 'ad' ? 'bg-primary' : 'bg-foreground'}`} />
                   <div className="space-y-1">
                     <p className="text-sm font-black uppercase italic">{activity.user}</p>
                     <p className="text-xs text-muted-foreground font-medium">{activity.action}</p>

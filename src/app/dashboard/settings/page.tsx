@@ -49,14 +49,8 @@ export default function SettingsIntegrations() {
               />
               <Separator />
               <IntegrationField 
-                label="Twilio Messaging" 
-                description="Enables WhatsApp and SMS omnichannel capabilities." 
-                placeholder="SK... (Auth Token)"
-              />
-              <Separator />
-              <IntegrationField 
                 label="OpenAI / Gemini" 
-                description="The brain behind your conversational agents." 
+                description="The brain behind your generative marketing assets." 
                 placeholder="sk-..."
               />
               
@@ -76,7 +70,7 @@ export default function SettingsIntegrations() {
             </CardHeader>
             <CardContent className="space-y-4">
               <StatusItem label="Meta API" connected={true} />
-              <StatusItem label="Twilio Webhooks" connected={true} />
+              <StatusItem label="Gemini AI" connected={true} />
               <StatusItem label="Firebase Database" connected={true} />
             </CardContent>
           </Card>
@@ -86,11 +80,15 @@ export default function SettingsIntegrations() {
               <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-primary italic">Quick Links</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button variant="link" className="p-0 h-auto text-[10px] justify-start font-black uppercase tracking-widest text-muted-foreground hover:text-primary">
-                <ExternalLink className="mr-2 h-3 w-3" /> Meta Developers Console
+              <Button variant="link" className="p-0 h-auto text-[10px] justify-start font-black uppercase tracking-widest text-muted-foreground hover:text-primary" asChild>
+                <a href="https://developers.facebook.com/" target="_blank" rel="noopener noreferrer">
+                   <ExternalLink className="mr-2 h-3 w-3" /> Meta Developers Console
+                </a>
               </Button>
-              <Button variant="link" className="p-0 h-auto text-[10px] justify-start font-black uppercase tracking-widest text-muted-foreground hover:text-primary">
-                <ExternalLink className="mr-2 h-3 w-3" /> Twilio Dashboard
+              <Button variant="link" className="p-0 h-auto text-[10px] justify-start font-black uppercase tracking-widest text-muted-foreground hover:text-primary" asChild>
+                <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 h-3 w-3" /> AI Studio Dashboard
+                </a>
               </Button>
             </CardContent>
           </Card>
