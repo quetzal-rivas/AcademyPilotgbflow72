@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -32,7 +31,7 @@ const formSchema = z.object({
   lastName: z.string().min(2, "Required"),
   email: z.string().email("Invalid email"),
   phoneNumber: z.string().min(10, "Required"),
-  trialTime: z.string().min(1, "Required"),
+  trialTime: z.string().optional(),
 });
 
 export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: (open: boolean) => void }) {
@@ -68,7 +67,7 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       userId: user?.uid,
-      notes: `Scheduled trial session for: ${values.trialTime}`,
+      notes: values.trialTime ? `Scheduled trial session for: ${values.trialTime}` : "No initial trial session scheduled.",
     });
 
     toast({
@@ -159,11 +158,11 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
               name="trialTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Trial Session Time</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Trial Session Time (Optional)</FormLabel>
                   <FormControl>
                     <Input type="datetime-local" {...field} className="rounded-none border-2 border-primary/50 font-bold" />
                   </FormControl>
-                  <FormDescription className="text-[9px] uppercase font-bold">Designate the hour for the introductory engagement</FormDescription>
+                  <FormDescription className="text-[9px] uppercase font-bold">Designate the hour for the introductory engagement if known</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
