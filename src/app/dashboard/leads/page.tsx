@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -123,7 +124,7 @@ export default function LeadManagement() {
               </TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px]">Contact Info</TableHead>
               <TableHead className="font-black uppercase tracking-widest text-[10px]">Source</TableHead>
-              <TableHead className="font-black uppercase tracking-widest text-[10px]">Status</TableHead>
+              <TableHead className="font-black uppercase tracking-widest text-[10px]">Status & Tags</TableHead>
               <TableHead onClick={() => toggleSort('capturedAt')} className="cursor-pointer font-black uppercase tracking-widest text-[10px]">
                 Captured <ArrowUpDown className="inline ml-1 h-3 w-3" />
               </TableHead>
@@ -153,9 +154,16 @@ export default function LeadManagement() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge className={`font-black uppercase tracking-widest text-[9px] rounded-none ${getStatusColor(lead.qualificationStatus)}`}>
-                    {lead.qualificationStatus}
-                  </Badge>
+                  <div className="flex flex-col gap-1">
+                    <Badge className={`font-black uppercase tracking-widest text-[9px] rounded-none ${getStatusColor(lead.qualificationStatus)}`}>
+                      {lead.qualificationStatus}
+                    </Badge>
+                    {lead.tags?.map((tag: string) => (
+                      <Badge key={tag} variant="outline" className="font-black text-[8px] uppercase tracking-widest border-foreground/30 text-muted-foreground rounded-none w-fit">
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground text-[11px] font-bold uppercase tracking-tighter">
                   {lead.capturedAt ? new Date(lead.capturedAt).toLocaleDateString() : 'N/A'}

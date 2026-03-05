@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -68,6 +69,7 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       userId: user?.uid,
+      tags: ["trial"], // Operational Tag: Identifying as Trial Unit per Command
       // Initialize with empty structures to prevent profile crashes
       billingDay: Math.floor(Math.random() * 28) + 1, // Random default billing day
       paymentHistory: [],
@@ -79,7 +81,7 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
 
     toast({
       title: "UNIT INITIALIZED",
-      description: `${values.firstName} ${values.lastName} has been added to the tactical matrix.`,
+      description: `${values.firstName} ${values.lastName} has been added to the tactical matrix with TRIAL status.`,
     });
     
     form.reset();
@@ -97,7 +99,7 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
             </DialogTitle>
           </div>
           <DialogDescription className="text-white/80 font-bold uppercase tracking-widest text-[10px] mt-2">
-            Protocol: Manual Enrollment Matrix
+            Protocol: Manual Enrollment Matrix (TAG: TRIAL)
           </DialogDescription>
         </DialogHeader>
         
