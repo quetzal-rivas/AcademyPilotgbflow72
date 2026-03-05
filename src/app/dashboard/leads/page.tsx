@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -31,10 +30,10 @@ export default function LeadManagement() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isInitDialogOpen, setIsInitDialogOpen] = useState(false);
 
-  // Memoize the collection reference
+  // Aligning path with security rules: /user_profiles/{userId}/leads
   const leadsRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'leads');
+    return collection(firestore, 'user_profiles', user.uid, 'leads');
   }, [firestore, user]);
 
   const { data: leads, isLoading: isLeadsLoading } = useCollection(leadsRef);

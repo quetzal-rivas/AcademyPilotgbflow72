@@ -39,9 +39,10 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
   const firestore = useFirestore();
   const { toast } = useToast();
   
+  // Aligning path with security rules: /user_profiles/{userId}/leads
   const leadsRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return collection(firestore, 'users', user.uid, 'leads');
+    return collection(firestore, 'user_profiles', user.uid, 'leads');
   }, [firestore, user]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -58,21 +59,27 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!leadsRef) return;
 
-    addDocumentNonBlocking(leadsRef, {
+    const leadData = {
       ...values,
       qualificationStatus: "New",
       sourceType: "Manual",
-      sourceId: "system",
+      sourceEntityId: "manual_entry",
       capturedAt: new Date().toISOString(),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       userId: user?.uid,
-      notes: values.trialTime ? `Scheduled trial session for: ${values.trialTime}` : "No initial trial session scheduled.",
-    });
+      // Initialize with empty structures to prevent profile crashes
+      billingDay: Math.floor(Math.random() * 28) + 1, // Random default billing day
+      paymentHistory: [],
+      savedPaymentMethods: [],
+      notes: values.trialTime ? `Scheduled trial session for: ${values.trialTime}` : "Initial enrollment complete. Tactical briefing pending.",
+    };
+
+    addDocumentNonBlocking(leadsRef, leadData);
 
     toast({
       title: "UNIT INITIALIZED",
-      description: `${values.firstName} ${values.lastName} has been added to the matrix.`,
+      description: `${values.firstName} ${values.lastName} has been added to the tactical matrix.`,
     });
     
     form.reset();
@@ -162,7 +169,7 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
                   <FormControl>
                     <Input type="datetime-local" {...field} className="rounded-none border-2 border-primary/50 font-bold" />
                   </FormControl>
-                  <FormDescription className="text-[9px] uppercase font-bold">Designate the hour for the introductory engagement if known</FormDescription>
+                  <FormDescription className="text-[9px] uppercase font-bold">Designate the hour for the introductory engagement if confirmed</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
