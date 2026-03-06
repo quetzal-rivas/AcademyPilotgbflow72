@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { FreeTrialDialog } from '@/components/landing/free-trial-dialog';
 import Marquee from '@/components/landing/Marquee';
@@ -131,16 +132,30 @@ export default function LandingPage() {
         <Marquee />
 
         {/* Call to Action Reveal Section */}
-        <section className="py-24 bg-secondary/10 relative overflow-hidden">
-          <div className="container mx-auto px-4 text-center space-y-12">
-            <div className="space-y-4 relative z-10">
-              <h2 className="font-headline text-5xl font-black uppercase italic tracking-tighter">Join the Legacy</h2>
-              <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
-                Step onto the mats and start your journey with the world&apos;s most successful team.
-              </p>
+        <section className="py-32 bg-secondary/5 relative overflow-hidden min-h-[600px] flex items-center">
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-xl space-y-8 text-left">
+              <div className="space-y-4">
+                <Badge className="bg-primary text-white font-black uppercase italic tracking-widest rounded-none px-4">Mission: Join the Legacy</Badge>
+                <h2 className="font-headline text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
+                  Establish Your <br />
+                  <span className="text-primary">Presence</span>
+                </h2>
+                <p className="text-xl text-muted-foreground font-bold uppercase italic tracking-tight">
+                  Step onto the mats and start your journey with the world&apos;s most successful team.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <FreeTrialDialog>
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 rounded-none font-black uppercase italic tracking-widest h-16 px-10">
+                    Request Trial Link
+                  </Button>
+                </FreeTrialDialog>
+              </div>
             </div>
-            <ScrollRevealImage />
           </div>
+          {/* Silhouette pinned to bottom right */}
+          <ScrollRevealImage />
         </section>
 
         <Marquee />
