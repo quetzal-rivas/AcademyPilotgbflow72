@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -29,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 const formSchema = z.object({
   firstName: z.string().min(2, "Required"),
   lastName: z.string().min(2, "Required"),
-  email: z.string().email("Invalid email"),
+  email: z.string().email("Invalid email").optional().or(z.literal("")),
   phoneNumber: z.string().min(10, "Required"),
 });
 
@@ -136,7 +135,7 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">Email Address</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">Email Address (Optional)</FormLabel>
                   <FormControl>
                     <Input placeholder="UNIT@EXAMPLE.COM" {...field} className="rounded-none border-2 font-bold uppercase" />
                   </FormControl>
