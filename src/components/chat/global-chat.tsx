@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { chatAssistantAction } from '@/app/actions';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
 interface ChatMessage {
@@ -83,16 +83,17 @@ export function GlobalChat() {
         <Button
           variant="outline"
           size="icon"
-          className="fixed bottom-6 right-6 rounded-none h-14 w-14 shadow-2xl border-2 border-primary bg-background hover:bg-primary transition-all z-50 p-0"
+          className="fixed bottom-6 right-6 rounded-none h-14 w-14 shadow-2xl border-2 border-primary bg-background hover:bg-primary transition-all z-50 p-0 overflow-hidden"
           aria-label="Open Global Chat"
         >
-          <Image 
-            src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-            alt="AI Assistant" 
-            width={24} 
-            height={24} 
-            className="h-6 w-6"
-          />
+          <div className="relative w-full h-full p-2 flex items-center justify-center">
+            <Image 
+              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+              alt="AI Assistant" 
+              fill
+              className="object-contain p-2"
+            />
+          </div>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px] h-[70vh] flex flex-col p-0 rounded-none border-2 border-border shadow-2xl overflow-hidden">
@@ -125,16 +126,13 @@ export function GlobalChat() {
                   }`}
                 >
                   {msg.role === 'ai' && (
-                    <Avatar className="h-8 w-8 rounded-none border border-primary">
-                      <AvatarFallback className="rounded-none bg-primary/10">
-                        <Image 
-                          src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-                          alt="AI" 
-                          width={16} 
-                          height={16} 
-                          className="h-4 w-4"
-                        />
-                      </AvatarFallback>
+                    <Avatar className="h-8 w-8 rounded-none border border-primary overflow-hidden">
+                      <AvatarImage 
+                        src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                        alt="AI"
+                        className="p-1"
+                      />
+                      <AvatarFallback className="rounded-none bg-primary/10 text-[8px]">GB</AvatarFallback>
                     </Avatar>
                   )}
                   <div
@@ -155,16 +153,13 @@ export function GlobalChat() {
               ))}
               {isPending && (
                 <div className="flex items-center space-x-2">
-                   <Avatar className="h-8 w-8 rounded-none border border-primary">
-                      <AvatarFallback className="rounded-none">
-                        <Image 
-                          src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-                          alt="AI" 
-                          width={16} 
-                          height={16} 
-                          className="h-4 w-4"
-                        />
-                      </AvatarFallback>
+                   <Avatar className="h-8 w-8 rounded-none border border-primary overflow-hidden">
+                      <AvatarImage 
+                        src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                        alt="AI"
+                        className="p-1"
+                      />
+                      <AvatarFallback className="rounded-none bg-primary/10 text-[8px]">GB</AvatarFallback>
                     </Avatar>
                   <div className="rounded-none border border-border bg-secondary/5 px-4 py-2">
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />

@@ -24,34 +24,36 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-sm">
+      <header className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur-md border-b-2 border-border shadow-sm">
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Image 
-              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-              alt="Gracie Barra Logo" 
-              width={40} 
-              height={40} 
-              className="h-10 w-10"
-            />
+          <div className="flex items-center gap-4">
+            <div className="relative w-10 h-10">
+              <Image 
+                src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                alt="Gracie Barra Logo" 
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
             <div className="flex flex-col leading-none">
               <span className="font-headline text-2xl font-black uppercase italic text-primary">GRACIE BARRA AI</span>
-              <span className="font-headline text-sm font-bold tracking-widest uppercase text-foreground">Pilot System</span>
+              <span className="font-headline text-[10px] font-bold tracking-[0.2em] uppercase text-foreground">Pilot System</span>
             </div>
           </div>
-          <nav className="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-widest">
+          <nav className="hidden lg:flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em]">
             <Link href="#programs" className="hover:text-primary transition-colors">Programs</Link>
             <Link href="/locator" className="hover:text-primary transition-colors">Find a School</Link>
-            <Link href="/dashboard" className="hover:text-primary transition-colors">Admin Hub</Link>
+            <Link href="/dashboard" className="hover:text-primary transition-colors text-primary">Admin Hub</Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Button asChild variant="outline" className="hidden sm:inline-flex font-black uppercase tracking-widest text-[10px] border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-none">
+            <Button asChild variant="outline" className="hidden sm:inline-flex font-black uppercase tracking-widest text-[10px] border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-none h-10 px-6">
               <Link href="/student/dashboard">
                 <UserCircle className="mr-2 h-4 w-4" /> Student Portal
               </Link>
             </Button>
             <FreeTrialDialog>
-              <Button className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest px-6 rounded-none">
+              <Button className="bg-primary hover:bg-primary/90 text-white font-black uppercase italic tracking-widest px-8 rounded-none h-10">
                 Free Trial
               </Button>
             </FreeTrialDialog>
@@ -75,17 +77,17 @@ export default function LandingPage() {
           </div>
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-2xl space-y-6">
-              <div className="inline-block bg-primary px-4 py-1 text-white text-xs font-black uppercase tracking-[0.3em] italic">
+              <div className="inline-block bg-primary px-4 py-1 text-white text-[10px] font-black uppercase tracking-[0.3em] italic">
                 Organizing the World of Jiu-Jitsu
               </div>
               <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-white tracking-tighter">
                 Jiu-Jitsu <br /> For <span className="text-primary">Everyone</span>
               </h1>
-              <p className="text-xl text-white/80 max-w-lg font-medium leading-relaxed">
+              <p className="text-xl text-white/80 max-w-lg font-bold uppercase italic tracking-tight leading-relaxed">
                 Join the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art, improve your health, and join our brotherhood.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 px-10 py-8 text-lg font-black uppercase tracking-widest rounded-none h-auto">
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 px-10 py-8 text-lg font-black uppercase italic tracking-widest rounded-none h-auto shadow-2xl">
                   <Link href="/locator">
                     Find Your School <ArrowRight className="ml-2 h-6 w-6" />
                   </Link>
@@ -101,31 +103,31 @@ export default function LandingPage() {
         <section id="programs" className="py-24 bg-white">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-              <div className="space-y-4">
-                <h2 className="font-headline text-sm font-black uppercase tracking-[0.4em] text-primary">Master the Art</h2>
-                <h3 className="font-headline text-5xl font-black uppercase tracking-tighter italic">Our Programs</h3>
+              <div className="space-y-4 border-l-8 border-primary pl-8">
+                <h2 className="font-headline text-xs font-black uppercase tracking-[0.4em] text-primary">Mission Directives</h2>
+                <h3 className="font-headline text-6xl font-black uppercase tracking-tighter italic text-black leading-none">Tactical Programs</h3>
               </div>
-              <p className="text-muted-foreground max-w-md font-medium">
-                We offer structured programs for all ages and skill levels, ensuring a safe and productive learning environment.
+              <p className="text-muted-foreground max-w-sm font-bold uppercase text-[10px] tracking-widest leading-loose">
+                Structured learning systems for all operational units. Certified instruction, safe environment, global community.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-0 border border-border">
+            <div className="grid md:grid-cols-3 gap-0 border-4 border-black">
               <ProgramCard 
                 title="GB¹ Fundamentals"
-                level="Beginner"
-                description="Designed for people with no martial arts experience. Build a strong foundation of BJJ basics."
+                level="Unit: Beginner"
+                description="Designed for civilians with no prior combat experience. Build a strong tactical foundation."
               />
               <ProgramCard 
                 title="GB² Advanced"
-                level="Intermediate"
-                description="Take your training to the next level with more complex techniques and live sparring."
+                level="Unit: Intermediate"
+                description="Elevate your operational capacity with complex techniques and live pressure testing."
                 featured
               />
               <ProgramCard 
                 title="GB³ Black Belt"
-                level="Elite"
-                description="The ultimate expression of our system. Deep dive into the philosophy and advanced techniques."
+                level="Unit: Elite"
+                description="The ultimate expression of the system. Master-level philosophy and advanced execution."
               />
             </div>
           </div>
@@ -156,7 +158,6 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          {/* Team silhouette revealed from bottom-right */}
           <ScrollRevealImage 
             src="https://graciebarra.com/wp-content/uploads/2025/03/call_to_action-IMG.png"
             alt="Gracie Barra Team Silhouette"
@@ -168,7 +169,6 @@ export default function LandingPage() {
 
         {/* Global Reach Section */}
         <section className="py-24 bg-white text-black text-center relative overflow-hidden">
-          {/* Master silhouette revealed from bottom-left */}
           <ScrollRevealImage 
             src="https://graciebarra.com/wp-content/uploads/2025/04/DSC06242bbb_1.png"
             alt="Gracie Barra Master Silhouette"
@@ -180,20 +180,20 @@ export default function LandingPage() {
             <div className="max-w-3xl mx-auto space-y-4">
               <History className="h-12 w-12 text-primary mx-auto mb-4" />
               <h2 className="font-headline text-5xl font-black uppercase tracking-tighter italic">One Team. One Shield.</h2>
-              <p className="text-xl text-muted-foreground">With over 1,000 schools across 6 continents, Academia Pilot brings the Gracie Barra legacy to your neighborhood.</p>
+              <p className="text-xl text-muted-foreground font-bold uppercase italic tracking-tight">With over 1,000 schools across 6 continents, Academia Pilot brings the Gracie Barra legacy to your neighborhood.</p>
             </div>
             <div className="grid sm:grid-cols-3 gap-12 max-w-5xl mx-auto pt-8">
               <div>
                 <div className="text-6xl font-black text-primary italic mb-2">1,000+</div>
-                <div className="uppercase tracking-[0.3em] text-xs font-bold text-muted-foreground/60">Global Schools</div>
+                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-muted-foreground">Deployed Schools</div>
               </div>
               <div>
                 <div className="text-6xl font-black text-primary italic mb-2">35+</div>
-                <div className="uppercase tracking-[0.3em] text-xs font-bold text-muted-foreground/60">Years of History</div>
+                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-muted-foreground">Operational Years</div>
               </div>
               <div>
                 <div className="text-6xl font-black text-primary italic mb-2">100k+</div>
-                <div className="uppercase tracking-[0.3em] text-xs font-bold text-muted-foreground/60">Active Students</div>
+                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-muted-foreground">Active Units</div>
               </div>
             </div>
           </div>
@@ -201,57 +201,58 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-black text-white border-t border-white/10 py-20 relative overflow-hidden">
+      <footer className="bg-black text-white border-t-4 border-primary py-20 relative overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="space-y-6">
-              <div className="flex items-center gap-2">
-                <Image 
-                  src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-                  alt="Gracie Barra Logo" 
-                  width={32} 
-                  height={32} 
-                  className="h-8 w-8"
-                />
+              <div className="flex items-center gap-3">
+                <div className="relative w-8 h-8">
+                  <Image 
+                    src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                    alt="Gracie Barra Logo" 
+                    fill
+                    className="object-contain"
+                  />
+                </div>
                 <span className="font-headline text-2xl font-black tracking-tighter uppercase italic">GRACIE BARRA AI</span>
               </div>
-              <p className="text-white/40 text-sm leading-relaxed">
-                Dedicated to the development of Jiu-Jitsu for everyone. Carrying on the legacy through structured teaching and strong community values.
+              <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+                Dedicated to the development of Jiu-Jitsu for everyone. Carrying on the legacy through structured teaching and brotherhood.
               </p>
             </div>
             <div className="space-y-6">
-              <h4 className="font-headline text-sm font-black uppercase tracking-widest">Explore</h4>
-              <ul className="space-y-3 text-sm text-white/60">
-                <li><Link href="#" className="hover:text-primary">Programs</Link></li>
-                <li><Link href="#" className="hover:text-primary">Instructors</Link></li>
-                <li><Link href="#" className="hover:text-primary">History</Link></li>
-                <li><Link href="#" className="hover:text-primary">Uniforms</Link></li>
+              <h4 className="font-headline text-[10px] font-black uppercase tracking-[0.3em] text-primary">Tactical Links</h4>
+              <ul className="space-y-3 text-[10px] font-bold uppercase tracking-widest text-white/60">
+                <li><Link href="#" className="hover:text-primary">Programs Matrix</Link></li>
+                <li><Link href="/locator" className="hover:text-primary">Coordinate Finder</Link></li>
+                <li><Link href="#" className="hover:text-primary">History Registry</Link></li>
+                <li><Link href="#" className="hover:text-primary">Equipment Store</Link></li>
               </ul>
             </div>
             <div className="space-y-6">
-              <h4 className="font-headline text-sm font-black uppercase tracking-widest">Connect</h4>
-              <ul className="space-y-3 text-sm text-white/60">
-                <li><Link href="/locator" className="hover:text-primary">Find a School</Link></li>
-                <li><Link href="#" className="hover:text-primary">Franchising</Link></li>
-                <li><Link href="#" className="hover:text-primary">Support</Link></li>
-                <li><Link href="#" className="hover:text-primary">Contact</Link></li>
+              <h4 className="font-headline text-[10px] font-black uppercase tracking-[0.3em] text-primary">Operational</h4>
+              <ul className="space-y-3 text-[10px] font-bold uppercase tracking-widest text-white/60">
+                <li><Link href="/dashboard" className="hover:text-primary text-primary">Command Dashboard</Link></li>
+                <li><Link href="#" className="hover:text-primary">Franchise Protocol</Link></li>
+                <li><Link href="#" className="hover:text-primary">Support Link</Link></li>
+                <li><Link href="#" className="hover:text-primary">Contact Base</Link></li>
               </ul>
             </div>
             <div className="space-y-6">
-              <h4 className="font-headline text-sm font-black uppercase tracking-widest">Newsletter</h4>
-              <p className="text-white/40 text-sm">Stay updated with the latest news and techniques.</p>
-              <div className="flex">
-                <input type="email" placeholder="Email Address" className="bg-white/5 border border-white/10 px-4 py-2 flex-grow text-sm focus:outline-none focus:border-primary" />
-                <Button className="bg-primary hover:bg-primary/90 rounded-none px-4">Join</Button>
+              <h4 className="font-headline text-[10px] font-black uppercase tracking-[0.3em] text-primary">Intelligence</h4>
+              <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Subscribe to receive tactical updates and news.</p>
+              <div className="flex border-2 border-white/10">
+                <input type="email" placeholder="UNIT EMAIL..." className="bg-white/5 px-4 py-2 flex-grow text-[10px] font-bold uppercase focus:outline-none focus:bg-white/10" />
+                <Button className="bg-primary hover:bg-primary/90 rounded-none px-6 font-black uppercase italic text-xs">Join</Button>
               </div>
             </div>
           </div>
-          <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-white/30 font-bold uppercase tracking-widest">
-            <p>© 2024 GRACIE BARRA AI Pilot System. All Rights Reserved.</p>
+          <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">
+            <p>© 2024 GRACIE BARRA AI PILOT SYSTEM. MISSION READY.</p>
             <div className="flex gap-8">
-              <Link href="#" className="hover:text-white">Privacy</Link>
-              <Link href="#" className="hover:text-white">Terms</Link>
-              <Link href="#" className="hover:text-white">Cookies</Link>
+              <Link href="#" className="hover:text-white">Privacy Protocol</Link>
+              <Link href="#" className="hover:text-white">Terms of Engagement</Link>
+              <Link href="#" className="hover:text-white">Cookie Registry</Link>
             </div>
           </div>
         </div>
@@ -262,15 +263,15 @@ export default function LandingPage() {
 
 function ProgramCard({ title, level, description, featured = false }: { title: string, level: string, description: string, featured?: boolean }) {
   return (
-    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 ${featured ? 'bg-secondary text-white scale-105 z-10 shadow-2xl' : 'bg-white text-black hover:bg-muted'}`}>
-      <div className={`text-xs font-black uppercase tracking-[0.3em] ${featured ? 'text-white/70' : 'text-primary'}`}>
+    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 border-r-2 last:border-r-0 border-black ${featured ? 'bg-secondary text-white scale-105 z-10 shadow-2xl' : 'bg-white text-black hover:bg-muted'}`}>
+      <div className={`text-[10px] font-black uppercase tracking-[0.3em] ${featured ? 'text-primary' : 'text-primary'}`}>
         {level}
       </div>
       <h4 className="font-headline text-3xl font-black uppercase italic tracking-tighter leading-none">{title}</h4>
-      <p className={`font-medium ${featured ? 'text-white/80' : 'text-muted-foreground'}`}>{description}</p>
-      <div className="mt-auto pt-6">
-        <Button variant={featured ? 'default' : 'outline'} className={`w-full font-black uppercase tracking-widest rounded-none h-12 ${featured ? 'bg-primary hover:bg-primary/90' : 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
-          Details
+      <p className={`text-sm font-bold uppercase tracking-tight leading-relaxed ${featured ? 'text-white/80' : 'text-muted-foreground'}`}>{description}</p>
+      <div className="mt-auto pt-8">
+        <Button variant={featured ? 'default' : 'outline'} className={`w-full font-black uppercase italic tracking-widest rounded-none h-14 text-xs transition-all ${featured ? 'bg-primary hover:bg-primary/90 border-primary text-white' : 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
+          Access Directive
         </Button>
       </div>
     </div>

@@ -17,13 +17,14 @@ export default function LocatorPage() {
           </Button>
           <div className="h-10 w-px bg-border hidden sm:block" />
           <div className="flex items-center gap-3">
-            <Image 
-              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-              alt="Logo" 
-              width={32} 
-              height={32} 
-              className="h-8 w-8"
-            />
+            <div className="relative w-10 h-10">
+              <Image 
+                src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                alt="Logo" 
+                fill
+                className="object-contain"
+              />
+            </div>
             <div className="flex flex-col leading-none">
               <span className="font-headline text-2xl font-black tracking-tighter uppercase italic text-primary">GRACIE BARRA AI</span>
               <span className="font-headline text-[10px] font-bold tracking-widest uppercase">Locator Link</span>

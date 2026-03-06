@@ -27,8 +27,10 @@ const Marquee = ({ variant = 'red' }: MarqueeProps) => {
           <li className="marquee__logo">
             <img 
               src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-              alt="Shield" 
-              className="h-6 w-6 brightness-0 invert"
+              alt="GB Shield" 
+              width="24"
+              height="24"
+              className="h-6 w-6 block"
             />
           </li>
         </React.Fragment>

@@ -24,33 +24,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <SidebarProvider>
       <div className="flex min-h-screen bg-background w-full">
         <Sidebar className="border-r border-border">
-          <SidebarHeader className="p-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Image 
-                src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-                alt="Logo" 
-                width={24} 
-                height={24} 
-                className="h-6 w-6"
-              />
+          <SidebarHeader className="p-4 border-b border-border">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="relative w-8 h-8 flex-shrink-0">
+                <Image 
+                  src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                  alt="Logo" 
+                  fill
+                  className="object-contain"
+                />
+              </div>
               <div className="flex flex-col leading-none">
                 <span className="font-headline text-lg font-black tracking-tighter uppercase italic text-primary">GRACIE BARRA AI</span>
                 <span className="font-headline text-[10px] font-bold tracking-widest uppercase text-foreground">Pilot</span>
               </div>
             </Link>
           </SidebarHeader>
-          <SidebarContent className="px-2">
+          <SidebarContent className="px-2 pt-4">
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild 
                     isActive={pathname === item.href}
-                    className={`rounded-lg py-5 px-4 ${pathname === item.href ? 'bg-primary/10 text-primary font-semibold' : 'hover:bg-sidebar-accent text-sidebar-foreground/70'}`}
+                    className={`rounded-none py-6 px-4 border-l-4 transition-all ${pathname === item.href ? 'bg-primary/10 border-primary text-primary font-black italic' : 'border-transparent hover:bg-sidebar-accent text-sidebar-foreground/70'}`}
                   >
                     <Link href={item.href}>
                       <item.icon className={`h-5 w-5 ${pathname === item.href ? 'text-primary' : ''}`} />
-                      <span className="font-headline uppercase tracking-wider text-xs font-bold">{item.title}</span>
+                      <span className="font-headline uppercase tracking-widest text-[10px] font-bold">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -58,7 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter className="p-4 border-t border-border">
-            <SidebarMenuButton className="w-full text-destructive hover:bg-destructive/10 font-bold uppercase tracking-widest text-[10px]">
+            <SidebarMenuButton className="w-full text-destructive hover:bg-destructive/10 font-black uppercase tracking-[0.2em] text-[10px] rounded-none">
               <LogOut className="h-5 w-5 mr-2" />
               <span>Sign Out</span>
             </SidebarMenuButton>
@@ -74,7 +75,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </h2>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-none bg-primary flex items-center justify-center text-white font-black italic">
+              <div className="w-10 h-10 rounded-none bg-primary flex items-center justify-center text-white font-black italic border-2 border-primary shadow-lg">
                 GB
               </div>
             </div>
