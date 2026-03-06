@@ -2,12 +2,12 @@
 .marquee_container {
     width: 100%;
     height: 70px;
-    background-color: hsl(220, 100%, 20%); /* Deep tactical blue */
+    background-color: hsl(0, 84%, 45%); /* Primary red background */
     display: flex;
     align-items: center;
     overflow: hidden;
-    border-top: 4px solid hsl(0, 84%, 45%); /* Primary red */
-    border-bottom: 4px solid hsl(0, 84%, 45%); /* Primary red */
+    border-top: 4px solid #000; /* Black border for tactical definition against red */
+    border-bottom: 4px solid #000; /* Black border for tactical definition against red */
 }
 
 div#motto {
