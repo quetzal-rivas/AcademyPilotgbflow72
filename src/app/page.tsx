@@ -1,8 +1,8 @@
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { FreeTrialDialog } from '@/components/landing/free-trial-dialog';
 import { 
   Trophy, 
   Users, 
@@ -42,9 +42,11 @@ export default function LandingPage() {
                 <UserCircle className="mr-2 h-4 w-4" /> Student Portal
               </Link>
             </Button>
-            <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest px-6 rounded-none">
-              <Link href="/register">Free Trial</Link>
-            </Button>
+            <FreeTrialDialog>
+              <Button className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest px-6 rounded-none">
+                Free Trial
+              </Button>
+            </FreeTrialDialog>
           </div>
         </div>
       </header>
