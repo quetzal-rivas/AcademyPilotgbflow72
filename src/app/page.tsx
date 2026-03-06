@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,8 @@ import {
   ArrowRight, 
   MapPin, 
   History, 
-  Zap 
+  Zap,
+  UserCircle
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -31,11 +33,14 @@ export default function LandingPage() {
           <nav className="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-widest">
             <Link href="#programs" className="hover:text-primary transition-colors">Programs</Link>
             <Link href="#philosophy" className="hover:text-primary transition-colors">Philosophy</Link>
-            <Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
+            <Link href="/locator" className="hover:text-primary transition-colors">Find a School</Link>
+            <Link href="/dashboard" className="hover:text-primary transition-colors">Admin Hub</Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Button asChild variant="ghost" className="hidden sm:inline-flex font-bold uppercase tracking-widest text-xs">
-              <Link href="/locator">Find a School</Link>
+            <Button asChild variant="outline" className="hidden sm:inline-flex font-black uppercase tracking-widest text-[10px] border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-none">
+              <Link href="/student/dashboard">
+                <UserCircle className="mr-2 h-4 w-4" /> Student Portal
+              </Link>
             </Button>
             <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest px-6 rounded-none">
               <Link href="/register">Free Trial</Link>
