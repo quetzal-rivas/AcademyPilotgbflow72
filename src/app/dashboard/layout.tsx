@@ -1,9 +1,9 @@
-
 "use client";
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Zap, Mic, MessageSquare, CalendarCheck } from "lucide-react";
+import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Mic, MessageSquare, CalendarCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { GlobalChat } from "@/components/chat/global-chat";
 
@@ -26,7 +26,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Sidebar className="border-r border-border">
           <SidebarHeader className="p-4">
             <Link href="/" className="flex items-center gap-2">
-              <Zap className="h-6 w-6 text-primary" />
+              <Image 
+                src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                alt="Logo" 
+                width={24} 
+                height={24} 
+                className="h-6 w-6"
+              />
               <div className="flex flex-col leading-none">
                 <span className="font-headline text-lg font-black tracking-tighter uppercase italic text-primary">GRACIE BARRA AI</span>
                 <span className="font-headline text-[10px] font-bold tracking-widest uppercase text-foreground">Pilot</span>

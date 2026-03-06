@@ -1,9 +1,7 @@
-
 'use client';
 
 import React from 'react';
 import './marquee.css';
-import { Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MarqueeProps {
@@ -27,7 +25,11 @@ const Marquee = ({ variant = 'red' }: MarqueeProps) => {
         <React.Fragment key={index}>
           <li className="marquee__text">{item.toUpperCase()}</li>
           <li className="marquee__logo">
-            <Zap className="h-6 w-6 fill-current text-white" />
+            <img 
+              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+              alt="Shield" 
+              className="h-6 w-6 brightness-0 invert"
+            />
           </li>
         </React.Fragment>
       ))}

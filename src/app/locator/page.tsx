@@ -1,7 +1,7 @@
-
 import { AcademyLocator } from "@/components/locator/academy-locator";
-import { Zap, ArrowLeft, Shield } from "lucide-react";
+import { ArrowLeft, Shield } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 export default function LocatorPage() {
@@ -17,7 +17,13 @@ export default function LocatorPage() {
           </Button>
           <div className="h-10 w-px bg-border hidden sm:block" />
           <div className="flex items-center gap-3">
-            <Zap className="h-8 w-8 text-primary" />
+            <Image 
+              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+              alt="Logo" 
+              width={32} 
+              height={32} 
+              className="h-8 w-8"
+            />
             <div className="flex flex-col leading-none">
               <span className="font-headline text-2xl font-black tracking-tighter uppercase italic text-primary">GRACIE BARRA AI</span>
               <span className="font-headline text-[10px] font-bold tracking-widest uppercase">Locator Link</span>

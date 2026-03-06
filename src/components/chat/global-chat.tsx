@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Zap, RotateCcw } from 'lucide-react';
+import { Send, User, Loader2, RotateCcw } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -29,13 +30,9 @@ export function GlobalChat() {
   const [question, setQuestion] = useState('');
   const [isPending, startTransition] = useTransition();
   
-  // Persistent history using hydration-safe Local Storage
   const [history, setHistory] = useLocalStorage<any[]>('ai-tactical-history', []);
-  
-  // Local messages for the UI
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  // Sync LocalStorage history to UI messages on mount/change
   useEffect(() => {
     if (!history) return;
     
@@ -62,8 +59,6 @@ export function GlobalChat() {
           history: history, 
           message: userMessage.text 
         });
-        
-        // Update persistent history
         setHistory(result.history);
       } catch (error) {
         console.error('Error getting AI response:', error);
@@ -88,10 +83,16 @@ export function GlobalChat() {
         <Button
           variant="outline"
           size="icon"
-          className="fixed bottom-6 right-6 rounded-none h-14 w-14 shadow-2xl border-2 border-primary bg-background hover:bg-primary hover:text-white transition-all z-50"
+          className="fixed bottom-6 right-6 rounded-none h-14 w-14 shadow-2xl border-2 border-primary bg-background hover:bg-primary transition-all z-50 p-0"
           aria-label="Open Global Chat"
         >
-          <Zap className="h-6 w-6" />
+          <Image 
+            src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+            alt="AI Assistant" 
+            width={24} 
+            height={24} 
+            className="h-6 w-6"
+          />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[525px] h-[70vh] flex flex-col p-0 rounded-none border-2 border-border shadow-2xl overflow-hidden">
@@ -125,7 +126,15 @@ export function GlobalChat() {
                 >
                   {msg.role === 'ai' && (
                     <Avatar className="h-8 w-8 rounded-none border border-primary">
-                      <AvatarFallback className="rounded-none bg-primary/10 text-primary"><Bot className="h-4 w-4" /></AvatarFallback>
+                      <AvatarFallback className="rounded-none bg-primary/10">
+                        <Image 
+                          src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                          alt="AI" 
+                          width={16} 
+                          height={16} 
+                          className="h-4 w-4"
+                        />
+                      </AvatarFallback>
                     </Avatar>
                   )}
                   <div
@@ -147,7 +156,15 @@ export function GlobalChat() {
               {isPending && (
                 <div className="flex items-center space-x-2">
                    <Avatar className="h-8 w-8 rounded-none border border-primary">
-                      <AvatarFallback className="rounded-none"><Bot className="h-4 w-4 text-primary" /></AvatarFallback>
+                      <AvatarFallback className="rounded-none">
+                        <Image 
+                          src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                          alt="AI" 
+                          width={16} 
+                          height={16} 
+                          className="h-4 w-4"
+                        />
+                      </AvatarFallback>
                     </Avatar>
                   <div className="rounded-none border border-border bg-secondary/5 px-4 py-2">
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />

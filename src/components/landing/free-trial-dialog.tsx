@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Zap, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -45,10 +46,7 @@ export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Simulate tactical delay for effect
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    console.log("Tactical Trial Request:", values);
     
     toast({
       title: "MISSION INITIALIZED",
@@ -68,7 +66,13 @@ export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
       <DialogContent className="rounded-none border-4 border-border bg-background shadow-2xl p-0 overflow-hidden max-w-md">
         <DialogHeader className="p-8 bg-primary text-white border-b-4 border-border">
           <div className="flex items-center gap-3">
-            <Zap className="h-8 w-8 text-white rotate-12" />
+            <Image 
+              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+              alt="Logo" 
+              width={32} 
+              height={32} 
+              className="h-8 w-8 brightness-0 invert"
+            />
             <DialogTitle className="font-headline text-3xl font-black uppercase italic tracking-tighter">
               Trial Protocol
             </DialogTitle>

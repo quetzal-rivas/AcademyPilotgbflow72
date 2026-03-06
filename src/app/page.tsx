@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -16,7 +15,6 @@ import {
   ArrowRight, 
   MapPin, 
   History, 
-  Zap,
   UserCircle
 } from 'lucide-react';
 
@@ -29,7 +27,13 @@ export default function LandingPage() {
       <header className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-sm">
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Zap className="h-10 w-10 text-primary" />
+            <Image 
+              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+              alt="Gracie Barra Logo" 
+              width={40} 
+              height={40} 
+              className="h-10 w-10"
+            />
             <div className="flex flex-col leading-none">
               <span className="font-headline text-2xl font-black uppercase italic text-primary">GRACIE BARRA AI</span>
               <span className="font-headline text-sm font-bold tracking-widest uppercase text-foreground">Pilot System</span>
@@ -202,7 +206,13 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="space-y-6">
               <div className="flex items-center gap-2">
-                <Zap className="h-8 w-8 text-primary" />
+                <Image 
+                  src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                  alt="Gracie Barra Logo" 
+                  width={32} 
+                  height={32} 
+                  className="h-8 w-8"
+                />
                 <span className="font-headline text-2xl font-black tracking-tighter uppercase italic">GRACIE BARRA AI</span>
               </div>
               <p className="text-white/40 text-sm leading-relaxed">
@@ -259,7 +269,7 @@ function ProgramCard({ title, level, description, featured = false }: { title: s
       <h4 className="font-headline text-3xl font-black uppercase italic tracking-tighter leading-none">{title}</h4>
       <p className={`font-medium ${featured ? 'text-white/80' : 'text-muted-foreground'}`}>{description}</p>
       <div className="mt-auto pt-6">
-        <Button variant={featured ? 'default' : 'outline'} className={`w-full font-black uppercase tracking-widest rounded-none h-12 ${!featured && 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
+        <Button variant={featured ? 'default' : 'outline'} className={`w-full font-black uppercase tracking-widest rounded-none h-12 ${featured ? 'bg-primary hover:bg-primary/90' : 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
           Details
         </Button>
       </div>
