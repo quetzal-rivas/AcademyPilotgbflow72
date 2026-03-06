@@ -291,14 +291,14 @@ export default function LandingPage() {
 
 function ProgramCard({ title, level, description, featured = false }: { title: string, level: string, description: string, featured?: boolean }) {
   return (
-    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 ${featured ? 'bg-primary text-white scale-105 z-10 shadow-2xl' : 'bg-white text-black hover:bg-muted'}`}>
+    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 ${featured ? 'bg-secondary text-white scale-105 z-10 shadow-2xl' : 'bg-white text-black hover:bg-muted'}`}>
       <div className={`text-xs font-black uppercase tracking-[0.3em] ${featured ? 'text-white/70' : 'text-primary'}`}>
         {level}
       </div>
       <h4 className="font-headline text-3xl font-black uppercase italic tracking-tighter leading-none">{title}</h4>
       <p className={`font-medium ${featured ? 'text-white/80' : 'text-muted-foreground'}`}>{description}</p>
       <div className="mt-auto pt-6">
-        <Button variant={featured ? 'secondary' : 'outline'} className={`w-full font-black uppercase tracking-widest rounded-none h-12 ${!featured && 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
+        <Button variant={featured ? 'default' : 'outline'} className={`w-full font-black uppercase tracking-widest rounded-none h-12 ${!featured && 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
           Details
         </Button>
       </div>
