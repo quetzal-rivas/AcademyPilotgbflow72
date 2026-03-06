@@ -2,12 +2,21 @@
 .marquee_container {
     width: 100%;
     height: 70px;
-    background-color: hsl(0, 84%, 45%); /* Primary red background */
     display: flex;
     align-items: center;
     overflow: hidden;
+}
+
+.marquee_container.bg-red {
+    background-color: hsl(0, 84%, 45%); /* Primary red background */
     border-top: 4px solid #000; /* Black border for tactical definition against red */
     border-bottom: 4px solid #000; /* Black border for tactical definition against red */
+}
+
+.marquee_container.bg-black {
+    background-color: #000; /* Tactical black background */
+    border-top: 4px solid hsl(0, 84%, 45%); /* Red border for tactical definition against black */
+    border-bottom: 4px solid hsl(0, 84%, 45%); /* Red border for tactical definition against black */
 }
 
 div#motto {

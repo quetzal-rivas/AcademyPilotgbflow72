@@ -4,8 +4,13 @@
 import React from 'react';
 import './marquee.css';
 import { Zap } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const Marquee = () => {
+interface MarqueeProps {
+  variant?: 'red' | 'black';
+}
+
+const Marquee = ({ variant = 'red' }: MarqueeProps) => {
   const items = [
     "Jiu-Jitsu For Everyone",
     "Brazilian Jiu-Jitsu",
@@ -30,7 +35,7 @@ const Marquee = () => {
   );
 
   return (
-    <div className="marquee_container">
+    <div className={cn("marquee_container", variant === 'black' ? "bg-black" : "bg-red")}>
       <div id="motto">
         <div className="mq-container">
           <div className="marquee enable-animation">

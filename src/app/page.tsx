@@ -94,7 +94,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <Marquee />
+        <Marquee variant="black" />
 
         {/* Programs Section */}
         <section id="programs" className="py-24 bg-white">
@@ -130,7 +130,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <Marquee />
+        <Marquee variant="red" />
 
         {/* Call to Action Reveal Section */}
         <section className="py-32 bg-secondary text-white relative overflow-hidden min-h-[600px] flex items-center border-y-4 border-border">
@@ -163,7 +163,7 @@ export default function LandingPage() {
           />
         </section>
 
-        <Marquee />
+        <Marquee variant="red" />
 
         {/* Global Reach Section */}
         <section className="py-24 bg-white text-black text-center relative overflow-hidden">
