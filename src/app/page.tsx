@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -24,7 +25,7 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-background/95 backdrop-blur-md border-b-2 border-border shadow-sm">
+      <header className="fixed top-0 w-full z-50 bg-background/20 backdrop-blur-xl border-b-2 border-border shadow-sm">
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative w-10 h-10">
