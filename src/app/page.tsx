@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { FreeTrialDialog } from '@/components/landing/free-trial-dialog';
 import Marquee from '@/components/landing/Marquee';
+import { ScrollRevealImage } from '@/components/landing/scroll-reveal-image';
 import { 
   Trophy, 
   Users, 
@@ -27,7 +28,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <Zap className="h-10 w-10 text-primary" />
             <div className="flex flex-col leading-none">
-              <span className="font-headline text-2xl font-black tracking-tighter uppercase italic text-primary">Academia</span>
+              <span className="font-headline text-2xl font-black uppercase italic text-primary">Academia</span>
               <span className="font-headline text-sm font-bold tracking-widest uppercase text-foreground">Pilot System</span>
             </div>
           </div>
@@ -124,6 +125,21 @@ export default function LandingPage() {
                 description="The ultimate expression of our system. Deep dive into the philosophy and advanced techniques."
               />
             </div>
+          </div>
+        </section>
+
+        <Marquee />
+
+        {/* Call to Action Reveal Section */}
+        <section className="py-24 bg-secondary/10 relative overflow-hidden">
+          <div className="container mx-auto px-4 text-center space-y-12">
+            <div className="space-y-4 relative z-10">
+              <h2 className="font-headline text-5xl font-black uppercase italic tracking-tighter">Join the Legacy</h2>
+              <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
+                Step onto the mats and start your journey with the world&apos;s most successful team.
+              </p>
+            </div>
+            <ScrollRevealImage />
           </div>
         </section>
 
