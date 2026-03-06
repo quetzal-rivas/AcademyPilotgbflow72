@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useTransition, useEffect } from 'react';
@@ -14,9 +15,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { chatAssistantAction } from '@/app/actions';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
 interface ChatMessage {
@@ -126,14 +128,14 @@ export function GlobalChat() {
                   }`}
                 >
                   {msg.role === 'ai' && (
-                    <Avatar className="h-8 w-8 rounded-none border border-primary overflow-hidden">
-                      <AvatarImage 
+                    <div className="h-8 w-8 rounded-none border border-primary bg-primary/5 flex-shrink-0 relative overflow-hidden">
+                      <Image 
                         src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
                         alt="AI"
-                        className="p-1"
+                        fill
+                        className="object-contain p-1"
                       />
-                      <AvatarFallback className="rounded-none bg-primary/10 text-[8px]">GB</AvatarFallback>
-                    </Avatar>
+                    </div>
                   )}
                   <div
                     className={`max-w-[75%] rounded-none border px-4 py-2 text-sm font-medium ${
@@ -153,14 +155,14 @@ export function GlobalChat() {
               ))}
               {isPending && (
                 <div className="flex items-center space-x-2">
-                   <Avatar className="h-8 w-8 rounded-none border border-primary overflow-hidden">
-                      <AvatarImage 
+                   <div className="h-8 w-8 rounded-none border border-primary bg-primary/5 flex-shrink-0 relative overflow-hidden">
+                      <Image 
                         src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
                         alt="AI"
-                        className="p-1"
+                        fill
+                        className="object-contain p-1"
                       />
-                      <AvatarFallback className="rounded-none bg-primary/10 text-[8px]">GB</AvatarFallback>
-                    </Avatar>
+                    </div>
                   <div className="rounded-none border border-border bg-secondary/5 px-4 py-2">
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   </div>

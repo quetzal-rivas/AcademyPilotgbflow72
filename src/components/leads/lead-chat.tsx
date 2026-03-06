@@ -3,6 +3,7 @@
 
 import { useState, useTransition, useRef, useEffect } from 'react';
 import { Send, Bot, User, Sparkles, Loader2, Zap } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -114,9 +115,14 @@ export function LeadChat({ leadId, leadName }: LeadChatProps) {
                   </p>
                 </div>
                  {msg.sender === 'agent' && (
-                  <Avatar className="h-8 w-8 rounded-none border border-primary">
-                    <AvatarFallback className="rounded-none bg-primary/10 text-primary font-black italic">GB</AvatarFallback>
-                  </Avatar>
+                  <div className="h-8 w-8 rounded-none border border-primary bg-primary/5 flex-shrink-0 relative overflow-hidden">
+                    <Image 
+                      src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                      alt="AI"
+                      fill
+                      className="object-contain p-1"
+                    />
+                  </div>
                 )}
               </div>
             ))}
