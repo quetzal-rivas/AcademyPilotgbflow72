@@ -1,4 +1,6 @@
 
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -20,7 +22,6 @@ import {
 
 export default function LandingPage() {
   const heroImg = PlaceHolderImages.find(img => img.id === 'hero-bjj');
-  const classImg = PlaceHolderImages.find(img => img.id === 'jiu-jitsu-class');
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -36,7 +37,6 @@ export default function LandingPage() {
           </div>
           <nav className="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-widest">
             <Link href="#programs" className="hover:text-primary transition-colors">Programs</Link>
-            <Link href="#philosophy" className="hover:text-primary transition-colors">Philosophy</Link>
             <Link href="/locator" className="hover:text-primary transition-colors">Find a School</Link>
             <Link href="/dashboard" className="hover:text-primary transition-colors">Admin Hub</Link>
           </nav>
@@ -165,42 +165,6 @@ export default function LandingPage() {
 
         <Marquee />
 
-        {/* Core Values */}
-        <section id="philosophy" className="py-24 bg-muted/30 border-y border-border">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="relative aspect-square">
-                <div className="absolute -top-4 -left-4 w-full h-full border-4 border-primary z-0" />
-                <Image 
-                  src={classImg?.imageUrl || 'https://picsum.photos/seed/gbclass/800/600'} 
-                  alt="Training Philosophy" 
-                  fill 
-                  className="object-cover relative z-10 shadow-2xl"
-                  data-ai-hint="martial arts class"
-                />
-              </div>
-              <div className="space-y-10">
-                <div className="space-y-4">
-                  <h2 className="font-headline text-sm font-black uppercase tracking-[0.4em] text-primary">The GB Way</h2>
-                  <h3 className="font-headline text-5xl font-black uppercase tracking-tighter italic leading-none">Philosophy & Heritage</h3>
-                </div>
-                
-                <div className="grid gap-8">
-                  <ValueItem icon={<Shield />} title="Safety First" description="We prioritize the physical and mental well-being of every student." />
-                  <ValueItem icon={<Users />} title="Brotherhood" description="Build lifelong friendships on and off the mats with our global community." />
-                  <ValueItem icon={<Trophy />} title="Excellence" description="Pursue the highest standards of technique and character development." />
-                </div>
-
-                <Button variant="link" className="p-0 h-auto text-primary font-black uppercase tracking-widest text-sm flex items-center gap-2">
-                  Read Our Full Philosophy <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <Marquee />
-
         {/* Global Reach Section */}
         <section className="py-24 bg-white text-black text-center relative overflow-hidden">
           {/* Master silhouette revealed from bottom-left */}
@@ -301,20 +265,6 @@ function ProgramCard({ title, level, description, featured = false }: { title: s
         <Button variant={featured ? 'default' : 'outline'} className={`w-full font-black uppercase tracking-widest rounded-none h-12 ${!featured && 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
           Details
         </Button>
-      </div>
-    </div>
-  );
-}
-
-function ValueItem({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
-  return (
-    <div className="flex gap-6 group">
-      <div className="mt-1 h-14 w-14 flex-shrink-0 bg-primary/10 text-primary flex items-center justify-center rounded-none group-hover:bg-primary group-hover:text-white transition-all duration-300">
-        {icon}
-      </div>
-      <div className="space-y-1">
-        <h4 className="font-headline text-xl font-black uppercase italic tracking-tight">{title}</h4>
-        <p className="text-muted-foreground font-medium leading-tight">{description}</p>
       </div>
     </div>
   );
