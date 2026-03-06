@@ -90,7 +90,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
         <Marquee />
+
         {/* Programs Section */}
         <section id="programs" className="py-24 bg-white">
           <div className="container mx-auto px-4">
@@ -124,6 +126,8 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <Marquee />
 
         {/* Core Values */}
         <section id="philosophy" className="py-24 bg-muted/30 border-y border-border">
@@ -159,7 +163,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Global Reach */}
+        <Marquee />
+
+        {/* Global Reach Section */}
         <section className="py-24 bg-black text-white text-center">
           <div className="container mx-auto px-4 space-y-12">
             <div className="max-w-3xl mx-auto space-y-4">
