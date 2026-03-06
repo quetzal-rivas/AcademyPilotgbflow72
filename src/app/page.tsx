@@ -86,9 +86,6 @@ export default function LandingPage() {
                     Find Your School <ArrowRight className="ml-2 h-6 w-6" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-black px-10 py-8 text-lg font-black uppercase tracking-widest rounded-none h-auto bg-transparent">
-                  Our Legacy
-                </Button>
               </div>
             </div>
           </div>
@@ -155,7 +152,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          {/* Silhouette pinned to bottom right */}
+          {/* Team silhouette revealed from bottom-right */}
           <ScrollRevealImage 
             src="https://graciebarra.com/wp-content/uploads/2025/03/call_to_action-IMG.png"
             alt="Gracie Barra Team Silhouette"
