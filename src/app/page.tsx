@@ -43,7 +43,7 @@ export default function LandingPage() {
             </div>
           </div>
           <nav className="hidden lg:flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em]">
-            <Link href="#programs" className="hover:text-primary transition-colors">Programs</Link>
+            <Link href="#programs" className="hover:text-primary transition-colors">Programas</Link>
             <Link href="/locator" className="hover:text-primary transition-colors">Find a School</Link>
             <Link href="/dashboard" className="hover:text-primary transition-colors text-primary">Admin Hub</Link>
           </nav>
@@ -105,31 +105,37 @@ export default function LandingPage() {
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
               <div className="space-y-4 border-l-8 border-primary pl-8">
-                <h2 className="font-headline text-xs font-black uppercase tracking-[0.4em] text-primary">Mission Directives</h2>
-                <h3 className="font-headline text-6xl font-black uppercase tracking-tighter italic text-black leading-none">Tactical Programs</h3>
+                <h2 className="font-headline text-xs font-black uppercase tracking-[0.4em] text-primary">Inversión Táctica</h2>
+                <h3 className="font-headline text-6xl font-black uppercase tracking-tighter italic text-black leading-none">Desglose de Pagos</h3>
               </div>
               <p className="text-muted-foreground max-w-sm font-bold uppercase text-[10px] tracking-widest leading-loose">
-                Structured learning systems for all operational units. Certified instruction, safe environment, global community.
+                Estructura de inversión para unidades operativas. Entrenamiento certificado, ambiente seguro, comunidad global.
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-0 border-4 border-black">
               <ProgramCard 
-                title="GB¹ Fundamentals"
-                level="Unit: Beginner"
-                description="Designed for civilians with no prior combat experience. Build a strong tactical foundation."
+                title="Plan Semestral"
+                level="Ciclo: 6 Meses"
+                description="Inversión Total: $900. Forma de Pago: Un solo pago de $900. Regalo: Uniforme No-Gi."
               />
               <ProgramCard 
-                title="GB² Advanced"
-                level="Unit: Intermediate"
-                description="Elevate your operational capacity with complex techniques and live pressure testing."
+                title="Plan Anual"
+                level="Ciclo: 12 Meses"
+                description="Inversión Total: $1,800. Forma de Pago: 2 exhibiciones de $900. Regalo: 1 Kimono + Uniforme No-Gi."
                 featured
               />
               <ProgramCard 
-                title="GB³ Black Belt"
-                level="Unit: Elite"
-                description="The ultimate expression of the system. Master-level philosophy and advanced execution."
+                title="Pago por Clase"
+                level="Ciclo: Por Sesión"
+                description="Costo: $20 cada vez que asistas. Beneficio: Préstamo de uniforme oficial incluido."
               />
+            </div>
+
+            <div className="mt-12 p-6 bg-primary/5 border-l-4 border-primary">
+              <p className="text-xs font-black uppercase tracking-widest text-primary italic">
+                Nota importante: Bajo este esquema, el plan anual es muy atractivo porque, pagando lo mismo que el semestral (en dos partes), el alumno asegura su lugar por más tiempo y recibe el Kimono de regalo.
+              </p>
             </div>
           </div>
         </section>
