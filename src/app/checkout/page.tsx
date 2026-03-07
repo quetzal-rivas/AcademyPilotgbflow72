@@ -3,13 +3,15 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PaymentMethodForm } from "@/components/leads/payment-method-form";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldCheck, Zap, CreditCard, ArrowLeft } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { getAcademyPhotos } from "@/app/actions";
+import { BackgroundPhotoRotation } from "@/components/landing/background-photo-rotation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -18,12 +20,21 @@ function CheckoutContent() {
   const router = useRouter();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [photos, setPhotos] = useState<string[]>([]);
 
   const planTitle = searchParams.get("plan") || "Strategic Plan";
   const planDetails = searchParams.get("details") || "Mission initialization details pending.";
   const itemType = searchParams.get("itemType") || "membership";
   const assetId = searchParams.get("assetId");
   const price = searchParams.get("price") || "900";
+
+  useEffect(() => {
+    async function loadPhotos() {
+      const academyPhotos = await getAcademyPhotos("310 S Glendora Ave West Covina 91790");
+      setPhotos(academyPhotos);
+    }
+    loadPhotos();
+  }, []);
 
   // Tactical logic to find the correct asset for display
   const tacticalAsset = assetId 
@@ -47,17 +58,10 @@ function CheckoutContent() {
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Left Sector: Intelligence Briefing */}
       <div className="w-full md:w-1/2 bg-secondary p-6 md:p-12 text-white flex flex-col justify-between relative overflow-hidden border-b-4 md:border-b-0 md:border-r-4 border-border">
-        {/* Background Asset Bleed - Disabled for uniforms to ensure single image focus */}
-        <div className="absolute inset-0 z-0 opacity-40">
-          {tacticalAsset && itemType !== 'uniform' && (
-            <Image 
-              src={tacticalAsset.imageUrl} 
-              alt="Mission Asset" 
-              fill 
-              className="object-cover"
-            />
-          )}
-          <div className="absolute inset-0 bg-secondary/60" />
+        {/* Dynamic Academy Background */}
+        <div className="absolute inset-0 z-0">
+          <BackgroundPhotoRotation photoUrls={photos} />
+          <div className="absolute inset-0 bg-secondary/40" />
         </div>
 
         <div className="relative z-10 space-y-8 md:space-y-12">
@@ -96,7 +100,7 @@ function CheckoutContent() {
 
               {/* Zoomed Centered Visualization Block - The single high-impact image */}
               {itemType === 'uniform' && tacticalAsset && (
-                <div className="mt-8 md:mt-12 border-l-8 border-primary relative h-72 md:h-[450px] bg-black/20 border-2 border-white/5 flex items-center justify-center overflow-hidden group">
+                <div className="mt-8 md:mt-12 border-l-8 border-primary relative h-72 md:h-[450px] bg-black/20 border-2 border-white/5 flex items-center justify-center overflow-hidden group shadow-2xl">
                   <div className="absolute inset-0 opacity-10">
                     <div className="h-full w-full bg-[repeating-linear-gradient(90deg,transparent,transparent_20px,rgba(255,255,255,0.05)_20px,rgba(255,255,255,0.05)_21px)]" />
                     <div className="h-full w-full absolute top-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,255,255,0.05)_2px,rgba(255,255,255,0.05)_4px)]" />
