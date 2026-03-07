@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useRef } from "react";
@@ -15,6 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function StoreAssemble() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const shieldRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -64,14 +66,25 @@ export default function StoreAssemble() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: `+=${(items.length + 1) * 150}%`,
+        end: `+=${(items.length + 2) * 150}%`,
         pin: true,
         scrub: 1.5,
         anticipatePin: 1,
       },
     });
 
-    // 1. MASTER TITLE SECTION
+    // 1. SHIELD LOGO
+    // Starts visible at scale 1 when scroll is at top
+    tl.to(shieldRef.current, {
+      scale: 15,
+      opacity: 0,
+      z: 1000,
+      filter: "blur(40px)",
+      ease: "power2.in",
+      duration: 1
+    });
+
+    // 2. MASTER TITLE SECTION
     tl.fromTo(titleRef.current,
       { scale: 0.1, opacity: 0, filter: "blur(20px)", z: -1000 },
       { scale: 1, opacity: 1, filter: "blur(0px)", z: 0, ease: "power2.out", duration: 1 }
@@ -86,7 +99,7 @@ export default function StoreAssemble() {
       duration: 1
     }, "+=0.5");
 
-    // 2. ITEMS ASSEMBLY
+    // 3. ITEMS ASSEMBLY
     items.forEach((item, index) => {
       const ref = itemRefs.current[index];
       if (!ref) return;
@@ -142,6 +155,17 @@ export default function StoreAssemble() {
         <div className="h-full w-full absolute top-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_40px,rgba(255,255,255,0.05)_40px,rgba(255,255,255,0.05)_41px)]" />
       </div>
 
+      {/* SHIELD LOGO STARTING ELEMENT */}
+      <div ref={shieldRef} className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-100 will-change-transform perspective-element px-4">
+        <div className="relative w-64 h-64 md:w-96 md:h-96 drop-shadow-[0_0_50px_rgba(225,29,72,0.4)]">
+          <img 
+            src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+            alt="Gracie Barra Shield" 
+            className="w-full h-full object-contain"
+          />
+        </div>
+      </div>
+
       <div ref={titleRef} className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 will-change-transform perspective-element px-4">
         <h1 className="text-center">
           <span className="block text-[15vw] md:text-[10vw] font-black text-white uppercase italic tracking-tighter leading-none drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]">
@@ -161,20 +185,9 @@ export default function StoreAssemble() {
             ref={el => { itemRefs.current[index] = el; }}
             className="absolute inset-0 flex items-center justify-center opacity-0 will-change-transform perspective-element px-4 md:px-6"
           >
-            <Card className="max-w-5xl w-full bg-card/40 backdrop-blur-2xl border-4 border-border rounded-none shadow-2xl overflow-hidden">
+            <Card className="max-w-4xl w-full bg-card/40 backdrop-blur-2xl border-4 border-border rounded-none shadow-2xl overflow-hidden">
               <div className="flex flex-col md:flex-row h-full">
-                <div className="md:w-1/2 relative aspect-square md:aspect-auto bg-black/20 group">
-                  {image && (
-                    <Image 
-                      src={image.imageUrl} 
-                      alt={item.name} 
-                      fill 
-                      className="object-contain p-4 md:p-8 transition-transform duration-700 group-hover:scale-110" 
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                </div>
-                <div className="md:w-1/2 p-6 md:p-12 flex flex-col justify-center space-y-6 md:space-y-8">
+                <div className="p-6 md:p-12 flex flex-col justify-center space-y-6 md:space-y-8 w-full">
                   <div className="space-y-2 border-l-8 border-primary pl-6 md:pl-8">
                     <p className="text-[8px] md:text-[10px] font-black text-primary uppercase tracking-[0.4em] italic">{item.tag}</p>
                     <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-white leading-none">{item.name}</h3>
