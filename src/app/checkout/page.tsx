@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { PaymentMethodForm } from "@/components/leads/payment-method-form";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldCheck, Zap, CreditCard, ArrowLeft } from "lucide-react";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 import Link from "next/link";
 
 function CheckoutContent() {
@@ -18,6 +20,14 @@ function CheckoutContent() {
 
   const planTitle = searchParams.get("plan") || "Strategic Plan";
   const planDetails = searchParams.get("details") || "Mission initialization details pending.";
+  const itemType = searchParams.get("itemType") || "membership";
+  const assetId = searchParams.get("assetId");
+  const price = searchParams.get("price") || "900";
+
+  // Tactical logic to find the correct asset for display
+  const tacticalAsset = assetId 
+    ? PlaceHolderImages.find(img => img.id === assetId)
+    : PlaceHolderImages.find(img => img.id === 'hero-bjj');
 
   const handlePaymentSubmit = async (data: any) => {
     setIsProcessing(true);
@@ -36,30 +46,32 @@ function CheckoutContent() {
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Left Sector: Intelligence Briefing */}
       <div className="md:w-1/2 bg-secondary p-12 text-white flex flex-col justify-between relative overflow-hidden border-b-4 md:border-b-0 md:border-r-4 border-border">
-        {/* Background Image Bleed */}
+        {/* Background Asset Bleed */}
         <div className="absolute inset-0 z-0 opacity-20 grayscale">
-          <Image 
-            src="https://picsum.photos/seed/gbcheckout/1200/1200" 
-            alt="Academy Briefing" 
-            fill 
-            className="object-cover"
-          />
+          {tacticalAsset && (
+            <Image 
+              src={tacticalAsset.imageUrl} 
+              alt="Mission Asset" 
+              fill 
+              className="object-cover"
+            />
+          )}
           <div className="absolute inset-0 bg-secondary/80" />
         </div>
 
         <div className="relative z-10 space-y-12">
-          <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/60 hover:text-primary transition-colors group">
+          <Link href={itemType === 'uniform' ? '/store' : '/'} className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/60 hover:text-primary transition-colors group">
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
             ABORT MISSION TO BASE
           </Link>
 
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <div className="relative w-12 h-12">
+              <div className="w-12 h-12 bg-primary flex items-center justify-center p-2 border-2 border-border shadow-lg">
                 <img 
                   src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
                   alt="Logo" 
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain brightness-0 invert"
                 />
               </div>
               <div className="flex flex-col leading-none">
@@ -69,8 +81,13 @@ function CheckoutContent() {
             </div>
             
             <div className="space-y-4 border-l-8 border-primary pl-8">
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic">Operational Protocol Selection</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic">
+                {itemType === 'uniform' ? 'Armory Acquisition Protocol' : 'Operational Protocol Selection'}
+              </p>
               <h1 className="text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">{planTitle}</h1>
+              <div className="inline-block bg-primary text-white px-4 py-1 text-2xl font-black italic shadow-lg">
+                ${price}.00
+              </div>
             </div>
 
             <div className="max-w-md p-8 bg-white/5 border-2 border-white/10 rounded-none italic shadow-2xl backdrop-blur-sm">
@@ -102,7 +119,7 @@ function CheckoutContent() {
               </div>
               <div className="space-y-3">
                 <h4 className="text-4xl font-black uppercase italic tracking-tighter">Syncing Matrix...</h4>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Authorizing Tuition Link with Central Command</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary animate-pulse">Authorizing Financial Link with Central Command</p>
               </div>
             </div>
           ) : (
@@ -122,13 +139,13 @@ function CheckoutContent() {
               <div className="bg-background border-2 border-border p-8 shadow-xl">
                 <PaymentMethodForm 
                   onSubmit={handlePaymentSubmit} 
-                  onCancel={() => router.push("/")} 
+                  onCancel={() => router.push(itemType === 'uniform' ? '/store' : '/')} 
                 />
               </div>
 
               <div className="text-center">
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">
-                  Mission Readiness: Your deployment starts immediately upon matrix verification.
+                  Mission Readiness: Your assets will be deployed immediately upon matrix verification.
                 </p>
               </div>
             </div>
