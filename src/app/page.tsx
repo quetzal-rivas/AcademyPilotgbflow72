@@ -9,6 +9,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { FreeTrialDialog } from '@/components/landing/free-trial-dialog';
 import Marquee from '@/components/landing/Marquee';
 import { ScrollRevealImage } from '@/components/landing/scroll-reveal-image';
+import { BackgroundPhotoRotation } from '@/components/landing/background-photo-rotation';
 import { 
   Trophy, 
   Users, 
@@ -135,6 +136,8 @@ export default async function LandingPage() {
 
         {/* Call to Action Reveal Section */}
         <section className="py-32 bg-secondary text-white relative overflow-hidden min-h-[600px] flex items-center border-y-4 border-border">
+          <BackgroundPhotoRotation photoUrls={photos} />
+          
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-xl space-y-8 text-left">
               <div className="space-y-4">
