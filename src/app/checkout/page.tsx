@@ -58,10 +58,11 @@ function CheckoutContent() {
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Left Sector: Intelligence Briefing */}
       <div className="w-full md:w-1/2 bg-secondary p-6 md:p-12 text-white flex flex-col justify-between relative overflow-hidden border-b-4 md:border-b-0 md:border-r-4 border-border">
-        {/* Dynamic Academy Background */}
+        {/* Dynamic Academy Background - High impact visibility */}
         <div className="absolute inset-0 z-0">
           <BackgroundPhotoRotation photoUrls={photos} />
-          <div className="absolute inset-0 bg-secondary/40" />
+          {/* Subtle overlay to keep text legible while showing images clearly */}
+          <div className="absolute inset-0 bg-secondary/30" />
         </div>
 
         <div className="relative z-10 space-y-8 md:space-y-12">
@@ -73,7 +74,7 @@ function CheckoutContent() {
           <div className="space-y-6">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-white flex items-center justify-center p-2 border-2 border-border shadow-lg">
+                <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center">
                   <img 
                     src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
                     alt="Logo" 
@@ -118,7 +119,7 @@ function CheckoutContent() {
             </div>
 
             <div className="max-w-md p-6 md:p-8 bg-white/5 border-2 border-white/10 rounded-none italic shadow-2xl backdrop-blur-sm">
-              <p className="text-base md:text-lg font-bold leading-relaxed opacity-90">
+              <p className="text-base md:text-lg font-bold leading-relaxed opacity-90 text-white">
                 {planDetails}
               </p>
             </div>

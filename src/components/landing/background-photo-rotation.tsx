@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -34,7 +35,7 @@ export function BackgroundPhotoRotation({ photoUrls }: BackgroundPhotoRotationPr
         <motion.div
           key={formattedUrl}
           initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 0.25, x: 0 }}
+          animate={{ opacity: 0.6, x: 0 }} // Increased opacity for better tactical visibility
           exit={{ opacity: 0, x: -100 }}
           transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
@@ -49,7 +50,8 @@ export function BackgroundPhotoRotation({ photoUrls }: BackgroundPhotoRotationPr
           />
         </motion.div>
       </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/80 to-secondary/40" />
+      {/* Refined gradient stops to let more of the image through on the right */}
+      <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/60 to-secondary/20" />
     </div>
   );
 }
