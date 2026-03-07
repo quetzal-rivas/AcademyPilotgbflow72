@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -229,10 +230,10 @@ export default function LandingPage() {
             <div className="space-y-6">
               <h4 className="font-headline text-[10px] font-black uppercase tracking-[0.3em] text-primary">Tactical Links</h4>
               <ul className="space-y-3 text-[10px] font-bold uppercase tracking-widest text-white/60">
-                <li><Link href="#" className="hover:text-primary">Programs Matrix</Link></li>
+                <li><Link href="#programs" className="hover:text-primary">Programs Matrix</Link></li>
                 <li><Link href="/locator" className="hover:text-primary">Coordinate Finder</Link></li>
                 <li><Link href="#" className="hover:text-primary">History Registry</Link></li>
-                <li><Link href="#" className="hover:text-primary">Equipment Store</Link></li>
+                <li><Link href="/store" className="hover:text-primary">Equipment Store</Link></li>
               </ul>
             </div>
             <div className="space-y-6">

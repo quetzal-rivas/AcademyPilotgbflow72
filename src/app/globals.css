@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -73,4 +74,13 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+.perspective-container {
+  perspective: 1200px;
+  overflow: hidden;
+}
+
+.perspective-element {
+  transform-style: preserve-3d;
 }
