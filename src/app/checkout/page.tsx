@@ -47,14 +47,14 @@ function CheckoutContent() {
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Left Sector: Intelligence Briefing */}
       <div className="w-full md:w-1/2 bg-secondary p-6 md:p-12 text-white flex flex-col justify-between relative overflow-hidden border-b-4 md:border-b-0 md:border-r-4 border-border">
-        {/* Background Asset Bleed */}
+        {/* Background Asset Bleed - Disabled for uniforms to ensure single image focus */}
         <div className="absolute inset-0 z-0 opacity-40">
-          {tacticalAsset && (
+          {tacticalAsset && itemType !== 'uniform' && (
             <Image 
               src={tacticalAsset.imageUrl} 
               alt="Mission Asset" 
               fill 
-              className={cn("object-cover", itemType === 'uniform' && "object-contain p-12 scale-110")}
+              className="object-cover"
             />
           )}
           <div className="absolute inset-0 bg-secondary/60" />
@@ -92,7 +92,7 @@ function CheckoutContent() {
                 </div>
               </div>
 
-              {/* Zoomed Centered Visualization Block */}
+              {/* Zoomed Centered Visualization Block - The single high-impact image */}
               {itemType === 'uniform' && tacticalAsset && (
                 <div className="mt-8 md:mt-12 border-l-8 border-primary relative h-72 md:h-[450px] bg-black/20 border-2 border-white/5 flex items-center justify-center overflow-hidden group">
                   <div className="absolute inset-0 opacity-10">
