@@ -17,6 +17,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function StoreAssemble() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const shieldRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const overlaysRef = useRef<HTMLDivElement>(null);
@@ -77,6 +78,14 @@ export default function StoreAssemble() {
       },
     });
 
+    // 0. HEADER HIDE
+    tl.to(headerRef.current, {
+      y: -100,
+      opacity: 0,
+      duration: 0.5,
+      ease: "power2.inOut"
+    }, 0);
+
     // 1. SHIELD LOGO (Initial state visible)
     tl.to(shieldRef.current, {
       scale: 10,
@@ -86,7 +95,7 @@ export default function StoreAssemble() {
       ease: "power2.in",
       duration: 1,
       force3D: true
-    });
+    }, 0);
 
     // 2. MASTER TITLE SECTION
     tl.fromTo(titleRef.current,
@@ -138,7 +147,7 @@ export default function StoreAssemble() {
   return (
     <section ref={containerRef} className="relative h-screen w-full bg-[#002B5B] overflow-hidden flex flex-col items-center justify-center perspective-container">
       {/* Tactical Header Overlay */}
-      <div className="absolute top-0 left-0 w-full h-20 md:h-24 border-b-4 border-border bg-black/40 backdrop-blur-xl z-[100] flex items-center justify-between px-6 md:px-12">
+      <div ref={headerRef} className="absolute top-0 left-0 w-full h-20 md:h-24 border-b-4 border-border bg-black/40 backdrop-blur-xl z-[100] flex items-center justify-between px-6 md:px-12">
         <div className="flex items-center gap-3 md:gap-4">
           <div className="relative w-8 h-8 md:w-10 md:h-10">
             <img 
@@ -202,7 +211,6 @@ export default function StoreAssemble() {
       </div>
 
       {items.map((item, index) => {
-        const image = PlaceHolderImages.find(img => img.id === item.id);
         return (
           <div 
             key={item.id}
