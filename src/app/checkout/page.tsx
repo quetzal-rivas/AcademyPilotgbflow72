@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
@@ -69,9 +70,9 @@ function CheckoutContent() {
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 md:w-12 md:h-12 bg-primary flex items-center justify-center p-2 border-2 border-border shadow-lg">
                 <img 
-                  src="https://graciebarrapilot.s3.us-east-1.amazonaws.com/Generated_Image_March_06__2026_-_12_01AM-removebg-preview.png" 
+                  src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
                   alt="Logo" 
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain brightness-0 invert"
                 />
               </div>
               <div className="flex flex-col leading-none">

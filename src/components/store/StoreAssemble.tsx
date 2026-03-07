@@ -151,7 +151,7 @@ export default function StoreAssemble() {
         <div className="flex items-center gap-3 md:gap-4">
           <div className="relative w-8 h-8 md:w-10 md:h-10">
             <img 
-              src="https://graciebarrapilot.s3.us-east-1.amazonaws.com/Generated_Image_March_06__2026_-_12_01AM-removebg-preview.png" 
+              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
               alt="GB Shield" 
               className="w-full h-full object-contain"
             />
