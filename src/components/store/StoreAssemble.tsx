@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingCart, ArrowLeft, ShieldCheck, Zap, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -222,7 +222,7 @@ export default function StoreAssemble({ photoUrls }: StoreAssembleProps) {
           ref={el => { itemRefs.current[index] = el; }}
           className="absolute inset-0 flex items-center justify-center opacity-0 will-change-transform perspective-element px-6 z-20"
         >
-          <Card className="max-w-4xl w-full bg-card/40 backdrop-blur-2xl border-4 border-border rounded-none shadow-2xl overflow-hidden">
+          <Card className="max-w-4xl w-full bg-secondary/90 backdrop-blur-2xl border-4 border-border rounded-none shadow-2xl overflow-hidden">
             <div className="flex flex-col md:flex-row h-full">
               <div className="p-12 flex flex-col justify-center space-y-8 w-full">
                 <div className="space-y-2 border-l-8 border-primary pl-8">
