@@ -113,9 +113,9 @@ export default function StoreAssemble() {
   return (
     <section ref={containerRef} className="relative h-screen w-full bg-[#002B5B] overflow-hidden flex flex-col items-center justify-center perspective-container">
       {/* Tactical Header Overlay */}
-      <div className="absolute top-0 left-0 w-full h-24 border-b-4 border-border bg-black/40 backdrop-blur-xl z-[100] flex items-center justify-between px-12">
-        <div className="flex items-center gap-4">
-          <div className="relative w-10 h-10">
+      <div className="absolute top-0 left-0 w-full h-20 md:h-24 border-b-4 border-border bg-black/40 backdrop-blur-xl z-[100] flex items-center justify-between px-6 md:px-12">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="relative w-8 h-8 md:w-10 md:h-10">
             <img 
               src="https://graciebarrapilot.s3.us-east-1.amazonaws.com/Generated_Image_March_06__2026_-_12_01AM-removebg-preview.png" 
               alt="GB Shield" 
@@ -123,13 +123,13 @@ export default function StoreAssemble() {
             />
           </div>
           <div className="flex flex-col">
-            <span className="font-headline text-2xl font-black uppercase italic tracking-tighter text-primary leading-none">ARMORY HUB</span>
-            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/60">Equipping the Global Legacy</span>
+            <span className="font-headline text-lg md:text-2xl font-black uppercase italic tracking-tighter text-primary leading-none">ARMORY HUB</span>
+            <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] text-white/60">Equipping the Global Legacy</span>
           </div>
         </div>
-        <Button asChild variant="ghost" className="text-white hover:text-primary rounded-none font-black uppercase italic text-xs tracking-widest p-0 h-auto">
+        <Button asChild variant="ghost" className="text-white hover:text-primary rounded-none font-black uppercase italic text-[10px] md:text-xs tracking-widest p-0 h-auto">
           <Link href="/" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" /> ABORT TO BASE
+            <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">ABORT TO BASE</span><span className="sm:hidden">ABORT</span>
           </Link>
         </Button>
       </div>
@@ -142,12 +142,12 @@ export default function StoreAssemble() {
         <div className="h-full w-full absolute top-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_40px,rgba(255,255,255,0.05)_40px,rgba(255,255,255,0.05)_41px)]" />
       </div>
 
-      <div ref={titleRef} className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 will-change-transform perspective-element">
+      <div ref={titleRef} className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 will-change-transform perspective-element px-4">
         <h1 className="text-center">
-          <span className="block text-[10vw] font-black text-white uppercase italic tracking-tighter leading-none drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]">
+          <span className="block text-[15vw] md:text-[10vw] font-black text-white uppercase italic tracking-tighter leading-none drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]">
             GRACIE BARRA
           </span>
-          <span className="block text-[8vw] font-black text-primary uppercase italic tracking-tighter leading-none -mt-4 drop-shadow-[0_0_30px_rgba(225,29,72,0.5)]">
+          <span className="block text-[12vw] md:text-[8vw] font-black text-primary uppercase italic tracking-tighter leading-none -mt-2 md:-mt-4 drop-shadow-[0_0_30px_rgba(225,29,72,0.5)]">
             STORE
           </span>
         </h1>
@@ -159,37 +159,37 @@ export default function StoreAssemble() {
           <div 
             key={item.id}
             ref={el => { itemRefs.current[index] = el; }}
-            className="absolute inset-0 flex items-center justify-center opacity-0 will-change-transform perspective-element px-6"
+            className="absolute inset-0 flex items-center justify-center opacity-0 will-change-transform perspective-element px-4 md:px-6"
           >
-            <Card className="max-w-4xl w-full bg-card/40 backdrop-blur-2xl border-4 border-border rounded-none shadow-2xl overflow-hidden">
+            <Card className="max-w-5xl w-full bg-card/40 backdrop-blur-2xl border-4 border-border rounded-none shadow-2xl overflow-hidden">
               <div className="flex flex-col md:flex-row h-full">
-                <div className="md:w-1/2 relative aspect-square md:aspect-auto">
+                <div className="md:w-1/2 relative aspect-square md:aspect-auto bg-black/20 group">
                   {image && (
                     <Image 
                       src={image.imageUrl} 
                       alt={item.name} 
                       fill 
-                      className="object-contain p-8" 
+                      className="object-contain p-4 md:p-8 transition-transform duration-700 group-hover:scale-110" 
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
-                <div className="md:w-1/2 p-12 flex flex-col justify-center space-y-8">
-                  <div className="space-y-2 border-l-8 border-primary pl-8">
-                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic">Armory Resource v2.0</p>
-                    <h3 className="text-5xl font-black uppercase italic tracking-tighter text-white leading-none">{item.name}</h3>
+                <div className="md:w-1/2 p-6 md:p-12 flex flex-col justify-center space-y-6 md:space-y-8">
+                  <div className="space-y-2 border-l-8 border-primary pl-6 md:pl-8">
+                    <p className="text-[8px] md:text-[10px] font-black text-primary uppercase tracking-[0.4em] italic">{item.tag}</p>
+                    <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-white leading-none">{item.name}</h3>
                   </div>
-                  <p className="text-lg font-bold text-white/60 uppercase tracking-tight leading-relaxed">
+                  <p className="text-sm md:text-lg font-bold text-white/60 uppercase tracking-tight leading-relaxed">
                     {item.description}
                   </p>
-                  <div className="flex items-center justify-between pt-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-4">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">UNIT COST</span>
-                      <span className="text-5xl font-black text-white italic">${item.price}.00</span>
+                      <span className="text-[8px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest">UNIT COST</span>
+                      <span className="text-4xl md:text-5xl font-black text-white italic">${item.price}.00</span>
                     </div>
-                    <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic h-16 px-10 shadow-xl">
+                    <Button asChild size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic h-14 md:h-16 px-8 md:px-10 shadow-xl text-xs md:text-sm">
                       <Link href={`/checkout?plan=${encodeURIComponent(item.name)}&price=${item.price}&details=${encodeURIComponent(item.details)}&itemType=uniform&assetId=${item.id}`}>
-                        ACQUIRE UNIT <ShoppingCart className="ml-3 h-5 w-5" />
+                        ACQUIRE UNIT <ShoppingCart className="ml-3 h-4 w-4 md:h-5 md:w-5" />
                       </Link>
                     </Button>
                   </div>
