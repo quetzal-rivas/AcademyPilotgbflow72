@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -44,18 +43,18 @@ export function PhotoGrid({ photoUrls }: PhotoGridProps) {
 
   if (currentPhotos.length === 0) {
     return (
-      <div className="absolute inset-0 bg-black">
-        <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/gb/1920/1080')] bg-cover bg-center opacity-30 blur-sm" />
-        <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-zinc-900">
+        <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/gb/1920/1080')] bg-cover bg-center opacity-40" />
+        <div className="absolute inset-0 bg-black/20" />
       </div>
     );
   }
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden bg-black">
-      <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-6 md:grid-rows-3 h-full w-full opacity-40">
+    <div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-950">
+      <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-6 md:grid-rows-3 h-full w-full opacity-75">
         {currentPhotos.map((photo, index) => (
-          <div key={`${photo}-${index}`} className="relative h-full w-full border border-white/5">
+          <div key={`${photo}-${index}`} className="relative h-full w-full border border-white/10">
             <Image
               src={photo}
               alt="Academy Environment"
@@ -67,8 +66,8 @@ export function PhotoGrid({ photoUrls }: PhotoGridProps) {
           </div>
         ))}
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
+      <div className="absolute inset-0 bg-black/20" />
     </div>
   );
 }
