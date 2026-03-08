@@ -293,30 +293,62 @@ export default function AcademySettingsPage() {
         </TabsContent>
 
         <TabsContent value="push" className="space-y-8 animate-in fade-in duration-500">
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-            <ActionTriggerCard 
-              icon={<Key className="w-8 h-8 text-primary" />}
-              title="Custom Webhook"
-              desc="Broadcast to custom operational endpoints"
-              onClick={() => addConnection('webhook')}
-            />
-          </div>
-
           <div className="space-y-6">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
-              <Zap className="h-4 w-4 text-primary" /> Active Integration Controllers
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
+                <Zap className="h-4 w-4 text-primary" /> Active Integration Controllers
+              </h3>
+              {allConfigs.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="rounded-none border-primary text-primary hover:bg-primary hover:text-white font-black uppercase italic text-[9px] h-8 px-4"
+                  onClick={() => addConnection('webhook')}
+                >
+                  <Plus className="w-3 h-3 mr-2" /> New Protocol
+                </Button>
+              )}
+            </div>
             
             {configsLoading && allConfigs.length === 0 ? (
                <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>
             ) : allConfigs.length === 0 ? (
-              <button 
-                onClick={() => addConnection('webhook')}
-                className="w-full p-20 border-2 border-dashed border-border rounded-none text-center opacity-40 italic hover:opacity-100 hover:border-primary hover:bg-primary/5 transition-all group"
-              >
-                <Plus className="h-12 w-12 mx-auto mb-4 text-muted-foreground group-hover:text-primary group-hover:scale-110 transition-transform" />
-                <p className="text-[10px] font-black uppercase tracking-widest">No active tactical links established. Click to initialize.</p>
-              </button>
+              /* PROVISIONING CARD: Rendered directly when no links exist as requested */
+              <Card className="rounded-none border-2 border-border bg-card group hover:border-primary transition-all shadow-md overflow-hidden">
+                <CardHeader className="p-6 pb-4 bg-secondary/5 border-b-2 border-border">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-background border-2 border-border group-hover:border-primary transition-colors">
+                        <Key className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-sm font-black uppercase italic tracking-tight">Tactical Webhook Provisioning</CardTitle>
+                        <Badge variant="outline" className="text-[8px] uppercase font-black tracking-widest rounded-none h-4 border-primary/30 text-primary">
+                          PENDING
+                        </Badge>
+                      </div>
+                    </div>
+                    <Badge className="rounded-none font-black uppercase text-[9px] tracking-widest px-3 py-1 bg-primary">
+                      OFFLINE
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-12 space-y-8 bg-background/50 text-center">
+                  <div className="max-w-md mx-auto space-y-6">
+                    <div className="p-6 bg-primary/5 border-2 border-dashed border-primary/20 rounded-none italic">
+                      <p className="text-xs font-bold uppercase text-primary leading-relaxed">
+                        No tactical data bridge is currently established. Initialize the protocol to manifest the integration controller.
+                      </p>
+                    </div>
+                    <Button 
+                      onClick={() => addConnection('webhook')}
+                      className="bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic tracking-widest h-16 px-12 shadow-xl shadow-primary/20 transition-all hover:scale-105"
+                    >
+                      <Zap className="mr-3 h-6 w-6 fill-current" /> MANIFEST CONTROLLER
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             ) : (
               <div className="space-y-6">
                 {allConfigs.map((conn) => (
@@ -472,23 +504,5 @@ export default function AcademySettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  );
-}
-
-function ActionTriggerCard({ icon, title, desc, onClick }: { icon: React.ReactNode, title: string, desc: string, onClick: () => void }) {
-  return (
-    <Button 
-      variant="outline" 
-      className="h-auto flex flex-col items-center gap-4 bg-background border-2 border-border hover:border-primary hover:bg-primary/5 transition-all p-8 rounded-none group text-center"
-      onClick={onClick}
-    >
-      <div className="p-4 bg-secondary/5 border-2 border-border group-hover:border-primary transition-colors">
-        {icon}
-      </div>
-      <div className="space-y-1">
-        <span className="block font-black uppercase italic text-sm tracking-tight">{title}</span>
-        <span className="block text-[9px] font-bold uppercase tracking-widest text-muted-foreground max-w-[120px] mx-auto leading-tight">{desc}</span>
-      </div>
-    </Button>
   );
 }
