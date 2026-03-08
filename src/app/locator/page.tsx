@@ -40,10 +40,10 @@ export default async function LocatorPage() {
       </header>
 
       <main className="flex-grow relative overflow-hidden bg-black">
-        {/* Cinematic Tactical Grid Background */}
+        {/* Cinematic Tactical Grid Background - Luminosity Enhanced */}
         <div className="absolute inset-0 z-0">
           <PhotoGrid photoUrls={photos} />
-          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-background/20 backdrop-blur-[2px]" />
         </div>
 
         <div className="relative z-10 py-16 lg:py-24">
@@ -52,10 +52,10 @@ export default async function LocatorPage() {
               <div className="inline-block bg-primary text-white px-4 py-1 text-[10px] font-black uppercase tracking-[0.3em] italic mb-2 shadow-lg">
                 MISSION: FIND YOUR TEAM
               </div>
-              <h1 className="text-6xl md:text-8xl font-headline font-black uppercase italic tracking-tighter leading-none text-white drop-shadow-2xl">
+              <h1 className="text-6xl md:text-8xl font-headline font-black uppercase italic tracking-tighter leading-none text-white drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]">
                 Locate the Nearest <br /><span className="text-primary">Jiu-Jitsu</span> Academy
               </h1>
-              <p className="text-xl text-white/90 font-bold uppercase italic tracking-tight max-w-xl drop-shadow-md">
+              <p className="text-xl text-white font-black uppercase italic tracking-tight max-w-xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] bg-black/20 p-2 inline-block">
                 Find a certified Gracie Barra training center in your area. Join our global brotherhood and start your journey with a free trial class today.
               </p>
             </div>

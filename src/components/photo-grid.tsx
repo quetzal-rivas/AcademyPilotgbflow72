@@ -52,9 +52,9 @@ export function PhotoGrid({ photoUrls }: PhotoGridProps) {
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden bg-zinc-950">
-      <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-6 md:grid-rows-3 h-full w-full opacity-75">
+      <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-6 md:grid-rows-3 h-full w-full opacity-100">
         {currentPhotos.map((photo, index) => (
-          <div key={`${photo}-${index}`} className="relative h-full w-full border border-white/10">
+          <div key={`${photo}-${index}`} className="relative h-full w-full border border-white/5">
             <Image
               src={photo}
               alt="Academy Environment"
@@ -66,8 +66,8 @@ export function PhotoGrid({ photoUrls }: PhotoGridProps) {
           </div>
         ))}
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-      <div className="absolute inset-0 bg-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
+      <div className="absolute inset-0 bg-black/10" />
     </div>
   );
 }
