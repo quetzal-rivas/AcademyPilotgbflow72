@@ -278,67 +278,72 @@ export default function AcademySettingsPage() {
             <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
               <Zap className="h-4 w-4 text-primary" /> Active Integration Controllers
             </h3>
+            
             {configsLoading ? (
                <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>
-            ) : configs?.length === 0 ? (
+            ) : !configs || configs.length === 0 ? (
               <div className="p-20 border-2 border-dashed border-border rounded-none text-center opacity-40 italic">
                 <p className="text-[10px] font-black uppercase">No active tactical links established.</p>
               </div>
-            ) : configs?.map((conn) => (
-              <Card key={conn.id} className="rounded-none border-2 border-border bg-card group hover:border-primary transition-all shadow-md overflow-hidden">
-                <CardHeader className="p-6 pb-4 bg-secondary/5 border-b-2 border-border">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-2 bg-background border-2 border-border group-hover:border-primary transition-colors">
-                        {conn.type === 'hubspot' ? <Globe className="w-5 h-5 text-primary" /> : conn.type === 'webhook' ? <Key className="w-5 h-5 text-primary" /> : <Database className="w-5 h-5 text-primary" />}
-                      </div>
-                      <div>
-                        <CardTitle className="text-sm font-black uppercase italic tracking-tight">{conn.name}</CardTitle>
-                        <Badge variant="outline" className="text-[8px] uppercase font-black tracking-widest rounded-none h-4 border-primary/30 text-primary">
-                          {conn.type}
+            ) : (
+              <div className="space-y-6">
+                {configs.map((conn) => (
+                  <Card key={conn.id} className="rounded-none border-2 border-border bg-card group hover:border-primary transition-all shadow-md overflow-hidden will-change-transform">
+                    <CardHeader className="p-6 pb-4 bg-secondary/5 border-b-2 border-border">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 bg-background border-2 border-border group-hover:border-primary transition-colors">
+                            {conn.type === 'hubspot' ? <Globe className="w-5 h-5 text-primary" /> : conn.type === 'webhook' ? <Key className="w-5 h-5 text-primary" /> : <Database className="w-5 h-5 text-primary" />}
+                          </div>
+                          <div>
+                            <CardTitle className="text-sm font-black uppercase italic tracking-tight">{conn.name}</CardTitle>
+                            <Badge variant="outline" className="text-[8px] uppercase font-black tracking-widest rounded-none h-4 border-primary/30 text-primary">
+                              {conn.type}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Badge className={`rounded-none font-black uppercase text-[9px] tracking-widest px-3 py-1 ${conn.status === 'active' ? 'bg-green-600' : 'bg-primary'}`}>
+                          {conn.status === 'active' ? 'CONNECTED' : 'DISCONNECTED'}
                         </Badge>
                       </div>
-                    </div>
-                    <Badge className={`rounded-none font-black uppercase text-[9px] tracking-widest px-3 py-1 ${conn.status === 'active' ? 'bg-green-600' : 'bg-primary'}`}>
-                      {conn.status === 'active' ? 'CONNECTED' : 'DISCONNECTED'}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-8 space-y-6 bg-background/50">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">API Secret Key</Label>
-                      <Input 
-                        type="password" 
-                        placeholder="PASTE SECRET..."
-                        defaultValue={conn.apiSecret || ''}
-                        onBlur={(e) => handleUpdateConnection(conn.id, { apiSecret: e.target.value, status: 'active' })}
-                        className="rounded-none border-2 h-12 bg-background font-mono text-xs focus-visible:ring-primary" 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Destination URL</Label>
-                      <Input 
-                        type="url" 
-                        placeholder="https://api.external-theater.com/webhook"
-                        defaultValue={conn.webhookUrl || ''}
-                        onBlur={(e) => handleUpdateConnection(conn.id, { webhookUrl: e.target.value, status: 'active' })}
-                        className="rounded-none border-2 h-12 bg-background font-mono text-xs focus-visible:ring-primary" 
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="p-4 bg-secondary/5 border-t border-border flex justify-between items-center px-8">
-                  <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                    <Info className="h-3.5 w-3.5 text-primary" />
-                    <span>Last Matrix Check: {conn.updatedAt?.seconds ? new Date(conn.updatedAt.seconds * 1000).toLocaleString() : 'STANDBY'}</span>
-                  </div>
-                  <Button variant="ghost" size="sm" className="text-destructive font-black uppercase italic text-[9px] hover:bg-destructive/10 rounded-none h-10 px-6" onClick={() => deleteConnection(conn.id)}>
-                    <Trash2 className="w-4 h-4 mr-2" /> DISCONNECT LINK
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+                    </CardHeader>
+                    <CardContent className="p-8 space-y-6 bg-background/50">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">API Secret Key</Label>
+                          <Input 
+                            type="password" 
+                            placeholder="PASTE SECRET..."
+                            defaultValue={conn.apiSecret || ''}
+                            onBlur={(e) => handleUpdateConnection(conn.id, { apiSecret: e.target.value, status: 'active' })}
+                            className="rounded-none border-2 h-12 bg-background font-mono text-xs focus-visible:ring-primary" 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Target Destination URL</Label>
+                          <Input 
+                            type="url" 
+                            placeholder="https://api.external-theater.com/webhook"
+                            defaultValue={conn.webhookUrl || ''}
+                            onBlur={(e) => handleUpdateConnection(conn.id, { webhookUrl: e.target.value, status: 'active' })}
+                            className="rounded-none border-2 h-12 bg-background font-mono text-xs focus-visible:ring-primary" 
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="p-4 bg-secondary/5 border-t border-border flex justify-between items-center px-8">
+                      <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                        <Info className="h-3.5 w-3.5 text-primary" />
+                        <span>Last Matrix Check: {conn.updatedAt?.seconds ? new Date(conn.updatedAt.seconds * 1000).toLocaleString() : 'STANDBY'}</span>
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-destructive font-black uppercase italic text-[9px] hover:bg-destructive/10 rounded-none h-10 px-6" onClick={() => deleteConnection(conn.id)}>
+                        <Trash2 className="w-4 h-4 mr-2" /> TERMINATE LINK
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </TabsContent>
 
@@ -353,7 +358,7 @@ export default function AcademySettingsPage() {
                 <ShieldCheck className="w-8 h-8" />
                 Secure Inbound Access (Pull API)
               </CardTitle>
-              <CardDescription className="text-white/80 font-bold uppercase tracking-widest text-[10px] mt-2">Engineering secure data exposure for external tactical software.</CardDescription>
+              <DialogDescription className="text-white/80 font-bold uppercase tracking-widest text-[10px] mt-2">Engineering secure data exposure for external tactical software.</DialogDescription>
             </CardHeader>
             <CardContent className="p-8 space-y-8 relative z-10">
               <div className="p-6 bg-background/80 border-2 border-primary/20 backdrop-blur-sm flex gap-6">
