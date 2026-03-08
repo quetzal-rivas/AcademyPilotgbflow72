@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, Megaphone, TrendingUp, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
+import { Users, Megaphone, TrendingUp, ArrowUpRight, ArrowDownRight, Activity, Zap, MessageSquare, CalendarCheck, Mic, LayoutGrid } from "lucide-react";
 import { 
   AreaChart,
   Area,
@@ -25,12 +25,13 @@ const data = [
 
 export default function DashboardOverview() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <div className="border-l-4 border-primary pl-6">
-        <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter leading-none">Automation Overview</h1>
-        <p className="text-muted-foreground font-medium uppercase tracking-widest text-[10px] mt-2">Mission Control: Monitoring Performance</p>
+        <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter leading-none">Command Overview</h1>
+        <p className="text-muted-foreground font-medium uppercase tracking-widest text-[10px] mt-2">Mission Control: Monitoring Operational Performance</p>
       </div>
 
+      {/* Tactical Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard 
           title="Total Leads" 
@@ -55,6 +56,41 @@ export default function DashboardOverview() {
         />
       </div>
 
+      {/* Operational Sectors Registry */}
+      <div className="space-y-6">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-2">
+          <LayoutGrid className="h-4 w-4 text-primary" /> Operational Sectors Registry
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <ModuleCard 
+            title="Lead Management" 
+            desc="Tactical registry for unit initialization. Monitor recruitment status and intelligence data."
+            icon={<Users className="h-5 w-5 text-primary" />}
+          />
+          <ModuleCard 
+            title="Conversations" 
+            desc="Encrypted logs. Review the history of AI-driven and manual comms with recruits."
+            icon={<MessageSquare className="h-5 w-5 text-primary" />}
+          />
+          <ModuleCard 
+            title="Class Command" 
+            desc="Operational matrix. Initialize protocols and manage real-time unit presence."
+            icon={<CalendarCheck className="h-5 w-5 text-primary" />}
+          />
+          <ModuleCard 
+            title="Ad Deployment" 
+            desc="Generative campaign engine. Deploy AI-optimized creative to target coordinates."
+            icon={<Megaphone className="h-5 w-5 text-primary" />}
+          />
+          <ModuleCard 
+            title="Voice Dispatch" 
+            desc="AI vocal link hub. Provision and launch tactical units for direct comms link."
+            icon={<Mic className="h-5 w-5 text-primary" />}
+          />
+        </div>
+      </div>
+
+      {/* Data Visualization Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 bg-card border-border shadow-md rounded-none">
           <CardHeader>
@@ -133,6 +169,20 @@ function StatsCard({ title, value, change, positive, icon }: {
           <p className="text-3xl font-headline font-black italic mt-1">{value}</p>
         </div>
       </CardContent>
+    </Card>
+  );
+}
+
+function ModuleCard({ title, desc, icon }: { title: string, desc: string, icon: React.ReactNode }) {
+  return (
+    <Card className="bg-secondary/5 border-2 border-border hover:border-primary transition-all rounded-none p-4 space-y-3 group">
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-background border border-border group-hover:border-primary transition-colors">
+          {icon}
+        </div>
+        <h4 className="text-xs font-black uppercase italic tracking-tight">{title}</h4>
+      </div>
+      <p className="text-[10px] font-medium leading-relaxed text-muted-foreground">{desc}</p>
     </Card>
   );
 }
