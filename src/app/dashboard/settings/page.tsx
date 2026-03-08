@@ -194,7 +194,7 @@ export default function AcademySettingsPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+    <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in duration-700">
       <div className="border-l-4 border-primary pl-6">
         <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter leading-none">Command & Integrations</h1>
         <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-2">Ops: Managing Tactical Handshakes & Mission Credentials</p>
@@ -358,7 +358,7 @@ export default function AcademySettingsPage() {
                 <ShieldCheck className="w-8 h-8" />
                 Secure Inbound Access (Pull API)
               </CardTitle>
-              <DialogDescription className="text-white/80 font-bold uppercase tracking-widest text-[10px] mt-2">Engineering secure data exposure for external tactical software.</DialogDescription>
+              <CardDescription className="text-white/80 font-bold uppercase tracking-widest text-[10px] mt-2">Engineering secure data exposure for external tactical software.</CardDescription>
             </CardHeader>
             <CardContent className="p-8 space-y-8 relative z-10">
               <div className="p-6 bg-background/80 border-2 border-primary/20 backdrop-blur-sm flex gap-6">
