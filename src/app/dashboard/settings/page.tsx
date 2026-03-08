@@ -112,24 +112,24 @@ export default function AcademySettingsPage() {
   const addConnection = (type: string) => {
     if (!db || !user) return;
     
-    // Generate a tactical ID locally to satisfy security rules
+    // Generate a tactical ID locally to satisfy security rules (ID in path must match data.id)
     const configId = `link_${Math.random().toString(36).substring(2, 12).toUpperCase()}`;
     const configDocRef = doc(db, 'user_profiles', user.uid, 'integration_configs', configId);
 
     const newConfig = {
       id: configId, // REQUIRED: Must match the document ID for the security rule
+      userId: user.uid, // REQUIRED: Must match auth.uid
       name: `TACTICAL ${type.toUpperCase()} LINK`,
       type,
       apiKeyIdentifier: `ID-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
       status: 'disconnected',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      userId: user.uid,
       apiSecret: '',
       webhookUrl: ''
     };
 
-    // Use setDoc instead of addDoc to control the ID
+    // Use setDoc instead of addDoc to ensure ID alignment
     setDoc(configDocRef, newConfig)
       .catch(async (e) => {
         errorEmitter.emit('permission-error', new FirestorePermissionError({
@@ -295,7 +295,7 @@ export default function AcademySettingsPage() {
             ) : (
               <div className="space-y-6">
                 {configs.map((conn) => (
-                  <Card key={conn.id} className="rounded-none border-2 border-border bg-card group hover:border-primary transition-all shadow-md overflow-hidden will-change-transform">
+                  <Card key={conn.id} className="rounded-none border-2 border-border bg-card group hover:border-primary transition-all shadow-md overflow-hidden will-change-transform animate-in slide-in-from-top-4 duration-500">
                     <CardHeader className="p-6 pb-4 bg-secondary/5 border-b-2 border-border">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
