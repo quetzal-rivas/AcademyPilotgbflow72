@@ -1,5 +1,4 @@
-
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { 
@@ -13,19 +12,14 @@ import {
   Trash2, 
   RefreshCcw, 
   Info,
-  ExternalLink,
-  Settings,
   Save,
   Loader2,
   Zap,
-  Plug,
-  Unplug
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
@@ -47,17 +41,12 @@ export default function AcademySettingsPage() {
   const { user } = useUser();
   const db = useFirestore();
   const [copied, setCopied] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   
   // Tactical Optimistic UI State
   const [localConfigs, setLocalConfigs] = useState<any[]>([]);
   
-  // Form state for General tab
-  const [academyName, setAcademyName] = useState('');
-  const [academyDesc, setAcademyDesc] = useState('');
-
-  // Profile Doc Reference
+  // Profile Doc Reference (needed for Pull API key)
   const profileRef = useMemoFirebase(() => {
     if (!db || !user) return null;
     return doc(db, 'user_profiles', user.uid);
@@ -73,19 +62,11 @@ export default function AcademySettingsPage() {
   
   const { data: configs, isLoading: configsLoading } = useCollection(configsRef);
 
-  // Merge optimistic local configs with Firestore data, avoiding duplicates
+  // Merge optimistic local configs with Firestore data
   const allConfigs = [
     ...localConfigs,
     ...(configs?.filter(c => !localConfigs.find(lc => lc.id === c.id)) || [])
   ];
-
-  // Sync form state
-  useEffect(() => {
-    if (profile) {
-      setAcademyName(profile.academyName || '');
-      setAcademyDesc(profile.description || '');
-    }
-  }, [profile]);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -94,35 +75,9 @@ export default function AcademySettingsPage() {
     toast({ title: "INTEL COPIED", description: "Tactical credentials secured to clipboard." });
   };
 
-  const handleSaveProfile = () => {
-    if (!profileRef) return;
-    setIsSaving(true);
-    
-    const updateData = {
-      academyName,
-      description: academyDesc,
-      updatedAt: serverTimestamp()
-    };
-
-    updateDoc(profileRef, updateData)
-      .then(() => {
-        setIsSaving(false);
-        toast({ title: "PROFILE UPDATED", description: "Academy mission parameters secured." });
-      })
-      .catch(async (e) => {
-        setIsSaving(false);
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-          path: profileRef.path,
-          operation: 'update',
-          requestResourceData: updateData
-        }));
-      });
-  };
-
   const addConnection = (type: string) => {
     if (!db || !user) return;
     
-    // Generate tactical ID
     const configId = `link_${Math.random().toString(36).substring(2, 12).toUpperCase()}`;
     const configDocRef = doc(db, 'user_profiles', user.uid, 'integration_configs', configId);
 
@@ -139,25 +94,21 @@ export default function AcademySettingsPage() {
       webhookUrl: ''
     };
 
-    // 1. RENDER IMMEDIATELY (Optimistic)
     setLocalConfigs(prev => [newConfig, ...prev]);
     toast({ title: "INITIALIZING LINK", description: `Manifesting ${type.toUpperCase()} controller...` });
 
-    // 2. EXECUTE LOGIC (Firestore Write)
     setDoc(configDocRef, newConfig)
       .then(() => {
-        // Success: Clean up local optimistic entry once useCollection syncs
         setTimeout(() => {
           setLocalConfigs(prev => prev.filter(c => c.id !== configId));
         }, 1000);
       })
       .catch(async (e) => {
-        // 3. IF FAIL: REVERT UI AND SHOW MESSAGE
         setLocalConfigs(prev => prev.filter(c => c.id !== configId));
         toast({ 
           variant: "destructive", 
           title: "HANDSHAKE FAILED", 
-          description: "Tactical security protocols blocked the connection initialization. Registry reverted." 
+          description: "Tactical security protocols blocked the connection initialization." 
         });
         errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: configDocRef.path,
@@ -186,7 +137,6 @@ export default function AcademySettingsPage() {
 
   const verifyConnection = (id: string) => {
     setVerifyingId(id);
-    // Simulate tactical handshake verification
     setTimeout(() => {
       handleUpdateConnection(id, { status: 'active' });
       setVerifyingId(null);
@@ -227,7 +177,7 @@ export default function AcademySettingsPage() {
     toast({ title: "KEY ROTATED", description: "New secret access key manifested." });
   };
 
-  if (profileLoading) {
+  if (profileLoading && !profile) {
     return (
       <div className="flex items-center justify-center h-96">
         <Loader2 className="w-12 h-12 text-primary animate-spin" />
@@ -242,11 +192,8 @@ export default function AcademySettingsPage() {
         <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-2">Ops: Managing Tactical Handshakes & Mission Credentials</p>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-8">
+      <Tabs defaultValue="push" className="space-y-8">
         <TabsList className="bg-secondary/10 border-2 border-border p-1 rounded-none">
-          <TabsTrigger value="general" className="rounded-none font-black uppercase italic tracking-widest text-xs px-8 data-[state=active]:bg-primary data-[state=active]:text-white gap-2">
-            <Settings className="w-4 h-4" /> Sector Alpha: Identity
-          </TabsTrigger>
           <TabsTrigger value="push" className="rounded-none font-black uppercase italic tracking-widest text-xs px-8 data-[state=active]:bg-primary data-[state=active]:text-white gap-2">
             <Globe className="w-4 h-4" /> Push (Outbound)
           </TabsTrigger>
@@ -254,43 +201,6 @@ export default function AcademySettingsPage() {
             <Database className="w-4 h-4" /> Pull (Inbound)
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="general" className="space-y-8 animate-in fade-in duration-500">
-          <Card className="rounded-none border-2 border-border bg-card shadow-md">
-            <CardHeader className="bg-secondary/5 border-b border-border">
-              <CardTitle className="font-headline text-xl font-black uppercase italic">Academy Registry Profile</CardTitle>
-              <CardDescription className="text-[10px] font-bold uppercase tracking-widest">Core mission identification for this tactical tenant.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-8 space-y-6">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest">Academy Callsign</Label>
-                <Input 
-                  value={academyName} 
-                  onChange={(e) => setAcademyName(e.target.value.toUpperCase())}
-                  className="rounded-none border-2 h-12 font-black italic uppercase"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest">Mission Directive (Description)</Label>
-                <Textarea 
-                  value={academyDesc} 
-                  onChange={(e) => setAcademyDesc(e.target.value)}
-                  className="rounded-none border-2 min-h-[100px] font-medium"
-                />
-              </div>
-            </CardContent>
-            <CardFooter className="bg-secondary/5 border-t border-border p-6 flex justify-end">
-              <Button 
-                className="bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic tracking-widest h-12 px-10 shadow-lg" 
-                onClick={handleSaveProfile}
-                disabled={isSaving}
-              >
-                {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4" />}
-                SECURE PROFILE
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="push" className="space-y-8 animate-in fade-in duration-500">
           <div className="space-y-6">
@@ -313,7 +223,6 @@ export default function AcademySettingsPage() {
             {configsLoading && allConfigs.length === 0 ? (
                <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>
             ) : allConfigs.length === 0 ? (
-              /* PROVISIONING CARD: Rendered directly when no links exist as requested */
               <Card className="rounded-none border-2 border-border bg-card group hover:border-primary transition-all shadow-md overflow-hidden">
                 <CardHeader className="p-6 pb-4 bg-secondary/5 border-b-2 border-border">
                   <div className="flex items-center justify-between">
@@ -352,7 +261,7 @@ export default function AcademySettingsPage() {
             ) : (
               <div className="space-y-6">
                 {allConfigs.map((conn) => (
-                  <Card key={conn.id} className="rounded-none border-2 border-border bg-card group hover:border-primary transition-all shadow-md overflow-hidden will-change-transform animate-in slide-in-from-top-4 duration-500">
+                  <Card key={conn.id} className="rounded-none border-2 border-border bg-card group hover:border-primary transition-all shadow-md overflow-hidden animate-in slide-in-from-top-4 duration-500">
                     <CardHeader className="p-6 pb-4 bg-secondary/5 border-b-2 border-border">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
