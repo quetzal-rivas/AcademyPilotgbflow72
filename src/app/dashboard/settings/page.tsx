@@ -253,19 +253,7 @@ export default function AcademySettingsPage() {
 
         {/* PUSH SECTOR */}
         <TabsContent value="push" className="space-y-8 animate-in fade-in duration-500">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <ActionTriggerCard 
-              icon={<Globe className="w-8 h-8 text-primary" />}
-              title="HubSpot Link"
-              desc="Synchronize unit data with HubSpot CRM"
-              onClick={() => addConnection('hubspot')}
-            />
-            <ActionTriggerCard 
-              icon={<Database className="w-8 h-8 text-primary" />}
-              title="GHL Handshake"
-              desc="Deploy lead data to GoHighLevel matrix"
-              onClick={() => addConnection('gohighlevel')}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
             <ActionTriggerCard 
               icon={<Key className="w-8 h-8 text-primary" />}
               title="Custom Webhook"
@@ -293,7 +281,7 @@ export default function AcademySettingsPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <div className="p-2 bg-background border-2 border-border group-hover:border-primary transition-colors">
-                            {conn.type === 'hubspot' ? <Globe className="w-5 h-5 text-primary" /> : conn.type === 'webhook' ? <Key className="w-5 h-5 text-primary" /> : <Database className="w-5 h-5 text-primary" />}
+                            <Key className="w-5 h-5 text-primary" />
                           </div>
                           <div>
                             <CardTitle className="text-sm font-black uppercase italic tracking-tight">{conn.name}</CardTitle>
