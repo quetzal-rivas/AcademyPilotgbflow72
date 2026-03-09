@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Phone, Star, Globe, ExternalLink, Send, CheckCircle2, Zap } from "lucide-react";
+import { MapPin, Phone, Star, Globe, ExternalLink, Send, CheckCircle2, Zap, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useUser, useAuth, initiateAnonymousSignIn } from "@/firebase";
 
 interface AcademyDetailsDialogProps {
   academy: Academy | null;
@@ -23,7 +24,10 @@ export function AcademyDetailsDialog({ academy, onClose }: AcademyDetailsDialogP
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [isSent, setIsSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useUser();
+  const auth = useAuth();
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!academy) return null;
@@ -40,7 +44,7 @@ export function AcademyDetailsDialog({ academy, onClose }: AcademyDetailsDialogP
     }
   }
 
-  const handleSendRequest = (e: React.FormEvent) => {
+  const handleSendRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone) {
       toast({
@@ -51,18 +55,73 @@ export function AcademyDetailsDialog({ academy, onClose }: AcademyDetailsDialogP
       return;
     }
     
-    setIsSent(true);
-    toast({
-      title: "Tactical Link Established",
-      description: "Mission request received. Expect unit contact shortly.",
-    });
+    setIsSubmitting(true);
 
-    setTimeout(() => {
-      setShowTrialForm(false);
-      setIsSent(false);
-      setName("");
-      setPhone("");
-    }, 3000);
+    try {
+      // 1. Mission Step: Create User / Establish Tactical Session
+      if (!user) {
+        console.log("[TACTICAL] Initializing anonymous unit session...");
+        initiateAnonymousSignIn(auth);
+      }
+
+      // 2. Mission Step: Save Lead to Registry Matrix
+      const leadPayload = {
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ').slice(1).join(' ') || 'RECRUIT',
+        phoneNumber: phone,
+        userId: user?.uid || 'INITIALIZING', // In a real app, we'd wait for user or use a dedicated system UID
+        qualificationStatus: "New",
+        sourceType: "Locator Link",
+        sourceEntityId: academy.id,
+        capturedAt: new Date().toISOString(),
+        tags: ["trial", "automated-dispatch"],
+        notes: "Unit self-enrolled via locator matrix. AI dispatch pending.",
+      };
+
+      const leadResponse = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...leadPayload,
+          // Since this is a public visitor, we use a global system ID for the "owner" of locator leads
+          // or rely on the anonymous user session. For this prototype, we'll use the session UID.
+          userId: user?.uid || 'guest_locator_unit'
+        }),
+      });
+
+      if (!leadResponse.ok) throw new Error('Registry synchronization failure');
+
+      // 3. Mission Step: Trigger AI Dispatch Automations (Simulated)
+      console.log(`[TACTICAL] Dispatching magic sign-in link to unit: ${phone}`);
+      console.log(`[AI DISPATCH] Initiating schedule call to lead: ${name}`);
+      console.log(`[AI DISPATCH] Initiating confirmation call to academy staff for ${academy.name}`);
+
+      // We simulate the AI "calls" by noting the protocol start
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setIsSent(true);
+      toast({
+        title: "TACTICAL LINK ESTABLISHED",
+        description: "Mission request received. Magic link dispatched. AI dispatch sequence initiated.",
+      });
+
+      // Cleanup
+      setTimeout(() => {
+        setShowTrialForm(false);
+        setIsSent(false);
+        setName("");
+        setPhone("");
+      }, 3000);
+
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "PROTOCOL FAILURE",
+        description: error.message || "An unexpected error occurred during initialization.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -71,6 +130,7 @@ export function AcademyDetailsDialog({ academy, onClose }: AcademyDetailsDialogP
         onClose();
         setShowTrialForm(false);
         setIsSent(false);
+        setIsSubmitting(false);
       }
     }}>
       <DialogContent className="sm:max-w-xl bg-background border-4 border-border rounded-none shadow-2xl p-0 overflow-hidden">
@@ -187,6 +247,7 @@ export function AcademyDetailsDialog({ academy, onClose }: AcademyDetailsDialogP
                       value={name}
                       onChange={(e) => setName(e.target.value.toUpperCase())}
                       required
+                      disabled={isSubmitting}
                     />
                   </div>
                   <div className="space-y-2">
@@ -199,6 +260,7 @@ export function AcademyDetailsDialog({ academy, onClose }: AcademyDetailsDialogP
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       required
+                      disabled={isSubmitting}
                     />
                   </div>
                   <div className="pt-6 flex gap-4">
@@ -207,13 +269,16 @@ export function AcademyDetailsDialog({ academy, onClose }: AcademyDetailsDialogP
                       variant="outline" 
                       className="flex-1 h-14 rounded-none font-black uppercase italic text-xs border-2"
                       onClick={() => setShowTrialForm(false)}
+                      disabled={isSubmitting}
                     >
                       ABORT
                     </Button>
                     <Button 
                       type="submit"
+                      disabled={isSubmitting}
                       className="flex-[2] h-14 bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic tracking-widest text-xs shadow-xl"
                     >
+                      {isSubmitting ? <Loader2 className="animate-spin mr-3 h-5 w-5" /> : <Zap className="mr-3 h-5 w-5" />}
                       ESTABLISH LINK
                     </Button>
                   </div>
