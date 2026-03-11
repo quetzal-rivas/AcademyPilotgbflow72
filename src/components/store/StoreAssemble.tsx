@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Marquee from "@/components/landing/Marquee";
 import { PhotoGrid } from "@/components/photo-grid";
+import { BackgroundPhotoRotation } from "@/components/landing/background-photo-rotation";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,6 +28,7 @@ export default function StoreAssemble({ photoUrls }: StoreAssembleProps) {
   const photoGridRef = useRef<HTMLDivElement>(null);
   const topMarqueeRef = useRef<HTMLDivElement>(null);
   const bottomMarqueeRef = useRef<HTMLDivElement>(null);
+  const bgPhotoRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const items = [
@@ -97,6 +99,13 @@ export default function StoreAssemble({ photoUrls }: StoreAssembleProps) {
       force3D: true
     }, 0);
 
+    // Fade out the initial rotating background early
+    tl.to(bgPhotoRef.current, {
+      opacity: 0,
+      duration: 0.8,
+      ease: "power2.inOut"
+    }, 0.5);
+
     // 2. MASTER TITLE ASSEMBLY
     tl.fromTo(titleRef.current,
       { scale: 0.1, opacity: 0, filter: "blur(20px)", z: -1000 },
@@ -146,6 +155,11 @@ export default function StoreAssemble({ photoUrls }: StoreAssembleProps) {
 
   return (
     <section ref={containerRef} className="relative h-screen w-full bg-[#002B5B] overflow-hidden flex flex-col items-center justify-center perspective-container">
+      {/* Initial Fading Background Photos */}
+      <div ref={bgPhotoRef} className="absolute inset-0 z-0">
+        <BackgroundPhotoRotation photoUrls={photoUrls} />
+      </div>
+
       {/* Tactical Header */}
       <div ref={headerRef} className="absolute top-0 left-0 w-full h-24 border-b-4 border-border bg-black/40 backdrop-blur-xl z-[100] flex items-center justify-between px-12">
         <div className="flex items-center gap-4">
