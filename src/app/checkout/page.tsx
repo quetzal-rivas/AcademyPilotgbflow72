@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
@@ -8,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PaymentMethodForm } from "@/components/leads/payment-method-form";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ShieldCheck, Zap, CreditCard, ArrowLeft } from "lucide-react";
+import { Loader2, ShieldCheck, Zap, CreditCard, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { getAcademyPhotos } from "@/app/actions";
 import { BackgroundPhotoRotation } from "@/components/landing/background-photo-rotation";
@@ -20,6 +19,8 @@ function CheckoutContent() {
   const router = useRouter();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(3);
   const [photos, setPhotos] = useState<string[]>([]);
 
   const planTitle = searchParams.get("plan") || "Strategic Plan";
@@ -36,6 +37,19 @@ function CheckoutContent() {
     loadPhotos();
   }, []);
 
+  // Tactical Redirection Countdown logic
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isSuccess && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (isSuccess && countdown === 0) {
+      router.push("/dashboard");
+    }
+    return () => clearInterval(timer);
+  }, [isSuccess, countdown, router]);
+
   // Tactical logic to find the correct asset for display
   const tacticalAsset = assetId 
     ? PlaceHolderImages.find(img => img.id === assetId)
@@ -43,15 +57,24 @@ function CheckoutContent() {
 
   const handlePaymentSubmit = async (data: any) => {
     setIsProcessing(true);
+    
+    // Simulated tactical handshake
     await new Promise((resolve) => setTimeout(resolve, 2000));
     
-    toast({
-      title: "ENROLLMENT SECURED",
-      description: `OSS! Tactical link established for ${planTitle.toUpperCase()}. Welcome to the team.`,
-    });
+    if (data.coupon?.toUpperCase() === "BYPASS") {
+      toast({
+        title: "PROTOCOL BYPASS ACTIVE",
+        description: "Credentials verified via bypass sector. Initializing immediate deployment.",
+      });
+    } else {
+      toast({
+        title: "ENROLLMENT SECURED",
+        description: `OSS! Tactical link established for ${planTitle.toUpperCase()}. Welcome to the team.`,
+      });
+    }
     
     setIsProcessing(false);
-    router.push("/");
+    setIsSuccess(true);
   };
 
   return (
@@ -139,7 +162,24 @@ function CheckoutContent() {
         <Zap className="absolute top-0 right-0 h-48 w-48 md:h-64 md:w-64 text-primary opacity-5 rotate-12 -translate-y-16 translate-x-16" />
         
         <div className="max-w-md w-full mx-auto relative z-10">
-          {isProcessing ? (
+          {isSuccess ? (
+            <div className="flex flex-col items-center justify-center text-center space-y-10 animate-in fade-in zoom-in-95 duration-700">
+              <div className="relative">
+                <div className="h-32 w-32 md:h-40 md:w-40 border-8 border-green-500 rounded-none rotate-45 flex items-center justify-center bg-green-500/5 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
+                  <CheckCircle2 className="h-16 w-16 md:h-20 md:w-20 text-green-500 -rotate-45" />
+                </div>
+                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-primary text-white px-6 py-2 font-black text-3xl shadow-xl italic rotate-3">
+                  {countdown}
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h4 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-green-500 drop-shadow-sm">MISSION SUCCESS</h4>
+                <p className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.4em] text-foreground animate-pulse">
+                  ESTABLISHING DASHBOARD LINK...
+                </p>
+              </div>
+            </div>
+          ) : isProcessing ? (
             <div className="flex flex-col items-center justify-center text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
               <div className="relative">
                 <div className="h-24 w-24 md:h-32 md:w-32 border-8 border-primary/20 border-t-primary rounded-none rotate-45 animate-spin" />

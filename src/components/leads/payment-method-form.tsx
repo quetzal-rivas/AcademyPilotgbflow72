@@ -1,4 +1,3 @@
-
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,7 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, Calendar, User, ShieldCheck } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { CreditCard, Calendar, User, ShieldCheck, Mail, Phone, Zap } from "lucide-react";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 10 }, (_, i) => (currentYear + i).toString().slice(-2));
@@ -30,10 +30,13 @@ const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(
 
 const paymentMethodSchema = z.object({
   cardholderName: z.string().min(2, { message: "Required (Min 2 chars)" }),
+  email: z.string().email({ message: "Invalid tactical email" }),
+  phoneNumber: z.string().min(10, { message: "Invalid comm link" }),
   cardNumber: z.string().min(13).max(19).regex(/^\d+$/),
   expiryMonth: z.string().min(1),
   expiryYear: z.string().min(1),
   cvv: z.string().min(3).max(4).regex(/^\d+$/),
+  coupon: z.string().optional(),
   cardType: z.enum(["visa", "mastercard", "amex", "discover", "other"]).optional(),
 });
 
@@ -51,10 +54,13 @@ export function PaymentMethodForm({ onSubmit, onCancel, initialData, isEditing =
     resolver: zodResolver(paymentMethodSchema),
     defaultValues: {
       cardholderName: initialData?.cardholderName || "",
+      email: initialData?.email || "",
+      phoneNumber: initialData?.phoneNumber || "",
       cardNumber: "",
       expiryMonth: initialData?.expiryMonth || "",
       expiryYear: initialData?.expiryYear || "",
       cvv: "",
+      coupon: "",
       cardType: initialData?.cardType || "other",
     },
   });
@@ -62,84 +68,146 @@ export function PaymentMethodForm({ onSubmit, onCancel, initialData, isEditing =
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="cardholderName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-[10px] font-black uppercase tracking-widest">Cardholder Matrix Name</FormLabel>
-              <FormControl>
-                <Input placeholder="JANE DOE" {...field} className="rounded-none border-2 font-bold uppercase" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="cardNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-[10px] font-black uppercase tracking-widest">Primary Card Number</FormLabel>
-              <FormControl>
-                <Input placeholder="XXXX XXXX XXXX XXXX" {...field} className="rounded-none border-2 font-mono" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
           <FormField
             control={form.control}
-            name="expiryMonth"
+            name="cardholderName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-black uppercase tracking-widest">EXP Month</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="rounded-none border-2"><SelectValue placeholder="MM" /></SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="rounded-none">
-                    {months.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <User className="h-3 w-3" /> Cardholder Matrix Name
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="JANE DOE" {...field} className="rounded-none border-2 font-bold uppercase h-10 text-xs focus-visible:ring-primary" />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="expiryYear"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-[10px] font-black uppercase tracking-widest">EXP Year</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                    <Mail className="h-3 w-3" /> Tactical Email
+                  </FormLabel>
                   <FormControl>
-                    <SelectTrigger className="rounded-none border-2"><SelectValue placeholder="YY" /></SelectTrigger>
+                    <Input placeholder="UNIT@EXAMPLE.COM" {...field} className="rounded-none border-2 font-bold h-10 text-xs focus-visible:ring-primary" />
                   </FormControl>
-                  <SelectContent className="rounded-none">
-                    {years.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                    <Phone className="h-3 w-3" /> Comm Link (Phone)
+                  </Label>
+                  <FormControl>
+                    <Input placeholder="+1 XXX XXX XXXX" {...field} className="rounded-none border-2 font-bold h-10 text-xs focus-visible:ring-primary" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
+
+        <Separator className="bg-border h-0.5" />
+
+        <div className="space-y-4">
+          <FormField
+            control={form.control}
+            name="cardNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <CreditCard className="h-3 w-3" /> Primary Card Number
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="XXXX XXXX XXXX XXXX" {...field} className="rounded-none border-2 font-mono h-10 text-xs focus-visible:ring-primary" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid grid-cols-3 gap-4">
+            <FormField
+              control={form.control}
+              name="expiryMonth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">EXP Month</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="rounded-none border-2 h-10 text-xs"><SelectValue placeholder="MM" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="rounded-none border-2 border-border">
+                      {months.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="expiryYear"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">EXP Year</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="rounded-none border-2 h-10 text-xs"><SelectValue placeholder="YY" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="rounded-none border-2 border-border">
+                      {years.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="cvv"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">CVV</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="***" {...field} className="rounded-none border-2 font-mono h-10 text-xs focus-visible:ring-primary" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <Separator className="bg-border h-0.5" />
+
         <FormField
           control={form.control}
-          name="cvv"
+          name="coupon"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-[10px] font-black uppercase tracking-widest">Secure CVV Code</FormLabel>
+            <FormItem className="bg-primary/5 p-4 border-2 border-primary/20">
+              <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-primary">
+                <Zap className="h-3 w-3 fill-current" /> Bypass / Coupon Code
+              </FormLabel>
               <FormControl>
-                <Input type="password" placeholder="***" {...field} className="rounded-none border-2 font-mono" />
+                <Input placeholder="ENTER CODE..." {...field} className="rounded-none border-2 border-primary/30 h-10 font-black uppercase italic text-xs focus-visible:ring-primary" />
               </FormControl>
+              <FormDescription className="text-[8px] font-bold uppercase tracking-tighter opacity-60">Use &apos;BYPASS&apos; to fast-track initialization protocol.</FormDescription>
+              <FormMessage />
             </FormItem>
           )}
         />
 
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
-          <Button type="button" variant="outline" onClick={onCancel} className="rounded-none font-black uppercase italic tracking-widest border-2">Abort</Button>
-          <Button type="submit" className="rounded-none font-black uppercase italic tracking-widest bg-primary hover:bg-primary/90 text-white">Secure Link</Button>
+          <Button type="button" variant="outline" onClick={onCancel} className="rounded-none font-black uppercase italic tracking-widest border-2 text-[10px] h-12 flex-1">Abort</Button>
+          <Button type="submit" className="rounded-none font-black uppercase italic tracking-widest bg-primary hover:bg-primary/90 text-white text-[10px] h-12 flex-[2] shadow-lg">Secure Link</Button>
         </div>
       </form>
     </Form>
