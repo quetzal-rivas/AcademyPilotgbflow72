@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, PhoneOutgoing, Zap } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -34,6 +34,10 @@ const formSchema = z.object({
 export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCalling, setIsCalling] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+  const [typedPhone, setTypedPhone] = useState("");
+  const [fullPhone, setFullPhone] = useState("");
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,87 +48,175 @@ export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
     },
   });
 
+  // TACTICAL EFFECT: Countdown & Typing Loop
+  useEffect(() => {
+    let countdownInterval: NodeJS.Timeout;
+    let typingInterval: NodeJS.Timeout;
+
+    if (isCalling) {
+      // Countdown Protocol: 60s to mission zero
+      countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setIsCalling(false);
+            setIsOpen(false);
+            return 60;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Typing Protocol: Looping digits entry
+      let charIndex = 0;
+      typingInterval = setInterval(() => {
+        setTypedPhone(fullPhone.substring(0, charIndex + 1));
+        charIndex++;
+        if (charIndex > fullPhone.length) {
+          charIndex = 0;
+          setTypedPhone("");
+        }
+      }, 150);
+    } else {
+      setCountdown(60);
+      setTypedPhone("");
+    }
+
+    return () => {
+      clearInterval(countdownInterval);
+      clearInterval(typingInterval);
+    };
+  }, [isCalling, fullPhone]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    toast({
-      title: "MISSION INITIALIZED",
-      description: `OSS! ${values.name.toUpperCase()}, your request has been recorded. Standby for deployment instructions.`,
-    });
+    setFullPhone(values.phone);
+    // Simulated tactical registration
+    await new Promise((resolve) => setTimeout(resolve, 1200));
     
     setIsSubmitting(false);
-    setIsOpen(false);
-    form.reset();
+    setIsCalling(true); // Engages the AI Dispatch Matrix
+    
+    toast({
+      title: "PROTOCOL INITIALIZED",
+      description: "Establishing tactical voice link. Standby for AI Dispatch.",
+    });
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(val) => {
+        setIsOpen(val);
+        if (!val) {
+            setIsCalling(false);
+            form.reset();
+        }
+    }}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
       <DialogContent className="rounded-none border-4 border-border bg-background shadow-2xl p-0 overflow-hidden max-w-md">
-        <DialogHeader className="p-8 bg-primary text-white border-b-4 border-border">
-          <div className="flex items-center gap-3">
-            <Image 
-              src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-              alt="Logo" 
-              width={32} 
-              height={32} 
-              className="h-8 w-8"
-            />
-            <DialogTitle className="font-headline text-3xl font-black uppercase italic tracking-tighter">
-              Trial Protocol
-            </DialogTitle>
-          </div>
-          <DialogDescription className="text-white/80 font-bold uppercase tracking-widest text-[10px] mt-2">
-            Secure your spot on the mats.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="p-8 space-y-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">Tactical Callsign (Full Name)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="ENTER NAME..." {...field} className="rounded-none border-2 font-bold uppercase h-12" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {!isCalling ? (
+          <>
+            <DialogHeader className="p-8 bg-primary text-white border-b-4 border-border">
+              <div className="flex items-center gap-3">
+                <Image 
+                  src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
+                  alt="Logo" 
+                  width={32} 
+                  height={32} 
+                  className="h-8 w-8"
+                />
+                <DialogTitle className="font-headline text-3xl font-black uppercase italic tracking-tighter">
+                  Trial Protocol
+                </DialogTitle>
+              </div>
+              <DialogDescription className="text-white/80 font-bold uppercase tracking-widest text-[10px] mt-2">
+                Secure your spot on the mats.
+              </DialogDescription>
+            </DialogHeader>
             
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">Comm Link (Phone Number)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+1 XXX-XXXX" {...field} className="rounded-none border-2 font-bold h-12" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="p-8 space-y-6">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[10px] font-black uppercase tracking-widest">Tactical Callsign (Full Name)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ENTER NAME..." {...field} className="rounded-none border-2 font-bold uppercase h-12 focus-visible:ring-primary" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[10px] font-black uppercase tracking-widest">Comm Link (Phone Number)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+1 XXX-XXXX" {...field} className="rounded-none border-2 font-bold h-12 focus-visible:ring-primary" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic tracking-widest h-16 shadow-xl text-lg mt-4"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    'REQUEST TRIAL CLASS'
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center p-12 space-y-10 animate-in fade-in zoom-in-95 duration-500">
+            {/* AI Dispatch Matrix UI */}
+            <div className="flex flex-col items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic">Establishing Tactical Link</span>
+                <div className="bg-primary text-white px-6 py-2 font-black text-4xl shadow-xl italic rotate-1">
+                    0:{countdown.toString().padStart(2, '0')}
+                </div>
+            </div>
+
+            <div className="relative">
+                <div className="absolute inset-0 bg-primary rounded-full blur-3xl opacity-20 animate-pulse" />
+                <div className="h-40 w-40 border-8 border-primary rounded-none rotate-45 flex items-center justify-center bg-primary/5 shadow-[0_0_50px_rgba(225,29,72,0.3)] relative z-10">
+                    <PhoneOutgoing className="h-20 w-20 text-primary -rotate-45 animate-bounce" />
+                </div>
+            </div>
+
+            <div className="text-center space-y-4 w-full">
+                <div className="space-y-1">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">DISPATCH FREQUENCY:</p>
+                    <div className="font-black text-3xl italic tracking-tighter text-foreground h-10 flex items-center justify-center font-mono">
+                        {typedPhone}
+                        <span className="w-1 h-8 bg-primary ml-1 animate-pulse" />
+                    </div>
+                </div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-primary animate-pulse italic">
+                    STANDBY FOR AI VOICE HANDSHAKE...
+                </p>
+            </div>
 
             <Button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="w-full bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic tracking-widest h-16 shadow-xl text-lg mt-4"
+                variant="outline" 
+                onClick={() => setIsCalling(false)}
+                className="rounded-none border-2 font-black uppercase italic tracking-widest text-[10px] h-12 px-10 hover:bg-destructive hover:text-white hover:border-destructive transition-all"
             >
-              {isSubmitting ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                'REQUEST TRIAL CLASS'
-              )}
+                ABORT DISPATCH
             </Button>
-          </form>
-        </Form>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
