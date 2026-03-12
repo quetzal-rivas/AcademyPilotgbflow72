@@ -179,23 +179,34 @@ export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
             </Form>
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center p-12 space-y-10 animate-in fade-in zoom-in-95 duration-500">
+          <div className="flex flex-col items-center justify-center p-12 space-y-10 animate-in fade-in zoom-in-95 duration-500 relative">
+            {/* TACTICAL BACKGROUND ASSET */}
+            <div className="absolute inset-0 z-0 opacity-10 pointer-events-none flex items-center justify-center">
+              <Image 
+                src="https://graciebarrapilot.s3.us-east-1.amazonaws.com/Generated_Image_March_06__2026_-_12_01AM-removebg-preview.png"
+                alt="Tactical Shield Background"
+                width={400}
+                height={400}
+                className="object-contain"
+              />
+            </div>
+
             {/* AI Dispatch Matrix UI */}
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 relative z-10">
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic">Establishing Tactical Link</span>
                 <div className="bg-primary text-white px-6 py-2 font-black text-4xl shadow-xl italic rotate-1">
                     0:{countdown.toString().padStart(2, '0')}
                 </div>
             </div>
 
-            <div className="relative">
+            <div className="relative z-10">
                 <div className="absolute inset-0 bg-primary rounded-full blur-3xl opacity-20 animate-pulse" />
                 <div className="h-40 w-40 border-8 border-primary rounded-none rotate-45 flex items-center justify-center bg-primary/5 shadow-[0_0_50px_rgba(225,29,72,0.3)] relative z-10">
                     <PhoneOutgoing className="h-20 w-20 text-primary -rotate-45 animate-bounce" />
                 </div>
             </div>
 
-            <div className="text-center space-y-4 w-full">
+            <div className="text-center space-y-4 w-full relative z-10">
                 <div className="space-y-1">
                     <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">DISPATCH FREQUENCY:</p>
                     <div className="font-black text-3xl italic tracking-tighter text-foreground h-10 flex items-center justify-center font-mono">
@@ -211,7 +222,7 @@ export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
             <Button 
                 variant="outline" 
                 onClick={() => setIsCalling(false)}
-                className="rounded-none border-2 font-black uppercase italic tracking-widest text-[10px] h-12 px-10 hover:bg-destructive hover:text-white hover:border-destructive transition-all"
+                className="rounded-none border-2 font-black uppercase italic tracking-widest text-[10px] h-12 px-10 hover:bg-destructive hover:text-white hover:border-destructive transition-all relative z-10"
             >
                 ABORT DISPATCH
             </Button>
