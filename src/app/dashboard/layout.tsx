@@ -1,7 +1,7 @@
 "use client";
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Mic, MessageSquare, CalendarCheck, Zap, FileText, CreditCard, BrainCircuit } from "lucide-react";
+import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Mic, MessageSquare, CalendarCheck, Zap, FileText, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { GlobalChat } from "@/components/chat/global-chat";
@@ -19,7 +19,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { title: "Voice Dispatch", icon: Mic, href: "/dashboard/voice" },
     { title: "Billing Hub", icon: CreditCard, href: "/dashboard/billing" },
     { title: "Compliance Hub", icon: FileText, href: "/dashboard/compliance" },
-    { title: "AI Tax Tool", icon: BrainCircuit, href: "/dashboard/ai-tax" },
     { title: "Integrations", icon: Settings, href: "/dashboard/settings" },
   ];
 
