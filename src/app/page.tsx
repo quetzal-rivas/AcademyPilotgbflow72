@@ -250,9 +250,9 @@ export default async function LandingPage() {
           <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">
             <p>© 2024 GRACIE BARRA AI PILOT SYSTEM. MISSION READY.</p>
             <div className="flex gap-8">
-              <Link href="#" className="hover:text-white">Privacy Protocol</Link>
-              <Link href="#" className="hover:text-white">Terms of Engagement</Link>
-              <Link href="#" className="hover:text-white">Cookie Registry</Link>
+              <Link href="/privacy" className="hover:text-white">Privacy Protocol</Link>
+              <Link href="/terms" className="hover:text-white">Terms of Engagement</Link>
+              <Link href="/taxation" className="hover:text-white">Taxation Compliance</Link>
             </div>
           </div>
         </div>
