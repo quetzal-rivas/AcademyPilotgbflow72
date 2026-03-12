@@ -1,3 +1,4 @@
+
 "use client";
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
@@ -82,8 +83,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </header>
           <div className="flex-1 overflow-auto p-6 bg-background/50">
-            <div className="max-w-7xl mx-auto space-y-8">
-              {children}
+            <div className="max-w-7xl mx-auto flex flex-col min-h-full">
+              <div className="flex-grow space-y-8 pb-12">
+                {children}
+              </div>
+              
+              <footer className="pt-12 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] text-muted-foreground/30 font-black uppercase tracking-[0.2em] pb-8">
+                <p>© 2024 GRACIE BARRA AI PILOT SYSTEM. MISSION READY.</p>
+                <div className="flex gap-8">
+                  <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Protocol</Link>
+                  <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Engagement</Link>
+                  <Link href="/taxation" className="hover:text-foreground transition-colors">Taxation Compliance</Link>
+                </div>
+              </footer>
             </div>
           </div>
         </main>
