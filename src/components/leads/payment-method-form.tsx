@@ -107,7 +107,7 @@ export function PaymentMethodForm({ onSubmit, onCancel, initialData, isEditing =
                 <FormItem>
                   <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                     <Phone className="h-3 w-3" /> Comm Link (Phone)
-                  </Label>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="+1 XXX XXX XXXX" {...field} className="rounded-none border-2 font-bold h-10 text-xs focus-visible:ring-primary" />
                   </FormControl>
