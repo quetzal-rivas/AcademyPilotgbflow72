@@ -1,5 +1,4 @@
-
-"use server";
+'use server';
 
 import { generateCampaignStructure } from "@/ai/flows/generate-campaign-structure";
 import { enhanceImage } from "@/ai/flows/enhance-image";
@@ -10,6 +9,7 @@ import { reasoningBasedAgentResponse as reasoningBasedAgentResponseFlow, type Re
 import { generateSystemPrompt } from "@/ai/flows/generate-system-prompt";
 import { chatAssistant as chatAssistantFlow, type ChatAssistantInput } from "@/ai/flows/global-chat-ai-assistant";
 import { receiveAutomationSuggestions as receiveAutomationSuggestionsFlow, type AutomationSuggestionInput } from '@/ai/flows/receive-automation-suggestions';
+import { interpretTaxRules as interpretTaxRulesFlow, type InterpretTaxRulesInput } from '@/ai/flows/tax-rule-interpreter';
 import type { CampaignStructure, Campaign, PublishResult, AdImage } from "@/lib/types";
 import type { AgentProfile } from "@/lib/synth-types";
 import { geocodeAddress, findFranchise } from '@/lib/academies';
@@ -240,6 +240,10 @@ export async function makeOutboundCallAction(
 
 export async function receiveAutomationSuggestionsAction(input: AutomationSuggestionInput) {
   return receiveAutomationSuggestionsFlow(input);
+}
+
+export async function interpretTaxRulesAction(input: InterpretTaxRulesInput) {
+  return interpretTaxRulesFlow(input);
 }
 
 /**

@@ -1,8 +1,7 @@
-
 "use client";
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Mic, MessageSquare, CalendarCheck, Zap } from "lucide-react";
+import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Mic, MessageSquare, CalendarCheck, Zap, FileText, CreditCard, BrainCircuit } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { GlobalChat } from "@/components/chat/global-chat";
@@ -18,6 +17,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { title: "Class Command", icon: CalendarCheck, href: "/dashboard/classes" },
     { title: "Ad Deployment", icon: Megaphone, href: "/dashboard/ads" },
     { title: "Voice Dispatch", icon: Mic, href: "/dashboard/voice" },
+    { title: "Billing Hub", icon: CreditCard, href: "/dashboard/billing" },
+    { title: "Compliance Hub", icon: FileText, href: "/dashboard/compliance" },
+    { title: "AI Tax Tool", icon: BrainCircuit, href: "/dashboard/ai-tax" },
     { title: "Integrations", icon: Settings, href: "/dashboard/settings" },
   ];
 
@@ -70,7 +72,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm flex items-center px-6 justify-between">
             <div className="flex items-center gap-4">
               <SidebarTrigger />
-              <h2 className="font-headline text-lg font-black uppercase italic tracking-tight">
+              <h2 className="font-headline text-lg font-black uppercase italic tracking-tight text-foreground">
                 {navItems.find(i => pathname === i.href || (i.href !== "/dashboard" && pathname.startsWith(i.href)))?.title || "Dashboard"}
               </h2>
             </div>
