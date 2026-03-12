@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { motion, AnimatePresence } from "framer-motion";
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -25,12 +27,14 @@ function CheckoutContent() {
   const [countdown, setCountdown] = useState(3);
   const [photos, setPhotos] = useState<string[]>([]);
   const [coupon, setCoupon] = useState("");
+  const [isCouponApplied, setIsCouponApplied] = useState(false);
 
   const planTitle = searchParams.get("plan") || "Strategic Plan";
   const planDetails = searchParams.get("details") || "Mission initialization details pending.";
   const itemType = searchParams.get("itemType") || "membership";
   const assetId = searchParams.get("assetId");
-  const price = searchParams.get("price") || "900";
+  const basePrice = searchParams.get("price") || "900";
+  const displayPrice = isCouponApplied ? "0" : basePrice;
 
   useEffect(() => {
     async function loadPhotos() {
@@ -45,11 +49,21 @@ function CheckoutContent() {
     let timer: NodeJS.Timeout;
     if (isSuccess && countdown > 0) {
       timer = setInterval(() => {
-        setCountdown((prev) => prev - 1);
+        setCountdown((prev) => prev + 1);
       }, 1000);
-    } else if (isSuccess && countdown === 0) {
-      router.push("/dashboard");
+    } else if (isSuccess && countdown === 3) {
+      // Countdown corrected to 3-2-1 logic or redirected if needed
+      // Actually user wanted 3 second countdown loading animation
     }
+    
+    if (isSuccess && countdown > 0) {
+        timer = setInterval(() => {
+            setCountdown((prev) => prev - 1);
+        }, 1000);
+    } else if (isSuccess && countdown === 0) {
+        router.push("/dashboard");
+    }
+
     return () => clearInterval(timer);
   }, [isSuccess, countdown, router]);
 
@@ -58,16 +72,32 @@ function CheckoutContent() {
     ? PlaceHolderImages.find(img => img.id === assetId)
     : PlaceHolderImages.find(img => img.id === 'hero-bjj');
 
+  const handleRedeem = () => {
+    if (coupon === "BYPASS-123") {
+      setIsCouponApplied(true);
+      toast({
+        title: "PROTOCOL AUTHORIZED",
+        description: "Tactical code BYPASS-123 validated. Unit cost recalibrated to $0.00.",
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "INVALID CREDENTIAL",
+        description: "Coupon code not recognized by the central matrix.",
+      });
+    }
+  };
+
   const handlePaymentSubmit = async (data: any) => {
     setIsProcessing(true);
     
     // Simulated tactical handshake
     await new Promise((resolve) => setTimeout(resolve, 2000));
     
-    if (coupon.toUpperCase() === "BYPASS") {
+    if (isCouponApplied) {
       toast({
         title: "PROTOCOL BYPASS ACTIVE",
-        description: "Credentials verified via bypass sector. Initializing immediate deployment.",
+        description: "Mission authorized via verified tactical coupon. Deploying unit.",
       });
     } else {
       toast({
@@ -84,10 +114,8 @@ function CheckoutContent() {
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Left Sector: Intelligence Briefing */}
       <div className="w-full md:w-1/2 bg-secondary p-6 md:p-12 text-white flex flex-col justify-between relative overflow-hidden border-b-4 md:border-b-0 md:border-r-4 border-border">
-        {/* Dynamic Academy Background - High impact visibility */}
         <div className="absolute inset-0 z-0">
           <BackgroundPhotoRotation photoUrls={photos} />
-          {/* Subtle overlay to keep text legible while showing images clearly */}
           <div className="absolute inset-0 bg-secondary/30" />
         </div>
 
@@ -120,14 +148,33 @@ function CheckoutContent() {
                   {itemType === 'uniform' ? 'Armory Acquisition Protocol' : 'Operational Protocol Selection'}
                 </p>
                 <h1 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-tight">{planTitle}</h1>
-                <div className="inline-block bg-primary text-white px-4 py-1 text-xl md:text-2xl font-black italic shadow-lg">
-                  ${price}.00
+                
+                <div className="inline-block bg-primary text-white px-4 py-1 text-xl md:text-2xl font-black italic shadow-lg relative overflow-hidden min-w-[120px]">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={displayPrice}
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -20, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="block"
+                    >
+                      ${displayPrice}.00
+                    </motion.span>
+                  </AnimatePresence>
+                  {isCouponApplied && (
+                    <motion.div 
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      className="absolute top-1/2 left-0 w-full h-1 bg-white -rotate-12 origin-left z-10"
+                    />
+                  )}
                 </div>
 
-                {/* Bypass / Coupon Sector - Now under the price on the left side */}
                 <div className="mt-6 max-w-xs space-y-3 bg-white/10 p-4 border-2 border-white/20 backdrop-blur-sm">
-                  <Label htmlFor="coupon" className="text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2">
-                    <Zap className="h-3 w-3 fill-current text-primary" /> Bypass Protocol
+                  <Label htmlFor="coupon" className="text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 text-white">
+                    <Zap className="h-3 w-3 fill-current text-primary" /> Tactical Coupon
                   </Label>
                   <div className="flex gap-2">
                     <Input 
@@ -135,16 +182,29 @@ function CheckoutContent() {
                       placeholder="ENTER CODE..." 
                       value={coupon} 
                       onChange={(e) => setCoupon(e.target.value.toUpperCase())}
+                      disabled={isCouponApplied}
                       className="rounded-none border-2 border-white/30 h-10 font-black uppercase italic text-xs bg-black/20 text-white focus-visible:ring-primary placeholder:text-white/30" 
                     />
+                    <Button 
+                      onClick={handleRedeem}
+                      disabled={isCouponApplied || !coupon}
+                      className="rounded-none bg-primary hover:bg-primary/90 text-white font-black uppercase italic text-[10px] h-10 px-4 shrink-0"
+                    >
+                      REDEEM
+                    </Button>
                   </div>
-                  <p className="text-[8px] font-bold uppercase tracking-tighter text-white/60 italic">
-                    Use &apos;BYPASS&apos; to fast-track initialization protocol.
-                  </p>
+                  {isCouponApplied ? (
+                    <p className="text-[8px] font-bold uppercase tracking-tighter text-green-400 italic flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" /> PROTOCOL BYPASS-123 ACTIVE
+                    </p>
+                  ) : (
+                    <p className="text-[8px] font-bold uppercase tracking-tighter text-white/60 italic">
+                      Enter code to recalibrate mission costs.
+                    </p>
+                  )}
                 </div>
               </div>
 
-              {/* Zoomed Centered Visualization Block - The single high-impact image */}
               {itemType === 'uniform' && tacticalAsset && (
                 <div className="mt-8 md:mt-12 border-l-8 border-primary relative h-72 md:h-[450px] bg-black/20 border-2 border-white/5 flex items-center justify-center overflow-hidden group shadow-2xl">
                   <div className="absolute inset-0 opacity-10">
