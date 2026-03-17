@@ -1,6 +1,8 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { Toaster } from "@/components/ui/toaster";
+import { AuthLinkHandler } from "@/components/auth/auth-link-handler";
 import Script from 'next/script';
 
 export const metadata: Metadata = {
@@ -24,8 +26,10 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground min-h-screen">
         <FirebaseClientProvider>
+          <AuthLinkHandler />
           {children}
         </FirebaseClientProvider>
+        <Toaster />
         {googleMapsKey && (
           <Script
             src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsKey}&libraries=places`}

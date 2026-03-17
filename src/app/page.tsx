@@ -1,4 +1,3 @@
-
 import { getAcademyPhotos } from '@/app/actions';
 import { PhotoGrid } from '@/components/photo-grid';
 import Link from 'next/link';
@@ -10,6 +9,7 @@ import { FreeTrialDialog } from '@/components/landing/free-trial-dialog';
 import Marquee from '@/components/landing/Marquee';
 import { ScrollRevealImage } from '@/components/landing/scroll-reveal-image';
 import { BackgroundPhotoRotation } from '@/components/landing/background-photo-rotation';
+import { AuthModal } from '@/components/auth/auth-modal';
 import { 
   Trophy, 
   Users, 
@@ -44,14 +44,24 @@ export default async function LandingPage() {
           <nav className="hidden lg:flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em]">
             <Link href="#programs" className="hover:text-primary transition-colors">Programas</Link>
             <Link href="/locator" className="hover:text-primary transition-colors">Find a School</Link>
-            <Link href="/dashboard" className="hover:text-primary transition-colors text-primary">Admin Hub</Link>
+            <AuthModal 
+              mode="admin" 
+              trigger={
+                <button className="hover:text-primary transition-colors text-primary font-black uppercase tracking-[0.2em]">
+                  Admin Hub
+                </button>
+              } 
+            />
           </nav>
           <div className="flex items-center gap-4">
-            <Button asChild variant="outline" className="hidden sm:inline-flex font-black uppercase tracking-widest text-[10px] border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-none h-10 px-6">
-              <Link href="/student/dashboard">
-                <UserCircle className="mr-2 h-4 w-4" /> Student Portal
-              </Link>
-            </Button>
+            <AuthModal 
+              mode="student" 
+              trigger={
+                <Button variant="outline" className="hidden sm:inline-flex font-black uppercase tracking-widest text-[10px] border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-none h-10 px-6">
+                  <UserCircle className="mr-2 h-4 w-4" /> Student Portal
+                </Button>
+              } 
+            />
             <FreeTrialDialog>
               <Button className="bg-primary hover:bg-primary/90 text-white font-black uppercase italic tracking-widest px-8 rounded-none h-10">
                 Free Trial
@@ -232,7 +242,9 @@ export default async function LandingPage() {
             <div className="space-y-6">
               <h4 className="font-headline text-[10px] font-black uppercase tracking-[0.3em] text-primary">Operational</h4>
               <ul className="space-y-3 text-[10px] font-bold uppercase tracking-widest text-white/60">
-                <li><Link href="/dashboard" className="hover:text-primary text-primary">Command Dashboard</Link></li>
+                <li>
+                  <AuthModal mode="admin" trigger={<button className="hover:text-primary text-primary">Command Dashboard</button>} />
+                </li>
                 <li><Link href="#" className="hover:text-primary">Franchise Protocol</Link></li>
                 <li><Link href="#" className="hover:text-primary">Support Link</Link></li>
                 <li><Link href="#" className="hover:text-primary">Contact Base</Link></li>
@@ -250,9 +262,9 @@ export default async function LandingPage() {
           <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">
             <p>© 2024 GRACIE BARRA AI PILOT SYSTEM. MISSION READY.</p>
             <div className="flex gap-8">
-              <Link href="/privacy" className="hover:text-white">Privacy Protocol</Link>
-              <Link href="/terms" className="hover:text-white">Terms of Engagement</Link>
-              <Link href="/taxation" className="hover:text-white">Taxation Compliance</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Protocol</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms of Engagement</Link>
+              <Link href="/taxation" className="hover:text-white transition-colors">Taxation Compliance</Link>
             </div>
           </div>
         </div>
@@ -271,11 +283,17 @@ function ProgramCard({ title, level, description, details, featured = false }: {
       <p className={`text-sm font-bold uppercase tracking-tight leading-relaxed ${featured ? 'text-white/80' : 'text-muted-foreground'}`}>{description}</p>
       <div className="mt-auto pt-8">
         <Button asChild variant={featured ? 'default' : 'outline'} className={`w-full font-black uppercase italic tracking-widest rounded-none h-14 text-xs transition-all ${featured ? 'bg-primary hover:bg-primary/90 border-primary text-white' : 'border-black hover:bg-black hover:text-white bg-transparent'}`}>
-          <Link href={`/checkout?plan=${encodeURIComponent(title)}&details=${encodeURIComponent(details)}`}>
+          <Link href={`/checkout?plan=${encodeURIComponent(title)}&price=${itemPrice(title)}&details=${encodeURIComponent(details)}`}>
             Access Directive
           </Link>
         </Button>
       </div>
     </div>
   );
+}
+
+function itemPrice(title: string): string {
+  if (title.includes('Semestral')) return '900';
+  if (title.includes('Anual')) return '1800';
+  return '20';
 }
