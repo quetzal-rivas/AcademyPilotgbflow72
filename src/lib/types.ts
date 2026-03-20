@@ -1,3 +1,4 @@
+
 export type CampaignStructure = {
   campaignName: string;
   adSetName: string;
@@ -30,3 +31,11 @@ export type AdImage = {
     url: string;
     permalink_url: string;
 };
+
+export interface LandingPageData {
+  slug: string;
+  userId: string;
+  branchName: string;
+  isPublic: boolean;
+  updatedAt: string;
+}

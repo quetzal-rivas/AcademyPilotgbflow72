@@ -1,74 +1,26 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * ACADEMIA PILOT SECURITY ARCHITECTURE
-     *
-     * Core Philosophy:
-     * This ruleset enforces a strict User-Ownership model. Access control is primarily handled 
-     * through path-based authorization, leveraging Firestore's hierarchical structure to ensure 
-     * that users can only access data within their own silo.
-     *
-     * Data Structure:
-     * All application data is organized under the root `/user_profiles/{userId}/` path. This 
-     * includes profile info, ad campaigns, AI assistants, integration settings, and leads. 
-     * This "Authorization Independence" strategy ensures that ownership is verified directly 
-     * by the request path, eliminating the need for expensive cross-document lookups.
-     *
-     * Key Security Decisions:
-     * 1. Strict Scoping: All read and write operations are restricted to the authenticated 
-     *    user whose UID matches the `{userId}` wildcard in the path.
-     * 2. Relational Integrity: While data shapes are flexible for prototyping, rules strictly 
-     *    enforce that internal "owner" or "ID" fields match the Firestore path to prevent 
-     *    orphaned or misattributed data.
-     * 3. Prototyping Flexibility: Rules do not enforce data types (strings, numbers) or 
-     *    optional/required fields, allowing rapid UI/UX iteration.
-     *
-     * Denormalization for Authorization:
-     * The `userId` is present in every path. This allows for simple, performant rules like 
-     * `isOwner(userId)` without using `get()` to check parent documents or roles.
-     */
-
-    // --- GLOBAL HELPER FUNCTIONS ---
-
-    /** @description Checks if the request is from an authenticated user. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** @description Verifies the authenticated user matches the provided ID. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** @description Combined check for ownership and document existence for destructive operations. */
     function isExistingOwner(userId) {
       return isOwner(userId) && resource != null;
     }
 
-    // --- COLLECTION RULES ---
-
-    /**
-     * @description Rules for the top-level User Profile document.
-     * @path /user_profiles/{userId}
-     * @allow (create) if auth.uid matches {userId} and data.id matches {userId}.
-     * @deny (get) if auth.uid does not match {userId}.
-     * @principle Enforces self-creation and strict owner-only access for profiles.
-     */
     match /user_profiles/{userId} {
       allow get, list: if isOwner(userId);
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(userId);
 
-      /**
-       * @description Management of advertising campaigns (Meta, etc.).
-       * @path /user_profiles/{userId}/ad_campaigns/{campaignId}
-       * @allow (update) if owner changes campaign status but keeps userId field immutable.
-       * @deny (create) if provided userId field does not match the path owner.
-       * @principle Path-based ownership with relational field consistency.
-       */
       match /ad_campaigns/{campaignId} {
         allow get, list: if isOwner(userId);
         allow create: if isOwner(userId) && request.resource.data.userId == userId && request.resource.data.id == campaignId;
@@ -76,13 +28,6 @@ service cloud.firestore {
         allow delete: if isExistingOwner(userId);
       }
 
-      /**
-       * @description Configurations for AI-driven multi-channel assistants.
-       * @path /user_profiles/{userId}/omnichannel_assistants/{assistantId}
-       * @allow (list) by the assistant's owner.
-       * @deny (delete) by a different authenticated user.
-       * @principle Restricts AI configuration access to the specific academy owner.
-       */
       match /omnichannel_assistants/{assistantId} {
         allow get, list: if isOwner(userId);
         allow create: if isOwner(userId) && request.resource.data.userId == userId && request.resource.data.id == assistantId;
@@ -90,12 +35,6 @@ service cloud.firestore {
         allow delete: if isExistingOwner(userId);
       }
 
-      /**
-       * @description Configurations for AI voice agents and phone scripts.
-       * @path /user_profiles/{userId}/voice_assistants/{assistantId}
-       * @allow (create) when path ID and internal ID/userId fields are synchronized.
-       * @principle Validates relational integrity between path and document data.
-       */
       match /voice_assistants/{assistantId} {
         allow get, list: if isOwner(userId);
         allow create: if isOwner(userId) && request.resource.data.userId == userId && request.resource.data.id == assistantId;
@@ -103,12 +42,6 @@ service cloud.firestore {
         allow delete: if isExistingOwner(userId);
       }
 
-      /**
-       * @description API Integration metadata (Meta, Twilio, ElevenLabs).
-       * @path /user_profiles/{userId}/integration_configs/{configId}
-       * @allow (get) by the owner to retrieve API identifiers for client-side SDKs.
-       * @principle Protects integration settings from cross-tenant access.
-       */
       match /integration_configs/{configId} {
         allow get, list: if isOwner(userId);
         allow create: if isOwner(userId) && request.resource.data.userId == userId && request.resource.data.id == configId;
@@ -116,19 +49,25 @@ service cloud.firestore {
         allow delete: if isExistingOwner(userId);
       }
 
-      /**
-       * @description Leads captured via AI campaigns and assistants.
-       * @path /user_profiles/{userId}/leads/{leadId}
-       * @allow (create) by the application backend or owner on behalf of a captured lead.
-       * @deny (list) if user tries to browse leads belonging to another academy.
-       * @principle Ensures sensitive lead contact information remains private to the owner.
-       */
       match /leads/{leadId} {
         allow get, list: if isOwner(userId);
         allow create: if isOwner(userId) && request.resource.data.userId == userId && request.resource.data.id == leadId;
         allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
         allow delete: if isExistingOwner(userId);
       }
+
+      match /automation_rules/{ruleId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId && request.resource.data.id == ruleId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    match /landing_pages/{slug} {
+      allow read: if resource.data.isPublic == true || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
   }
 }

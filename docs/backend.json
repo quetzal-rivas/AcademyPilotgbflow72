@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -42,6 +43,19 @@
         "status": { "type": "string" },
         "actions": { "type": "array", "items": { "type": "object" } }
       }
+    },
+    "LandingPage": {
+      "title": "LandingPage",
+      "description": "Customized branch landing page configuration.",
+      "type": "object",
+      "properties": {
+        "slug": { "type": "string" },
+        "userId": { "type": "string" },
+        "branchName": { "type": "string" },
+        "isPublic": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["slug", "userId", "branchName", "isPublic"]
     }
   },
   "auth": {
@@ -59,6 +73,10 @@
     "/user_profiles/{userId}/automation_rules/{ruleId}": {
       "schema": { "$ref": "#/backend/entities/AutomationRule" },
       "description": "Autonomous mission protocols."
+    },
+    "/landing_pages/{slug}": {
+      "schema": { "$ref": "#/backend/entities/LandingPage" },
+      "description": "Public registry for branch landing pages."
     }
   }
 }
