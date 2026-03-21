@@ -1,18 +1,27 @@
 const { getFirestore } = require('./firebase-admin');
 
 /**
- * Add Lead Handler
+ * Add Lead Handler (Multi-Tenant)
  * 
- * This function is responsible for adding a new lead to the Firestore database.
- * It receives lead data, validates it, and then creates a new document in the 'leads' collection.
+ * This function adds a new lead to the Firestore database. It requires a tenantSlug
+ * to associate the new lead with the correct academy.
  */
 exports.handler = async (event) => {
   console.log('--- ADD LEAD HANDLER ---');
 
   try {
-    // 1. Parse and Validate Input
+    // 1. Parse Input
     const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
-    const { name, phone, clase, visit_date, note, uniform } = body;
+    const { tenantSlug, name, phone, clase, visit_date, note, uniform, source } = body;
+
+    // 2. Validate Tenant and Required Fields
+    if (!tenantSlug) {
+      console.error('Security Alert: Attempted to add a lead without a tenantSlug.');
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Bad Request: tenantSlug is required.' })
+      };
+    }
 
     if (!name || !phone) {
       return {
@@ -21,26 +30,27 @@ exports.handler = async (event) => {
       };
     }
 
-    // 2. Initialize Firestore
+    // 3. Initialize Firestore
     const db = getFirestore();
 
-    // 3. Prepare Lead Document
+    // 4. Prepare Lead Document
     const leadData = {
+      tenantSlug, // Explicitly assign the lead to the tenant
       name,
       phone,
       clase: clase || 'sin especificar',
       visit_date: visit_date || null,
       note: note || '',
       uniform: uniform !== undefined ? !!uniform : null, 
-      source: 'orchestrator', // Source is now the orchestrator
+      source: source || 'orchestrator', 
       processed: false,
       createdAt: new Date(),
     };
 
-    // 4. Add to Firestore
+    // 5. Add to Firestore
     const docRef = await db.collection('leads').add(leadData);
 
-    console.log(`Successfully added lead with ID: ${docRef.id}`);
+    console.log(`Successfully added lead with ID: ${docRef.id} to tenant: ${tenantSlug}`);
 
     return {
       statusCode: 200,

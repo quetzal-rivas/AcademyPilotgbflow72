@@ -1,4 +1,3 @@
-
 # Academia Pilot | AI-Powered Commercial Automation
 
 High-performance automation system for Gracie Barra academies. Streamline marketing, recruitment, and session management via an integrated tactical dashboard.
