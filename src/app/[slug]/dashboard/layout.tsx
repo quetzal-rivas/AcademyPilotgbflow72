@@ -1,28 +1,34 @@
-
 "use client";
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Mic, MessageSquare, CalendarCheck, Zap, FileText, CreditCard, Layout } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { GlobalChat } from "@/components/chat/global-chat";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const params = useParams();
+  const slug = params?.slug as string;
+
+  // Tenant-aware base path
+  const basePath = `/${slug}/dashboard`;
 
   const navItems = [
-    { title: "Overview", icon: LayoutDashboard, href: "/dashboard" },
-    { title: "Lead Management", icon: Users, href: "/dashboard/leads" },
-    { title: "Tactical Automations", icon: Zap, href: "/dashboard/automations" },
-    { title: "Landing Page", icon: Layout, href: "/dashboard/landing-page" },
-    { title: "Conversations", icon: MessageSquare, href: "/dashboard/conversations" },
-    { title: "Class Command", icon: CalendarCheck, href: "/dashboard/classes" },
-    { title: "Ad Deployment", icon: Megaphone, href: "/dashboard/ads" },
-    { title: "Voice Dispatch", icon: Mic, href: "/dashboard/voice" },
-    { title: "Billing Hub", icon: CreditCard, href: "/dashboard/billing" },
-    { title: "Compliance Hub", icon: FileText, href: "/dashboard/compliance" },
-    { title: "Integrations", icon: Settings, href: "/dashboard/settings" },
+    { title: "Overview", icon: LayoutDashboard, href: basePath },
+    { title: "Lead Management", icon: Users, href: `${basePath}/leads` },
+    { title: "Tactical Automations", icon: Zap, href: `${basePath}/automations` },
+    { title: "Landing Page", icon: Layout, href: `${basePath}/landing-page` },
+    { title: "Conversations", icon: MessageSquare, href: `${basePath}/conversations` },
+    { title: "Class Command", icon: CalendarCheck, href: `${basePath}/classes` },
+    { title: "Ad Deployment", icon: Megaphone, href: `${basePath}/ads` },
+    { title: "Voice Dispatch", icon: Mic, href: `${basePath}/voice` },
+    { title: "Billing Hub", icon: CreditCard, href: `${basePath}/billing` },
+    { title: "Compliance Hub", icon: FileText, href: `${basePath}/compliance` },
+    { title: "Integrations", icon: Settings, href: `${basePath}/settings` },
   ];
+
+  const isActive = (href: string) => pathname === href || (href !== basePath && pathname.startsWith(href));
 
   return (
     <SidebarProvider>
@@ -39,7 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
               <div className="flex flex-col leading-none">
                 <span className="font-headline text-lg font-black tracking-tighter uppercase italic text-primary">GRACIE BARRA AI</span>
-                <span className="font-headline text-[10px] font-bold tracking-widest uppercase text-foreground">Pilot</span>
+                <span className="font-headline text-[10px] font-bold tracking-widest uppercase text-foreground">Tenant: {slug}</span>
               </div>
             </Link>
           </SidebarHeader>
@@ -49,11 +55,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild 
-                    isActive={pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))}
-                    className={`rounded-none py-6 px-4 border-l-4 transition-all ${pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href)) ? 'bg-primary/10 border-primary text-primary font-black italic' : 'border-transparent hover:bg-sidebar-accent text-sidebar-foreground/70'}`}
+                    isActive={isActive(item.href)}
+                    className={`rounded-none py-6 px-4 border-l-4 transition-all ${isActive(item.href) ? 'bg-primary/10 border-primary text-primary font-black italic' : 'border-transparent hover:bg-sidebar-accent text-sidebar-foreground/70'}`}
                   >
                     <Link href={item.href}>
-                      <item.icon className={`h-5 w-5 ${pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href)) ? 'text-primary' : ''}`} />
+                      <item.icon className={`h-5 w-5 ${isActive(item.href) ? 'text-primary' : ''}`} />
                       <span className="font-headline uppercase tracking-widest text-[10px] font-bold">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -74,7 +80,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-4">
               <SidebarTrigger />
               <h2 className="font-headline text-lg font-black uppercase italic tracking-tight text-foreground">
-                {navItems.find(i => pathname === i.href || (i.href !== "/dashboard" && pathname.startsWith(i.href)))?.title || "Dashboard"}
+                {navItems.find(i => isActive(i.href))?.title || "Dashboard"}
               </h2>
             </div>
             <div className="flex items-center gap-4">
