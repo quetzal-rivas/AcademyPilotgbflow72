@@ -1,0 +1,10 @@
+{
+  "name": "schedule-lead-callback-service",
+  "version": "1.0.0",
+  "description": "A webhook endpoint that adds a lead to the Firestore callback queue.",
+  "main": "index.js",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "firebase-admin": "^11.10.0"
+  }
+}

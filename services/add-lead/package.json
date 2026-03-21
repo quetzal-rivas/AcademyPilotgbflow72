@@ -1,9 +1,12 @@
 {
   "name": "add-lead-handler",
-  "version": "1.0.0",
-  "description": "Lambda handler to add a lead to Firestore, invoked by the Orchestrator",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "Lambda handler to add a lead to Firestore from ElevenLabs webhook",
+  "main": "handler.js",
   "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node handler.js"
+  },
   "dependencies": {
     "firebase-admin": "^11.10.0"
   }

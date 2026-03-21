@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  process-callback-queue-service
+
+  Background worker triggered by EventBridge to process pending callbacks in Firestore.
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 256
+    Runtime: nodejs18.x
+
+Resources:
+  ProcessCallbackQueueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: ./
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          ELEVENLABS_API_KEY: '{{resolve:ssm:/app/elevenlabs-api-key:1}}'
+          CALLBACK_AGENT_ID: 'agent_2001khfa9cn7fqab8wrv2ertt7jb'
+          CALLBACK_PHONE_ID: '+16266993169'
+          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm:/app/firebase-service-account:1}}'
+          FIREBASE_PROJECT_ID: 'admin-audit-3f2cd'
+          TZ: 'America/New_York' # Replace with actual timezone if different
+
+  # EventBridge Rule to trigger the lambda periodically
+  ProcessCallbackQueueSchedule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Triggers the callback queue processor every minute"
+      ScheduleExpression: "rate(1 minute)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt ProcessCallbackQueueFunction.Arn
+          Id: "ProcessCallbackQueueTarget"
+
+  # Permission for EventBridge to invoke the lambda
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ProcessCallbackQueueFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt ProcessCallbackQueueSchedule.Arn
+
+Outputs:
+  ProcessCallbackQueueFunctionName:
+    Description: "The name of the Process Callback Queue Lambda function"
+    Value: !Ref ProcessCallbackQueueFunction

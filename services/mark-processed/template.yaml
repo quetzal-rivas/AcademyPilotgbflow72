@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  mark-processed-service
+
+  A microservice invoked by an outbound agent webhook to mark a batch of leads as processed in Firestore.
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+    Runtime: nodejs18.x
+
+Resources:
+  MarkProcessedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Description: Marks leads as processed.
+      CodeUri: ./
+      Policies:
+        - VPCAccessPolicy: {}
+      Environment:
+        Variables:
+          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm:/app/firebase-service-account:1}}'
+          AUTH_TOKEN: '{{resolve:ssm:/app/auth-token:1}}'
+
+Outputs:
+  MarkProcessedFunctionName:
+    Description: "The name of the Mark Processed Lambda function"
+    Value: !Ref MarkProcessedFunction

@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  transcript-webhook-service
+
+  A microservice that processes end-of-conversation transcripts and triggers outbound calls to the academy for unprocessed leads.
+
+Globals:
+  Function:
+    Timeout: 15
+    MemorySize: 256
+    Runtime: nodejs18.x
+
+Parameters:
+  TriggerOutboundCallFunctionName:
+    Type: String
+    Description: The name of the Lambda function responsible for initiating outbound calls (e.g., triggerOutboundCallHandler).
+
+Resources:
+  TranscriptWebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Description: Processes end-of-conversation transcripts.
+      CodeUri: ./
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref TriggerOutboundCallFunctionName
+        - VPCAccessPolicy: {}
+      Environment:
+        Variables:
+          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm:/app/firebase-service-account:1}}'
+          TRIGGER_OUTBOUND: 'true' # Set to 'false' to disable outbound calls
+          OUTBOUND_LAMBDA_NAME: !Ref TriggerOutboundCallFunctionName
+
+Outputs:
+  TranscriptWebhookFunctionName:
+    Description: "The name of the Transcript Webhook Lambda function"
+    Value: !Ref TranscriptWebhookFunction

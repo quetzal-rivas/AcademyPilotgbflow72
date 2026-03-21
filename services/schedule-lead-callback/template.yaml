@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  schedule-lead-callback-service
+
+  A microservice that adds a lead to the Firestore callback queue, invoked by a webhook.
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+    Runtime: nodejs18.x
+
+Resources:
+  ScheduleLeadCallbackFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Description: Adds a lead to the callback queue.
+      CodeUri: ./
+      Policies:
+        - VPCAccessPolicy: {}
+      Environment:
+        Variables:
+          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm:/app/firebase-service-account:1}}'
+
+Outputs:
+  ScheduleLeadCallbackFunctionName:
+    Description: "The name of the Schedule Lead Callback Lambda function"
+    Value: !Ref ScheduleLeadCallbackFunction

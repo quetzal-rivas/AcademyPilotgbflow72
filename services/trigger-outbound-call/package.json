@@ -1,0 +1,7 @@
+{
+  "name": "trigger-outbound-call-service",
+  "version": "1.0.0",
+  "description": "Asynchronously invoked to format lead data and initiate an outbound call via ElevenLabs API.",
+  "main": "index.js",
+  "engines": { "node": ">=18" }
+}

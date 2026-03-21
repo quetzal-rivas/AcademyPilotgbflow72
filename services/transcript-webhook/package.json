@@ -1,0 +1,11 @@
+{
+  "name": "transcript-webhook-service",
+  "version": "1.0.0",
+  "description": "Receives end-of-conversation transcripts from ElevenLabs, queries for unprocessed leads, and asynchronously triggers outbound calls to the academy.",
+  "main": "index.js",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "aws-sdk": "^2.1481.0",
+    "firebase-admin": "^11.10.0"
+  }
+}

@@ -1,0 +1,167 @@
+
+{
+  "entities": {
+    "LandingPage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LandingPage",
+      "type": "object",
+      "description": "Represents a landing page generated for a business academy.",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who owns this page (the tenant)."
+        },
+        "companyInfo": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            },
+            "hours": {
+              "type": "string"
+            },
+            "socialLinks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "required": ["name", "description", "phone"]
+        },
+        "media": {
+          "type": "object",
+          "properties": {
+            "coverImage": {
+              "type": "string",
+              "format": "uri"
+            },
+            "galleryImages": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "promotionalVideo": {
+              "type": "string"
+            }
+          },
+          "required": ["galleryImages"]
+        },
+        "offerings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": ["name", "description"]
+          }
+        },
+        "slug": {
+          "type": "string"
+        },
+        "selectedTemplate": {
+          "type": "string"
+        },
+        "enabledTemplates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "isPublic": {
+          "type": "boolean"
+        },
+        "generatedContent": {
+          "type": "object",
+          "properties": {
+            "headline": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            },
+            "callToAction": {
+              "type": "string"
+            },
+            "suggestedLayout": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "userId",
+        "companyInfo",
+        "media",
+        "offerings",
+        "slug",
+        "selectedTemplate",
+        "enabledTemplates",
+        "isPublic"
+      ]
+    },
+    "Lead": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Lead",
+      "type": "object",
+      "description": "A prospect captured from a specific landing page tenant.",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "phone"]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/landingPages/{landingPageId}",
+        "definition": {
+          "entityName": "LandingPage",
+          "schema": {
+            "$ref": "#/backend/entities/LandingPage"
+          },
+          "description": "Stores academy details for multi-tenancy."
+        }
+      },
+      {
+        "path": "/landingPages/{landingPageId}/leads/{leadId}",
+        "definition": {
+          "entityName": "Lead",
+          "schema": {
+            "$ref": "#/backend/entities/Lead"
+          },
+          "description": "Leads attributed to a specific academy (tenant)."
+        }
+      }
+    ]
+  }
+}

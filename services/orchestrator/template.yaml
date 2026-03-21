@@ -22,6 +22,12 @@ Parameters:
   GetLeadsFunctionName:
     Type: String
     Description: The name of the Get Leads Lambda function.
+  MarkProcessedFunctionName:
+    Type: String
+    Description: The name of the Mark Processed Lambda function.
+  ScheduleCallbackFunctionName:
+    Type: String
+    Description: The name of the Schedule Callback Lambda function.
 
 Resources:
   OrchestratorFunction:
@@ -37,12 +43,18 @@ Resources:
             FunctionName: !Ref SesHandlerFunctionName
         - LambdaInvokePolicy:
             FunctionName: !Ref GetLeadsFunctionName
+        - LambdaInvokePolicy:
+            FunctionName: !Ref MarkProcessedFunctionName
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ScheduleCallbackFunctionName
       Environment:
         Variables:
           AUTH_TOKEN: '{{resolve:ssm:/app/auth-token:1}}'
           ADD_LEAD_FUNCTION_NAME: !Ref AddLeadFunctionName
           SES_HANDLER_FUNCTION_NAME: !Ref SesHandlerFunctionName
           GET_LEADS_FUNCTION_NAME: !Ref GetLeadsFunctionName
+          MARK_PROCESSED_FUNCTION_NAME: !Ref MarkProcessedFunctionName
+          SCHEDULE_CALLBACK_FUNCTION_NAME: !Ref ScheduleCallbackFunctionName
       Events:
         ApiEvent:
           Type: Api

@@ -1,0 +1,10 @@
+{
+  "name": "mark-processed-service",
+  "version": "1.0.0",
+  "description": "Marks a batch of leads as processed in Firestore, invoked by an outbound agent webhook.",
+  "main": "index.js",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "firebase-admin": "^11.10.0"
+  }
+}

@@ -1,39 +1,23 @@
-# Add Lead Service
+Add-Lead Lambda
 
-This is a specialized backend service responsible for a single task: adding a new lead to the Firestore database.
+Endpoint: POST to the Function URL (or API Gateway endpoint)
 
-## Mission Objective
+Expected JSON body:
 
-To receive lead information, validate it, and persist it in the `leads` collection in Firestore. This function is designed to be invoked by the central `UniversalTacticalOrchestrator`.
+- `name` (string) — required
+- `clase` or `class` (string) — required (class they want to take)
+- `phone` (string) — required
+- `visit_date` (string) — optional (date for trial class)
+- `note` (string) — optional
+- `uniform` (boolean) — optional
 
-## Invocation
+Security: set `ELEVENLABS_WEBHOOK_SECRET` in env and ElevenLabs tool must send header `Authorization: Bearer <secret>`.
 
-This function is not intended to be called directly from the outside world. It is invoked by the `Orchestrator` Lambda function.
-
-## Request Payload
-
-The `Orchestrator` passes a payload to this function with the following structure:
-
-```json
-{
-  "name": "John Doe",
-  "phone": "+15551234567",
-  "clase": "Advanced Gi",
-  "visit_date": "2024-07-20",
-  "note": "Interested in a trial class.",
-  "uniform": true
-}
-```
-
-## Environment Variables
-
-- `FIREBASE_SERVICE_ACCOUNT`: A JSON string containing the Firebase service account credentials. This is securely retrieved from AWS Systems Manager (SSM) Parameter Store.
-
-## Deployment
-
-This service is defined using the AWS Serverless Application Model (SAM). To deploy, navigate to the `services/add-lead` directory and run:
+Example curl:
 
 ```bash
-sam build
-sam deploy --guided
+curl -X POST <FUNCTION_URL> \
+  -H "Authorization: Bearer $ELEVENLABS_WEBHOOK_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Juan Perez","clase":"Karate Kids","phone":"+521234567890","visit_date":"2026-03-01","note":"Ya tiene uniforme","uniform":true}'
 ```

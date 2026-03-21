@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  trigger-outbound-call-service
+
+  A microservice asynchronously invoked to format lead data and initiate an outbound call via ElevenLabs API.
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: nodejs18.x
+
+Resources:
+  TriggerOutboundCallFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Description: Initiates an outbound call via ElevenLabs API.
+      CodeUri: ./
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          ELEVENLABS_API_KEY: '{{resolve:ssm:/app/elevenlabs-api-key:1}}'
+          SALLY_AGENT_ID: 'agent_5101kh4k6hxvezmsa2tbwp0y6mvs'
+          ELEVENLABS_PHONE_ID: '+16266993169'
+          ACADEMY_PHONE: '+13059293241'
+
+Outputs:
+  TriggerOutboundCallFunctionName:
+    Description: "The name of the Trigger Outbound Call Lambda function"
+    Value: !Ref TriggerOutboundCallFunction
