@@ -1,0 +1,39 @@
+name: AWS Tactical Backend Deployment (SAM)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/**' # Only trigger if files inside /services change
+  workflow_dispatch: # Allows you to run this manually from the GitHub UI
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Configure AWS Credentials (Access Keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Make Deployment Script Executable
+        run: chmod +x scripts/deploy-backend.sh
+
+      - name: Run Tactical Deployment
+        run: ./scripts/deploy-backend.sh

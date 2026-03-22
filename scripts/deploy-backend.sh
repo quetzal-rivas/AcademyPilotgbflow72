@@ -1,0 +1,62 @@
+#!/bin/bash
+set -e
+
+# Deploy script for AWS Serverless Application Model (SAM) Microservices
+# This script handles the order of operations for deploying dependent services
+
+echo "============================================="
+echo "🚀 INITIATING TACTICAL BACKEND DEPLOYMENT"
+echo "============================================="
+
+# 1. Deploy the Onboarding Service (Creates the S3 Bucket first)
+echo "\n--- [1/7] Deploying Onboarding Service (S3 Infrastructure) ---"
+cd services/onboarding
+npm install
+sam build
+sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-onboarding-service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+
+# Capture the exact S3 bucket name created by CloudFormation
+S3_BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name gracie-onboarding-service --query "Stacks[0].Outputs[?OutputKey=='IncomingEmailsBucketName'].OutputValue" --output text)
+echo "✅ S3 Bucket Provisioned: $S3_BUCKET_NAME"
+cd ../..
+
+# 2. Deploy Inbound Mail Parser (Requires the S3 Bucket Name)
+echo "\n--- [2/7] Deploying Inbound Mail Parser ---"
+cd services/inbound-mail-parser
+npm install
+sam build
+sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-inbound-mail-parser --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides IncomingEmailsBucketName=$S3_BUCKET_NAME
+cd ../..
+
+# 3. Deploy Standalone Services
+for service in add-lead get-leads mark-processed schedule-lead-callback; do
+  echo "\n--- [3-6/7] Deploying Microservice: $service ---"
+  cd services/$service
+  npm install
+  sam build
+  sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-$service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+  cd ../..
+done
+
+# 4. Deploy Orchestrator (Requires all other Lambda ARNs)
+echo "\n--- [7/7] Deploying Universal Tactical Orchestrator ---"
+# We need to fetch the ARNs of the deployed functions to pass as parameters to the Orchestrator
+ADD_LEAD_ARN=$(aws cloudformation describe-stacks --stack-name gracie-add-lead --query "Stacks[0].Outputs[?OutputKey=='AddLeadFunctionName'].OutputValue" --output text)
+GET_LEADS_ARN=$(aws cloudformation describe-stacks --stack-name gracie-get-leads --query "Stacks[0].Outputs[?OutputKey=='GetLeadsFunctionName'].OutputValue" --output text)
+MARK_PROCESSED_ARN=$(aws cloudformation describe-stacks --stack-name gracie-mark-processed --query "Stacks[0].Outputs[?OutputKey=='MarkProcessedFunctionName'].OutputValue" --output text)
+SCHEDULE_CALLBACK_ARN=$(aws cloudformation describe-stacks --stack-name gracie-schedule-lead-callback --query "Stacks[0].Outputs[?OutputKey=='ScheduleLeadCallbackFunctionName'].OutputValue" --output text)
+
+cd services/orchestrator
+npm install
+sam build
+sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-orchestrator --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+  --parameter-overrides \
+  AddLeadFunctionName=$ADD_LEAD_ARN \
+  GetLeadsFunctionName=$GET_LEADS_ARN \
+  MarkProcessedFunctionName=$MARK_PROCESSED_ARN \
+  ScheduleCallbackFunctionName=$SCHEDULE_CALLBACK_ARN \
+  SesHandlerFunctionName="sesTemplateHandler" # Assuming this legacy one exists or will be updated
+
+echo "============================================="
+echo "✅ TACTICAL BACKEND DEPLOYMENT COMPLETE"
+echo "============================================="
