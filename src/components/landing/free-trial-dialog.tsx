@@ -25,14 +25,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, PhoneOutgoing, Zap } from "lucide-react";
+import { Loader2, PhoneOutgoing } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
   phone: z.string().min(10, "Valid phone number required"),
 });
 
-export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
+export function FreeTrialDialog({ children, tenantSlug }: { children: React.ReactNode, tenantSlug: string }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,7 +68,8 @@ export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
             const price = "1800";
             const details = "Inversión Total: $1,800. Forma de Pago: 2 exhibiciones de $900. Regalo: 1 Kimono + Uniforme No-Gi.";
             
-            router.push(`/checkout?plan=${encodeURIComponent(plan)}&price=${price}&details=${encodeURIComponent(details)}`);
+            // Redirect to the tenant-specific checkout or a general success page
+            router.push(`/${tenantSlug}/checkout?plan=${encodeURIComponent(plan)}&price=${price}&details=${encodeURIComponent(details)}`);
             
             return 60;
           }
@@ -95,21 +96,57 @@ export function FreeTrialDialog({ children }: { children: React.ReactNode }) {
       clearInterval(countdownInterval);
       clearInterval(typingInterval);
     };
-  }, [isCalling, fullPhone, router]);
+  }, [isCalling, fullPhone, router, tenantSlug]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     setFullPhone(values.phone);
-    // Simulated tactical registration
-    await new Promise((resolve) => setTimeout(resolve, 1200));
     
-    setIsSubmitting(false);
-    setIsCalling(true); // Engages the AI Dispatch Matrix
-    
-    toast({
-      title: "PROTOCOL INITIALIZED",
-      description: "Establishing tactical voice link. Standby for AI Dispatch.",
-    });
+    try {
+      // Tactical Backend Integration: Sending the lead to the orchestrator
+      // We do NOT use the authenticated /api/orchestrator route here because 
+      // this is a public form. We need a specific public intake endpoint or
+      // we need to configure our orchestrator to allow unauthenticated 'ADD_LEAD' actions
+      // if they come from our own trusted frontend (e.g., via a distinct public proxy route).
+      
+      // For this implementation, we will assume we have a public intake route
+      // that safely accepts leads for a specific tenant.
+      
+      const response = await fetch('/api/public-intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'ADD_LEAD',
+          payload: {
+            tenantSlug: tenantSlug, // CRUCIAL: Assigning the lead to the specific academy
+            name: values.name,
+            phone: values.phone,
+            source: 'website_free_trial'
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit tactical data.');
+      }
+
+      setIsSubmitting(false);
+      setIsCalling(true); // Engages the AI Dispatch Matrix UI
+      
+      toast({
+        title: "PROTOCOL INITIALIZED",
+        description: "Establishing tactical voice link. Standby for AI Dispatch.",
+      });
+
+    } catch (error) {
+      console.error("Submission error:", error);
+      setIsSubmitting(false);
+      toast({
+        title: "MISSION FAILURE",
+        description: "Could not establish link with tactical command. Please try again.",
+        variant: "destructive"
+      });
+    }
   }
 
   return (

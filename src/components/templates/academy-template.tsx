@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -20,11 +19,30 @@ import {
 import { PhotoGrid } from '@/components/photo-grid';
 
 interface AcademyTemplateProps {
+  slug: string;
   branchName: string;
+  headline?: string;
+  subheadline?: string;
+  callToAction?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  address?: string;
+  heroImage?: string;
   photos: string[];
 }
 
-export function AcademyTemplate({ branchName, photos }: AcademyTemplateProps) {
+export function AcademyTemplate({ 
+  slug,
+  branchName, 
+  headline,
+  subheadline,
+  callToAction,
+  contactPhone,
+  contactEmail,
+  address,
+  heroImage,
+  photos 
+}: AcademyTemplateProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="fixed top-0 w-full z-50 bg-background/20 backdrop-blur-xl border-b-2 border-border shadow-sm">
@@ -51,7 +69,8 @@ export function AcademyTemplate({ branchName, photos }: AcademyTemplateProps) {
                 </Button>
               } 
             />
-            <FreeTrialDialog>
+            {/* The FreeTrialDialog needs to know WHICH tenant it belongs to */}
+            <FreeTrialDialog tenantSlug={slug}>
               <Button className="bg-primary hover:bg-primary/90 text-white font-black uppercase italic tracking-widest px-8 rounded-none h-10">
                 Free Trial
               </Button>
@@ -62,21 +81,39 @@ export function AcademyTemplate({ branchName, photos }: AcademyTemplateProps) {
 
       <main className="flex-grow pt-20">
         <section className="relative h-[85vh] flex items-center overflow-hidden bg-black">
-          <PhotoGrid photoUrls={photos} />
+          {/* Use the specific hero image if provided, otherwise fallback to the photo grid */}
+          {heroImage ? (
+            <div className="absolute inset-0 z-0">
+               <img src={heroImage} alt={`${branchName} Hero`} className="w-full h-full object-cover opacity-60" />
+               <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
+            </div>
+          ) : (
+            <PhotoGrid photoUrls={photos} />
+          )}
+          
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-2xl space-y-6">
               <div className="inline-block bg-primary px-4 py-1 text-white text-[10px] font-black uppercase tracking-[0.3em] italic">
                 {branchName} Tactical Unit Deployed
               </div>
               <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-white tracking-tighter">
-                Jiu-Jitsu <br /> For <span className="text-primary">Everyone</span>
+                {headline ? (
+                  // Simple split to try and highlight the last word if it's a custom headline
+                  <>
+                    {headline.split(' ').slice(0, -1).join(' ')} <br />
+                    <span className="text-primary">{headline.split(' ').slice(-1)}</span>
+                  </>
+                ) : (
+                  <>Jiu-Jitsu <br /> For <span className="text-primary">Everyone</span></>
+                )}
               </h1>
               <p className="text-xl text-white/80 max-w-lg font-bold uppercase italic tracking-tight leading-relaxed">
-                Join {branchName}, part of the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art today.
+                {subheadline || `Join ${branchName}, part of the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art today.`}
               </p>
-              <FreeTrialDialog>
+              
+              <FreeTrialDialog tenantSlug={slug}>
                 <Button size="lg" className="bg-primary hover:bg-primary/90 px-10 py-8 text-lg font-black uppercase italic tracking-widest rounded-none h-auto shadow-2xl">
-                  START YOUR MISSION <ArrowRight className="ml-2 h-6 w-6" />
+                  {callToAction || 'START YOUR MISSION'} <ArrowRight className="ml-2 h-6 w-6" />
                 </Button>
               </FreeTrialDialog>
             </div>
@@ -115,7 +152,7 @@ export function AcademyTemplate({ branchName, photos }: AcademyTemplateProps) {
                   <span className="text-primary">{branchName} Team</span>
                 </h2>
               </div>
-              <FreeTrialDialog>
+              <FreeTrialDialog tenantSlug={slug}>
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-white rounded-full font-black uppercase italic tracking-tighter w-36 h-36 flex flex-col items-center justify-center text-center leading-none shadow-2xl border-4 border-white/10 transition-transform hover:scale-110">
                   FREE<br/>TRIAL
                 </Button>
@@ -137,6 +174,18 @@ export function AcademyTemplate({ branchName, photos }: AcademyTemplateProps) {
             </div>
             <span className="font-headline text-2xl font-black tracking-tighter uppercase italic">GB {branchName.toUpperCase()}</span>
           </div>
+          
+          {/* Display contact info if available */}
+          {(contactPhone || contactEmail || address) && (
+             <div className="flex flex-col items-center justify-center gap-2 text-sm font-bold text-white/60">
+                {address && <p>{address}</p>}
+                <div className="flex gap-4">
+                  {contactPhone && <p>{contactPhone}</p>}
+                  {contactEmail && <p>{contactEmail}</p>}
+                </div>
+             </div>
+          )}
+
           <div className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">
             © 2024 GRACIE BARRA AI PILOT SYSTEM // SECTOR: {branchName.toUpperCase()}
           </div>
