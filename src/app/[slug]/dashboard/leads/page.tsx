@@ -18,6 +18,7 @@ import { LeadProfileDialog } from "@/components/leads/lead-profile-dialog";
 import { InitializeLeadDialog } from "@/components/leads/initialize-lead-dialog";
 import { useParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { auth } from "@/firebase/config"; // Import Firebase auth
 
 export default function LeadManagement() {
   const params = useParams();
@@ -35,26 +36,44 @@ export default function LeadManagement() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isInitDialogOpen, setIsInitDialogOpen] = useState(false);
 
-  // Data Fetching via the Secure Next.js Orchestrator Proxy
+  // Secure Data Fetching via the Next.js Orchestrator Proxy
   useEffect(() => {
     async function fetchLeads() {
       if (!tenantSlug) return;
       setIsLeadsLoading(true);
+
       try {
-        const response = await fetch('/api/orchestrator', { // Updated to use the new secure proxy route
+        // 1. Get the current user's Firebase JWT
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error("User must be logged in to access tactical data.");
+        }
+        
+        // Force refresh the token to ensure it hasn't expired.
+        const idToken = await user.getIdToken(true);
+
+        // 2. Send the request to our secure proxy, including the JWT in the Authorization header.
+        const response = await fetch('/api/orchestrator', { 
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}` // Add the JWT here
+          },
           body: JSON.stringify({
-            action: 'GET_LEADS', // The Orchestrator action
+            action: 'GET_LEADS', 
             payload: {
-              tenantSlug: tenantSlug, // Mandatory for tenant isolation
-              limit: 100 // Example filter
+              tenantSlug: tenantSlug, 
+              limit: 100 
             }
           })
         });
 
         if (!response.ok) {
            const errData = await response.json();
+           // Handle 401 Unauthorized or 403 Forbidden specifically
+           if (response.status === 401 || response.status === 403) {
+             throw new Error(errData.error || 'Access Denied: You do not have clearance for this tenant.');
+           }
            throw new Error(errData.error || 'Network response was not ok');
         }
         
@@ -74,7 +93,17 @@ export default function LeadManagement() {
       }
     }
 
-    fetchLeads();
+    // Since auth state can take a moment to initialize on the client,
+    // we should wait for Firebase Auth to be ready before fetching.
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchLeads();
+      } else {
+        setIsLeadsLoading(false); // Stop loading if not logged in
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup listener
   }, [tenantSlug, toast]);
 
   const filteredLeads = useMemo(() => {

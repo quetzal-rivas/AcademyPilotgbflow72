@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "google-maps": {
+    "firebase": {
       "command": "npx",
-      "args": ["-y", "@googlemaps/code-assist-mcp"]
+      "args": ["-y", "firebase-tools@latest", "mcp"]
     }
   }
 }
