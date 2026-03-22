@@ -18,7 +18,7 @@ import { LeadProfileDialog } from "@/components/leads/lead-profile-dialog";
 import { InitializeLeadDialog } from "@/components/leads/initialize-lead-dialog";
 import { useParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { auth } from "@/firebase/config"; // Import Firebase auth
+import { initializeFirebase } from "@/firebase";
 
 export default function LeadManagement() {
   const params = useParams();
@@ -38,12 +38,15 @@ export default function LeadManagement() {
 
   // Secure Data Fetching via the Next.js Orchestrator Proxy
   useEffect(() => {
+    // 1. Initialize Firebase to get the Auth instance
+    const { auth } = initializeFirebase();
+
     async function fetchLeads() {
       if (!tenantSlug) return;
       setIsLeadsLoading(true);
 
       try {
-        // 1. Get the current user's Firebase JWT
+        // 2. Get the current user's Firebase JWT
         const user = auth.currentUser;
         if (!user) {
           throw new Error("User must be logged in to access tactical data.");
@@ -52,7 +55,7 @@ export default function LeadManagement() {
         // Force refresh the token to ensure it hasn't expired.
         const idToken = await user.getIdToken(true);
 
-        // 2. Send the request to our secure proxy, including the JWT in the Authorization header.
+        // 3. Send the request to our secure proxy, including the JWT in the Authorization header.
         const response = await fetch('/api/orchestrator', { 
           method: 'POST',
           headers: { 
