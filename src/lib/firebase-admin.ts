@@ -1,4 +1,3 @@
-
 import * as admin from 'firebase-admin';
 
 /**
@@ -18,11 +17,15 @@ export function getFirebaseAdmin() {
   if (serviceAccount) {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
-      projectId: process.env.FIREBASE_PROJECT_ID || 'admin-audit-3f2cd',
+      // Updated to the correct project ID based on the current environment
+      projectId: process.env.FIREBASE_PROJECT_ID || 'studio-5472086834-71ab7',
     });
   } else {
     // Fallback: This may fail in strict production theaters if no SA key is provided.
-    admin.initializeApp();
+    // It relies on Application Default Credentials (ADC)
+    admin.initializeApp({
+      projectId: process.env.FIREBASE_PROJECT_ID || 'studio-5472086834-71ab7'
+    });
   }
 
   return admin;
