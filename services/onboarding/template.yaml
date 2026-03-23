@@ -73,8 +73,8 @@ Resources:
         Variables:
           INCOMING_EMAILS_BUCKET: !Ref TenantIncomingEmailsBucket
           # Pulling Cloudflare secrets securely from SSM Parameter Store
-          CLOUDFLARE_API_TOKEN: '{{resolve:ssm:/app/cloudflare-api-token:1}}'
-          CLOUDFLARE_ZONE_ID: '{{resolve:ssm:/app/cloudflare-zone-id:1}}'
+          CLOUDFLARE_API_TOKEN: '{{resolve:ssm-secure:/app/cloudflare-api-token:1}}'
+          CLOUDFLARE_ZONE_ID: '{{resolve:ssm-secure:/app/cloudflare-zone-id:1}}'
           AWS_REGION: !Ref "AWS::Region"
 
 Outputs:

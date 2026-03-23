@@ -33,7 +33,7 @@ Resources:
             Resource: !Sub 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm'
       Environment:
         Variables:
-          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm:/app/firebase-service-account:1}}'
+          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm-secure:/app/firebase-service-account:1}}'
 
 Outputs:
   ScheduleLeadCallbackFunctionName:
