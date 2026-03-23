@@ -34,10 +34,10 @@ Resources:
             Resource: !Sub 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm'
       Environment:
         Variables:
-          ELEVENLABS_API_KEY: '{{resolve:ssm-secure:/app/elevenlabs-api-key:1}}'
+          ELEVENLABS_API_KEY: '/app/elevenlabs-api-key'
           CALLBACK_AGENT_ID: 'agent_2001khfa9cn7fqab8wrv2ertt7jb'
           CALLBACK_PHONE_ID: '+16266993169'
-          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm-secure:/app/firebase-service-account:1}}'
+          FIREBASE_SERVICE_ACCOUNT: '/app/firebase-service-account'
           FIREBASE_PROJECT_ID: 'admin-audit-3f2cd'
           TZ: 'America/New_York' 
 

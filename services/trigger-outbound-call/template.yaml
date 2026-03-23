@@ -35,8 +35,8 @@ Resources:
             Resource: !Sub 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm'
       Environment:
         Variables:
-          ELEVENLABS_API_KEY: '{{resolve:ssm-secure:/app/elevenlabs-api-key:1}}'
-          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm-secure:/app/firebase-service-account:1}}'
+          ELEVENLABS_API_KEY: '/app/elevenlabs-api-key'
+          FIREBASE_SERVICE_ACCOUNT: '/app/firebase-service-account'
           SALLY_AGENT_ID: 'agent_5101kh4k6hxvezmsa2tbwp0y6mvs'
           ELEVENLABS_PHONE_ID: '+16266993169'
 

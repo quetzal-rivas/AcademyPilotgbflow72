@@ -35,8 +35,8 @@ Resources:
             Resource: !Sub 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm'
       Environment:
         Variables:
-          FIREBASE_SERVICE_ACCOUNT: '{{resolve:ssm-secure:/app/firebase-service-account:1}}'
-          AUTH_TOKEN: '{{resolve:ssm-secure:/app/auth-token:1}}'
+          FIREBASE_SERVICE_ACCOUNT: '/app/firebase-service-account'
+          AUTH_TOKEN: '/app/auth-token'
 
 Outputs:
   MarkProcessedFunctionName:

@@ -69,13 +69,25 @@ Resources:
                 - ses:DescribeReceiptRuleSet
                 - ses:CreateReceiptRuleSet
               Resource: "*"
+            # Grant permission to read and decrypt parameters from SSM
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+                - ssm:GetParameters
+              Resource: 
+                - !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/app/cloudflare-api-token'
+                - !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/app/cloudflare-zone-id'
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+              Resource: !Sub 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm'
       Environment:
         Variables:
           INCOMING_EMAILS_BUCKET: !Ref TenantIncomingEmailsBucket
-          # Pulling Cloudflare secrets securely from SSM Parameter Store
-          CLOUDFLARE_API_TOKEN: '{{resolve:ssm-secure:/app/cloudflare-api-token:1}}'
-          CLOUDFLARE_ZONE_ID: '{{resolve:ssm-secure:/app/cloudflare-zone-id:1}}'
           AWS_REGION: !Ref "AWS::Region"
+          # Pass the PATH to the secret, not the secret itself
+          CLOUDFLARE_API_TOKEN_PATH: '/app/cloudflare-api-token'
+          CLOUDFLARE_ZONE_ID_PATH: '/app/cloudflare-zone-id'
 
 Outputs:
   IncomingEmailsBucketName:

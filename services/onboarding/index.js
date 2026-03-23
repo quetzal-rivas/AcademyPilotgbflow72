@@ -1,11 +1,45 @@
 const AWS = require('aws-sdk');
 
 const ses = new AWS.SES({ region: process.env.AWS_REGION || 'us-east-2' });
+const ssm = new AWS.SSM({ region: process.env.AWS_REGION || 'us-east-2' });
 
-// Configuration fetched from environment variables
-const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
-const CLOUDFLARE_ZONE_ID = process.env.CLOUDFLARE_ZONE_ID;
 const ROOT_DOMAIN = 'graciebarra.ai';
+
+// We fetch secrets dynamically at runtime to satisfy AWS Security constraints on SecureStrings
+let CLOUDFLARE_API_TOKEN = null;
+let CLOUDFLARE_ZONE_ID = null;
+
+async function fetchSecrets() {
+    if (CLOUDFLARE_API_TOKEN && CLOUDFLARE_ZONE_ID) return; // Cache them during cold starts
+
+    console.log("Fetching secure parameters from AWS SSM...");
+    try {
+        const response = await ssm.getParameters({
+            Names: [
+                process.env.CLOUDFLARE_API_TOKEN_PATH || '/app/cloudflare-api-token',
+                process.env.CLOUDFLARE_ZONE_ID_PATH || '/app/cloudflare-zone-id'
+            ],
+            WithDecryption: true
+        }).promise();
+
+        const parameters = response.Parameters;
+        
+        const tokenParam = parameters.find(p => p.Name.includes('api-token'));
+        const zoneParam = parameters.find(p => p.Name.includes('zone-id'));
+
+        if (!tokenParam || !zoneParam) {
+             throw new Error("Failed to retrieve one or more required SSM parameters.");
+        }
+
+        CLOUDFLARE_API_TOKEN = tokenParam.Value;
+        CLOUDFLARE_ZONE_ID = zoneParam.Value;
+        console.log("Secrets successfully decrypted and cached in memory.");
+    } catch (err) {
+        console.error("Critical Error: Failed to fetch secrets from SSM.", err);
+        throw err;
+    }
+}
+
 
 /**
  * Tenant Onboarding Service
@@ -24,20 +58,19 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'tenantSlug and ownerEmail are required' }) };
     }
 
+    // 1. Retrieve Secrets BEFORE executing logic
+    await fetchSecrets();
+
     const customEmailIdentity = `${tenantSlug}@${ROOT_DOMAIN}`;
     const customMailFromDomain = `mail.${tenantSlug}.${ROOT_DOMAIN}`;
     
     console.log(`Provisioning communications for: ${customEmailIdentity}`);
 
     // =========================================================================
-    // PHASE 1: CLOUDFLARE DNS PROVISIONING (Adapted from the provided snippet)
+    // PHASE 1: CLOUDFLARE DNS PROVISIONING
     // =========================================================================
     console.log(`[Phase 1] Configuring Cloudflare DNS for ${customMailFromDomain}...`);
     
-    if (!CLOUDFLARE_API_TOKEN || !CLOUDFLARE_ZONE_ID) {
-      throw new Error("Missing Cloudflare API configuration.");
-    }
-
     const cfFetch = async (endpoint, method, body) => {
         const response = await fetch(`https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}${endpoint}`, {
             method: method,
@@ -94,13 +127,10 @@ exports.handler = async (event) => {
     console.log(`\n[Phase 2] Configuring AWS SES for ${customEmailIdentity}...`);
 
     // 2a. Verify the Custom Email Identity (westcovina@graciebarra.ai)
-    // Note: If in SES Sandbox, AWS will send an email requiring manual verification.
-    // If out of Sandbox, and the root domain is verified, this might auto-verify.
     console.log(`  -> Sending VerifyEmailIdentity command`);
     await ses.verifyEmailIdentity({ EmailAddress: customEmailIdentity }).promise();
 
     // 2b. Set the Custom MAIL FROM Domain
-    // This tells AWS to use mail.westcovina.graciebarra.ai instead of default amazonses.com
     console.log(`  -> Setting Identity MAIL FROM domain to ${customMailFromDomain}`);
     await ses.setIdentityMailFromDomain({
       Identity: customEmailIdentity,
@@ -109,12 +139,10 @@ exports.handler = async (event) => {
     }).promise();
 
     // 2c. Setup Inbound Receipt Rule
-    // This catches emails sent TO westcovina@graciebarra.ai and drops them in our S3 bucket.
     console.log(`  -> Creating SES Receipt Rule for inbound routing`);
     const ruleSetName = 'TenantIncomingMailRules';
     const bucketName = process.env.INCOMING_EMAILS_BUCKET;
 
-    // Ensure the RuleSet exists first (creates it if it doesn't)
     try {
         await ses.describeReceiptRuleSet({ RuleSetName: ruleSetName }).promise();
     } catch (err) {
@@ -125,7 +153,6 @@ exports.handler = async (event) => {
         }
     }
 
-    // Create the specific rule for this tenant
     await ses.createReceiptRule({
         RuleSetName: ruleSetName,
         Rule: {
@@ -137,7 +164,6 @@ exports.handler = async (event) => {
                     S3Action: {
                         BucketName: bucketName,
                         ObjectKeyPrefix: `${tenantSlug}/`,
-                        // We will need a forwarder lambda attached here later to actually send it to the ownerEmail
                     }
                 }
             ],

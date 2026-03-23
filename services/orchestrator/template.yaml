@@ -60,7 +60,7 @@ Resources:
             Resource: !Sub 'arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm'
       Environment:
         Variables:
-          AUTH_TOKEN: '{{resolve:ssm-secure:/app/auth-token:1}}'
+          AUTH_TOKEN: '/app/auth-token'
           ADD_LEAD_FUNCTION_NAME: !Ref AddLeadFunctionName
           SES_HANDLER_FUNCTION_NAME: !Ref SesHandlerFunctionName
           GET_LEADS_FUNCTION_NAME: !Ref GetLeadsFunctionName
