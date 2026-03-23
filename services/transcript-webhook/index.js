@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const { getFirestore } = require('./firebase-admin');
 
-const lambda = new AWS.Lambda({ region: process.env.AWS_REGION || 'us-east-1' });
+const lambda = new AWS.Lambda({ region: process.env.AWS_REGION || 'us-east-2' });
 
 /**
  * Transcript Webhook Service (Multi-Tenant)

@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 
-const ses = new AWS.SES({ region: process.env.AWS_REGION || 'us-east-1' });
+const ses = new AWS.SES({ region: process.env.AWS_REGION || 'us-east-2' });
 
 // Configuration fetched from environment variables
 const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
     await cfFetch('/dns_records', 'POST', {
         type: "MX",
         name: customMailFromDomain,
-        content: `inbound-smtp.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com`, // SES specific inbound endpoint
+        content: `inbound-smtp.${process.env.AWS_REGION || 'us-east-2'}.amazonaws.com`, // SES specific inbound endpoint
         priority: 10,
         proxied: false, // Critical: MUST NOT BE PROXIED
         ttl: 300

@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const { templateTypes } = require('./ses-template-map');
 
-const ses = new AWS.SES({ region: process.env.AWS_REGION || 'us-east-1' });
+const ses = new AWS.SES({ region: process.env.AWS_REGION || 'us-east-2' });
 
 /**
  * SES Template Handler

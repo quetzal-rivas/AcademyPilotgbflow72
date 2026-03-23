@@ -8,15 +8,24 @@ echo "============================================="
 echo "🚀 INITIATING TACTICAL BACKEND DEPLOYMENT"
 echo "============================================="
 
+# Ensure AWS_REGION is set (passed down from the GitHub Actions YAML)
+if [ -z "$AWS_REGION" ]; then
+  echo "Error: AWS_REGION is not set. Defaulting to us-east-2"
+  export AWS_REGION=us-east-2
+fi
+
+echo "Deploying to region: $AWS_REGION"
+
 # 1. Deploy the Onboarding Service (Creates the S3 Bucket first)
 echo "\n--- [1/7] Deploying Onboarding Service (S3 Infrastructure) ---"
 cd services/onboarding
 npm install
 sam build
-sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-onboarding-service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+# Added --region flag to explicitly force SAM to deploy to us-east-2
+sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-onboarding-service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
 # Capture the exact S3 bucket name created by CloudFormation
-S3_BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name gracie-onboarding-service --query "Stacks[0].Outputs[?OutputKey=='IncomingEmailsBucketName'].OutputValue" --output text)
+S3_BUCKET_NAME=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-onboarding-service --query "Stacks[0].Outputs[?OutputKey=='IncomingEmailsBucketName'].OutputValue" --output text)
 echo "✅ S3 Bucket Provisioned: $S3_BUCKET_NAME"
 cd ../..
 
@@ -25,7 +34,7 @@ echo "\n--- [2/7] Deploying Inbound Mail Parser ---"
 cd services/inbound-mail-parser
 npm install
 sam build
-sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-inbound-mail-parser --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides IncomingEmailsBucketName=$S3_BUCKET_NAME
+sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-inbound-mail-parser --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides IncomingEmailsBucketName=$S3_BUCKET_NAME
 cd ../..
 
 # 3. Deploy Standalone Services
@@ -34,22 +43,22 @@ for service in add-lead get-leads mark-processed schedule-lead-callback; do
   cd services/$service
   npm install
   sam build
-  sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-$service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+  sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-$service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
   cd ../..
 done
 
 # 4. Deploy Orchestrator (Requires all other Lambda ARNs)
 echo "\n--- [7/7] Deploying Universal Tactical Orchestrator ---"
 # We need to fetch the ARNs of the deployed functions to pass as parameters to the Orchestrator
-ADD_LEAD_ARN=$(aws cloudformation describe-stacks --stack-name gracie-add-lead --query "Stacks[0].Outputs[?OutputKey=='AddLeadFunctionName'].OutputValue" --output text)
-GET_LEADS_ARN=$(aws cloudformation describe-stacks --stack-name gracie-get-leads --query "Stacks[0].Outputs[?OutputKey=='GetLeadsFunctionName'].OutputValue" --output text)
-MARK_PROCESSED_ARN=$(aws cloudformation describe-stacks --stack-name gracie-mark-processed --query "Stacks[0].Outputs[?OutputKey=='MarkProcessedFunctionName'].OutputValue" --output text)
-SCHEDULE_CALLBACK_ARN=$(aws cloudformation describe-stacks --stack-name gracie-schedule-lead-callback --query "Stacks[0].Outputs[?OutputKey=='ScheduleLeadCallbackFunctionName'].OutputValue" --output text)
+ADD_LEAD_ARN=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-add-lead --query "Stacks[0].Outputs[?OutputKey=='AddLeadFunctionName'].OutputValue" --output text)
+GET_LEADS_ARN=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-get-leads --query "Stacks[0].Outputs[?OutputKey=='GetLeadsFunctionName'].OutputValue" --output text)
+MARK_PROCESSED_ARN=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-mark-processed --query "Stacks[0].Outputs[?OutputKey=='MarkProcessedFunctionName'].OutputValue" --output text)
+SCHEDULE_CALLBACK_ARN=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-schedule-lead-callback --query "Stacks[0].Outputs[?OutputKey=='ScheduleLeadCallbackFunctionName'].OutputValue" --output text)
 
 cd services/orchestrator
 npm install
 sam build
-sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-orchestrator --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-orchestrator --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
   --parameter-overrides \
   AddLeadFunctionName=$ADD_LEAD_ARN \
   GetLeadsFunctionName=$GET_LEADS_ARN \

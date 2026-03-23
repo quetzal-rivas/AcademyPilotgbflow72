@@ -30,10 +30,13 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
+          # Changed to us-east-2 (Ohio) where your secrets actually live!
+          aws-region: us-east-2
+          
       - name: Make Deployment Script Executable
         run: chmod +x scripts/deploy-backend.sh
 
       - name: Run Tactical Deployment
-        run: ./scripts/deploy-backend.sh
+        # Explicitly pass the AWS_REGION environment variable to the bash script
+        # so all 'sam deploy' commands use us-east-2
+        run: AWS_REGION=us-east-2 ./scripts/deploy-backend.sh
