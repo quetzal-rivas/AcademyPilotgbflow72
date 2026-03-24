@@ -84,7 +84,6 @@ Resources:
       Environment:
         Variables:
           INCOMING_EMAILS_BUCKET: !Ref TenantIncomingEmailsBucket
-          AWS_REGION: !Ref "AWS::Region"
           # Pass the PATH to the secret, not the secret itself
           CLOUDFLARE_API_TOKEN_PATH: '/app/cloudflare-api-token'
           CLOUDFLARE_ZONE_ID_PATH: '/app/cloudflare-zone-id'
