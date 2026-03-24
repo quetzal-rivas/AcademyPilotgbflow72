@@ -21,8 +21,8 @@ echo "\n--- [1/7] Deploying Onboarding Service (S3 Infrastructure) ---"
 cd services/onboarding
 npm install
 sam build
-# First deployment: S3 bucket without the inbound-mail-parser listener yet
-sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-onboarding-service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides InboundMailParserFunctionArn=""
+# First deployment: S3 bucket without the inbound-mail-parser listener yet (use template default)
+sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-onboarding-service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
 # Capture the exact S3 bucket name created by CloudFormation
 S3_BUCKET_NAME=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-onboarding-service --query "Stacks[0].Outputs[?OutputKey=='IncomingEmailsBucketName'].OutputValue" --output text)
