@@ -26,6 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { showErrorToast } from '@/lib/client-errors';
 import { doc, setDoc } from 'firebase/firestore';
 import { slugify } from '@/lib/utils';
 import Link from 'next/link';
@@ -92,7 +93,7 @@ export default function LandingPageManager() {
 
         toast({ title: "MISSION DEPLOYED", description: `Landing page is now ${formData.isPublished ? 'LIVE' : 'SECURED'} at /${formData.slug}` });
       } catch (error: any) {
-        toast({ variant: "destructive", title: "DEPLOYMENT FAILURE", description: error.message });
+        showErrorToast(toast, 'DEPLOYMENT FAILURE', error, 'Landing page deployment failed.');
       }
     });
   };

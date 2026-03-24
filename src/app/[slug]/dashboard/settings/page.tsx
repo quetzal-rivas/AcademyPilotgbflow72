@@ -32,6 +32,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { showErrorToast } from '@/lib/client-errors';
 import { 
   useUser, 
   useFirestore, 
@@ -90,7 +91,7 @@ export default function AcademySettingsPage() {
 
       toast({ title: "CREDENTIAL SECURED", description: `${name} matrix updated.` });
     } catch (error: any) {
-      toast({ variant: "destructive", title: "UPDATE FAILURE", description: error.message });
+      showErrorToast(toast, 'UPDATE FAILURE', error, 'Failed to update credential matrix.');
     }
   };
 
@@ -129,7 +130,7 @@ export default function AcademySettingsPage() {
       if (!response.ok) throw new Error('Deletion blocked by security matrix');
       toast({ title: "LINK TERMINATED", variant: "destructive" });
     } catch (error: any) {
-      toast({ variant: "destructive", title: "PURGE FAILURE", description: error.message });
+      showErrorToast(toast, 'PURGE FAILURE', error, 'Deletion blocked by security matrix.');
     }
   };
 
@@ -145,7 +146,7 @@ export default function AcademySettingsPage() {
       if (!response.ok) throw new Error('Key rotation failed');
       toast({ title: "KEY ROTATED" });
     } catch (error: any) {
-      toast({ variant: "destructive", title: "ROTATION FAILURE", description: error.message });
+      showErrorToast(toast, 'ROTATION FAILURE', error, 'Key rotation failed.');
     }
   };
 

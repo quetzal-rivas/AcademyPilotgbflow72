@@ -8,6 +8,40 @@ const ssm = new AWS.SSM({ region: process.env.AWS_REGION || 'us-east-2' });
 
 let AUTH_TOKEN = null;
 
+function log(level, message, meta = {}) {
+  const entry = {
+    level,
+    message,
+    timestamp: new Date().toISOString(),
+    ...meta,
+  };
+
+  const serialized = JSON.stringify(entry);
+  if (level === 'error') {
+    console.error(serialized);
+    return;
+  }
+
+  if (level === 'warn') {
+    console.warn(serialized);
+    return;
+  }
+
+  console.log(serialized);
+}
+
+function serializeError(error) {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    };
+  }
+
+  return { value: String(error) };
+}
+
 /**
  * Tactical Credential Resolution
  * Fetches the AUTH_TOKEN from SSM if the env var points to a secure path.
@@ -45,7 +79,12 @@ async function resolveAuthToken() {
  * Distinguishes between Service-Level trust and User-Level authorization.
  */
 exports.handler = async (event) => {
-  console.log('--- MISSION DIRECTIVE RECEIVED (AWS ORCHESTRATOR) ---');
+  const requestId = event.headers?.['x-request-id'] || event.headers?.['X-Request-Id'] || event.requestContext?.requestId || `aws-${Date.now()}`;
+
+  log('info', 'Mission directive received by AWS orchestrator', {
+    requestId,
+    scope: 'aws.orchestrator',
+  });
   
   try {
     // 1. Service-to-Service Authorization (Verify Next.js Proxy)
@@ -54,8 +93,11 @@ exports.handler = async (event) => {
     const token = authHeader.replace('Bearer ', '').trim();
     
     if (token !== activeToken) {
-      console.error('Handshake Failure: Unauthorized Access from untrusted source.');
-      return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized Backend Access' }) };
+      log('error', 'Handshake failure: unauthorized backend access', {
+        requestId,
+        scope: 'aws.orchestrator',
+      });
+      return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized Backend Access', requestId }) };
     }
 
     // 2. Parse Mission Parameters
@@ -63,7 +105,7 @@ exports.handler = async (event) => {
     const { action, payload, userJwt } = body;
 
     if (!action) {
-        return { statusCode: 400, body: JSON.stringify({ error: 'Mission directive "action" is missing.' }) };
+      return { statusCode: 400, body: JSON.stringify({ error: 'Mission directive "action" is missing.', requestId }) };
     }
 
     // 3. Define Action Classes
@@ -91,31 +133,56 @@ exports.handler = async (event) => {
           authorizedTenant = userProfile?.tenantSlug;
         }
       } catch (authError) {
-        console.error('Security Alert: Invalid Firebase ID token.', authError);
-        return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized: Invalid user token' }) };
+        log('error', 'Security alert: invalid Firebase ID token', {
+          requestId,
+          scope: 'aws.orchestrator',
+          error: serializeError(authError),
+        });
+        return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized: Invalid user token', requestId }) };
       }
     }
 
     // 5. Enforce Access Control
     if (OWNER_ACTIONS.includes(action)) {
         if (!uid) {
-            console.error(`Security Alert: Action '${action}' requires user JWT.`);
-            return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized: Missing user token' }) };
+            log('error', 'Security alert: owner action missing user JWT', {
+              requestId,
+              scope: 'aws.orchestrator',
+              action,
+            });
+            return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized: Missing user token', requestId }) };
         }
 
         if (authorizedRole !== 'academy_owner') {
-             console.warn(`Security Alert: User ${uid} attempted owner action '${action}' without owner role.`);
-             return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden: Insufficient permissions' }) };
+             log('warn', 'Security alert: owner action attempted without owner role', {
+               requestId,
+               scope: 'aws.orchestrator',
+               action,
+               uid,
+               authorizedRole,
+             });
+             return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden: Insufficient permissions', requestId }) };
         }
 
         // Check IDOR: Does the tenant they are asking for match the tenant they own?
         if (payload && payload.tenantSlug && payload.tenantSlug !== authorizedTenant) {
-             console.warn(`Security Alert (IDOR): User ${uid} (Tenant: ${authorizedTenant}) attempted to access data for Tenant: ${payload.tenantSlug}`);
-             return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden: Cross-tenant access denied' }) };
+             log('warn', 'Security alert: cross-tenant access denied', {
+               requestId,
+               scope: 'aws.orchestrator',
+               uid,
+               authorizedTenant,
+               requestedTenant: payload.tenantSlug,
+             });
+             return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden: Cross-tenant access denied', requestId }) };
         }
     }
 
-    console.log(`Authorization successful for action '${action}'. Proxying to target sector.`);
+    log('info', 'Authorization successful. Proxying action to target sector', {
+      requestId,
+      scope: 'aws.orchestrator',
+      action,
+      uid,
+    });
 
     // 6. Dispatch to Specialized Sector
     let targetFunction;
@@ -136,13 +203,21 @@ exports.handler = async (event) => {
         targetFunction = process.env.SCHEDULE_CALLBACK_FUNCTION_NAME;
         break;
       default:
-        console.error(`Unknown action: ${action}`);
-        return { statusCode: 400, body: JSON.stringify({ error: `Unknown action: ${action}` }) };
+        log('error', 'Unknown action requested', {
+          requestId,
+          scope: 'aws.orchestrator',
+          action,
+        });
+        return { statusCode: 400, body: JSON.stringify({ error: `Unknown action: ${action}`, requestId }) };
     }
 
     if (!targetFunction) {
-      console.error(`Target function for action ${action} is not configured.`);
-      return { statusCode: 500, body: JSON.stringify({ error: `Server Configuration Error for action: ${action}` }) };
+      log('error', 'Target function is not configured', {
+        requestId,
+        scope: 'aws.orchestrator',
+        action,
+      });
+      return { statusCode: 500, body: JSON.stringify({ error: `Server Configuration Error for action: ${action}`, requestId }) };
     }
 
     const securePayload = {
@@ -150,7 +225,8 @@ exports.handler = async (event) => {
         _trustedContext: {
             uid: uid,
             role: authorizedRole,
-            tenantSlug: authorizedTenant || payload?.tenantSlug // Fallback for public intake
+            tenantSlug: authorizedTenant || payload?.tenantSlug,
+            requestId,
         }
     };
 
@@ -166,14 +242,18 @@ exports.handler = async (event) => {
     // 8. Relay Response
     return {
       statusCode: responsePayload.statusCode || 200,
-      body: responsePayload.body || JSON.stringify(responsePayload)
+      body: responsePayload.body || JSON.stringify({ ...responsePayload, requestId })
     };
 
   } catch (error) {
-    console.error('Matrix Failure: Orchestrator encountered a critical error.', error);
+    log('error', 'Matrix failure: orchestrator critical error', {
+      requestId,
+      scope: 'aws.orchestrator',
+      error: serializeError(error),
+    });
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal Matrix Error', details: error.message })
+      body: JSON.stringify({ error: 'Internal Matrix Error', details: error.message, requestId })
     };
   }
 };

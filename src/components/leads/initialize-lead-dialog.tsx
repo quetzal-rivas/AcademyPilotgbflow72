@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Zap, Loader2 } from "lucide-react";
 import { useUser } from "@/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { showErrorToast } from '@/lib/client-errors';
 import { useState } from "react";
 
 const formSchema = z.object({
@@ -81,11 +82,7 @@ export function InitializeLeadDialog({ isOpen, onOpenChange }: { isOpen: boolean
       form.reset();
       onOpenChange(false);
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "INITIALIZATION FAILURE",
-        description: error.message,
-      });
+      showErrorToast(toast, 'INITIALIZATION FAILURE', error, 'Lead initialization failed.');
     } finally {
       setIsSubmitting(false);
     }

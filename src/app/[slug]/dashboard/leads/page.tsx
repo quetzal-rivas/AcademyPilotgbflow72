@@ -18,6 +18,7 @@ import { LeadProfileDialog } from "@/components/leads/lead-profile-dialog";
 import { InitializeLeadDialog } from "@/components/leads/initialize-lead-dialog";
 import { useParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { showErrorToast } from '@/lib/client-errors';
 import { initializeFirebase } from "@/firebase";
 
 export default function LeadManagement() {
@@ -44,6 +45,7 @@ export default function LeadManagement() {
     async function fetchLeads() {
       if (!tenantSlug) return;
       setIsLeadsLoading(true);
+      const requestId = crypto.randomUUID();
 
       try {
         // 2. Get the current user's Firebase JWT
@@ -60,7 +62,8 @@ export default function LeadManagement() {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}` // Add the JWT here
+            'Authorization': `Bearer ${idToken}`,
+            'x-request-id': requestId,
           },
           body: JSON.stringify({
             action: 'GET_LEADS', 
@@ -75,9 +78,9 @@ export default function LeadManagement() {
            const errData = await response.json();
            // Handle 401 Unauthorized or 403 Forbidden specifically
            if (response.status === 401 || response.status === 403) {
-             throw new Error(errData.error || 'Access Denied: You do not have clearance for this tenant.');
+             throw new Error(`${errData.error || 'Access Denied: You do not have clearance for this tenant.'} (requestId: ${errData.requestId || requestId})`);
            }
-           throw new Error(errData.error || 'Network response was not ok');
+           throw new Error(`${errData.error || 'Network response was not ok'} (requestId: ${errData.requestId || requestId})`);
         }
         
         const data = await response.json();
@@ -85,12 +88,12 @@ export default function LeadManagement() {
         if (data.success && data.leads) {
           setLeads(data.leads);
         } else {
-           console.error("Backend error:", data.error);
-           toast({ title: "Error fetching leads", description: data.error, variant: "destructive" });
+           console.error("Backend error:", { requestId: data.requestId || requestId, error: data.error });
+           showErrorToast(toast, 'Error fetching leads', data, 'Failed to fetch leads.');
         }
       } catch (error: any) {
-        console.error("Failed to fetch leads:", error);
-        toast({ title: "Connection Error", description: error.message || "Could not reach the tactical backend.", variant: "destructive" });
+        console.error("Failed to fetch leads:", { requestId, error });
+        showErrorToast(toast, 'Connection Error', error, `Could not reach the tactical backend. requestId: ${requestId}`);
       } finally {
         setIsLeadsLoading(false);
       }

@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { initiateTacticalLoginAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+import { showErrorToast } from '@/lib/client-errors';
 import { Shield, Zap, Mail, Loader2, UserPlus, ArrowRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
@@ -49,11 +50,7 @@ export function AuthModal({ mode, trigger }: AuthModalProps) {
         description: "Secure tactical link transmitted via AWS SES.",
       });
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "DISPATCH FAILURE",
-        description: error.message || "Failed to transmit authentication link through the matrix.",
-      });
+      showErrorToast(toast, 'DISPATCH FAILURE', error, 'Failed to transmit authentication link through the matrix.');
     } finally {
       setIsLoading(false);
     }

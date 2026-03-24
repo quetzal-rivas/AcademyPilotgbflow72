@@ -1,4 +1,5 @@
 const { getFirestore } = require('./firebase-admin');
+const { logger, parseEventPayload, getRequestId, serializeError } = require('../logger');
 
 /**
  * Get Leads Service (Multi-Tenant)
@@ -7,7 +8,13 @@ const { getFirestore } = require('./firebase-admin');
  * It enforces tenant isolation by requiring a tenantSlug and applying it to all queries.
  */
 exports.handler = async (event) => {
-  console.log('--- GET LEADS SERVICE ---');
+  const payload = parseEventPayload(event);
+  const requestId = getRequestId(event, payload);
+
+  logger.info('Get leads service request received', {
+    requestId,
+    scope: 'service.get-leads',
+  });
 
   try {
     // 1. Parse and Validate Input (Tenant Isolation)
@@ -17,14 +24,18 @@ exports.handler = async (event) => {
       orderBy = 'createdAt', 
       order = 'desc', 
       includeProcessed = false 
-    } = event;
+    } = payload;
 
     if (!tenantSlug) {
-      console.error('Security Alert: Attempted to fetch leads without a tenantSlug.');
+      logger.error('Security alert: attempted to fetch leads without tenantSlug', {
+        requestId,
+        scope: 'service.get-leads',
+      });
       return {
         success: false,
         error: 'Bad Request',
-        details: 'tenantSlug is required for data isolation.'
+        details: 'tenantSlug is required for data isolation.',
+        requestId,
       };
     }
 
@@ -53,20 +64,32 @@ exports.handler = async (event) => {
       createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate().toISOString() : doc.data().createdAt
     }));
 
-    console.log(`Successfully retrieved ${leads.length} leads for tenant: ${tenantSlug}.`);
+    logger.info('Leads retrieved successfully', {
+      requestId,
+      scope: 'service.get-leads',
+      tenantSlug,
+      count: leads.length,
+    });
 
     return {
       success: true,
       total: leads.length,
-      leads: leads
+      leads: leads,
+      requestId,
     };
 
   } catch (error) {
-    console.error(`Get Leads Service Error (Tenant: ${event.tenantSlug || 'Unknown'}):`, error);
+    logger.error('Get leads service error', {
+      requestId,
+      scope: 'service.get-leads',
+      tenantSlug: payload.tenantSlug || 'Unknown',
+      error: serializeError(error),
+    });
     return {
       success: false,
       error: 'Internal Server Error',
-      details: error.message
+      details: error.message,
+      requestId,
     };
   }
 };

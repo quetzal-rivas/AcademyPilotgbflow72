@@ -141,6 +141,8 @@ function AgentSynthForm({ agent, onSave, onDelete }: { agent: AgentProfile, onSa
       if (result.systemPrompt) {
         form.setValue("systemPrompt", result.systemPrompt);
         toast({ title: "Logic Engineered", description: "New system prompt generated successfully." });
+      } else if (result.error) {
+        showErrorToast(toast, 'Prompt Generation Failed', result, 'Failed to generate system prompt.');
       }
     });
   };
@@ -155,7 +157,7 @@ function AgentSynthForm({ agent, onSave, onDelete }: { agent: AgentProfile, onSa
         onSave(form.getValues());
         toast({ title: "Unit Deployed", description: "AI Agent is now live on ElevenLabs network." });
       } else {
-        toast({ variant: "destructive", title: "Deployment Failed", description: result.error });
+        showErrorToast(toast, 'Deployment Failed', result, 'Agent deployment failed.');
       }
     });
   };

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createRequestId, logger, serializeError } from '@/lib/logger';
 
 /**
  * Orchestrator Proxy API Route (Cloudflare Pages Compatible)
@@ -10,12 +11,17 @@ import { NextResponse } from 'next/server';
 export const runtime = 'edge'; // Explicitly declare Edge runtime for Cloudflare
 
 export async function POST(req: Request) {
+  const requestId = req.headers.get('x-request-id') || createRequestId();
+
   try {
     // 1. Extract the User's Identity (Firebase JWT) from the frontend request
     const authHeader = req.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.warn('Proxy Alert: Request missing Authorization header.');
-      return NextResponse.json({ error: 'Unauthorized: Missing or invalid token' }, { status: 401 });
+      logger.warn('Proxy alert: missing or invalid authorization header', {
+        requestId,
+        scope: 'api.orchestrator',
+      });
+      return NextResponse.json({ error: 'Unauthorized: Missing or invalid token', requestId }, { status: 401 });
     }
 
     // 2. Parse the Action Payload
@@ -23,7 +29,7 @@ export async function POST(req: Request) {
     const { action, payload } = body;
 
     if (!action) {
-      return NextResponse.json({ error: 'Bad Request: Missing action' }, { status: 400 });
+      return NextResponse.json({ error: 'Bad Request: Missing action', requestId }, { status: 400 });
     }
 
     // 3. Prepare the upstream request to AWS
@@ -31,11 +37,18 @@ export async function POST(req: Request) {
     const ORCHESTRATOR_AUTH_TOKEN = process.env.ORCHESTRATOR_AUTH_TOKEN;
 
     if (!ORCHESTRATOR_URL || !ORCHESTRATOR_AUTH_TOKEN) {
-      console.error("Server Configuration Error: Missing Orchestrator environment variables.");
-      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+      logger.error('Server configuration error: missing orchestrator env vars', {
+        requestId,
+        scope: 'api.orchestrator',
+      });
+      return NextResponse.json({ error: 'Internal Server Error', requestId }, { status: 500 });
     }
-    
-    console.log(`[Cloudflare Edge] Proxying action '${action}' to AWS Orchestrator...`);
+
+    logger.info('Proxying action to AWS orchestrator', {
+      requestId,
+      scope: 'api.orchestrator',
+      action,
+    });
 
     // 4. Proxy to the Tactical Backend (AWS Lambda)
     // We send BOTH the service-to-service token (in the header) AND the user's JWT (in the body)
@@ -44,7 +57,8 @@ export async function POST(req: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${ORCHESTRATOR_AUTH_TOKEN}` 
+        'Authorization': `Bearer ${ORCHESTRATOR_AUTH_TOKEN}`,
+        'x-request-id': requestId,
       },
       body: JSON.stringify({ 
         action, 
@@ -55,10 +69,24 @@ export async function POST(req: Request) {
     });
 
     const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
+    return NextResponse.json({ ...data, requestId }, { status: response.status });
 
   } catch (error: any) {
-    console.error("Orchestrator Proxy Error:", error);
-    return NextResponse.json({ error: 'Failed to process request on Edge', details: error.message }, { status: 500 });
+    logger.error('Orchestrator proxy error', {
+      requestId,
+      scope: 'api.orchestrator',
+      error: serializeError(error),
+    });
+
+    const includeDetails = process.env.NODE_ENV !== 'production';
+
+    return NextResponse.json(
+      {
+        error: 'Failed to process request on Edge',
+        requestId,
+        ...(includeDetails ? { details: error?.message || 'Unknown error' } : {}),
+      },
+      { status: 500 }
+    );
   }
 }

@@ -13,6 +13,7 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Send, Loader2, Check, Globe, CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { showErrorToast } from '@/lib/client-errors';
 import { Badge } from "@/components/ui/badge";
 import { publishCampaignAction } from "@/app/actions";
 import { CALL_TO_ACTION_TYPES } from "@/lib/meta-options";
@@ -98,7 +99,7 @@ export default function AdPreview({ campaign, images, imageHashes, adAccountID, 
             setIsPosted(true);
             toast({ title: "Ad Posted!", description: result.message });
         } else {
-            toast({ variant: "destructive", title: "Failed to post ad", description: result.message });
+          showErrorToast(toast, 'Failed to post ad', result, 'Ad publication failed.');
         }
     });
   };

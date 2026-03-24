@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { showErrorToast } from '@/lib/client-errors';
 import { Loader2, PhoneOutgoing } from "lucide-react";
 
 const formSchema = z.object({
@@ -107,7 +108,7 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
     try {
       const response = await fetch('/api/public-intake', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-request-id': crypto.randomUUID() },
         body: JSON.stringify({
           action: 'ADD_LEAD',
           payload: {
@@ -121,7 +122,8 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit tactical data.');
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.requestId ? `${errorData.error || 'Failed to submit tactical data.'} (requestId: ${errorData.requestId})` : errorData?.error || 'Failed to submit tactical data.');
       }
 
       setIsSubmitting(false);
@@ -133,13 +135,8 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
       });
 
     } catch (error) {
-      console.error("Submission error:", error);
       setIsSubmitting(false);
-      toast({
-        title: "MISSION FAILURE",
-        description: "Could not establish link with tactical command. Please try again.",
-        variant: "destructive"
-      });
+      showErrorToast(toast, 'MISSION FAILURE', error, 'Could not establish link with tactical command. Please try again.');
     }
   }
 

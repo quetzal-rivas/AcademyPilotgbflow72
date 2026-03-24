@@ -15,6 +15,7 @@ import AdPreview from './ad-preview';
 import { Building, KeyRound, Image as ImageIcon, Wand2, Loader2, Sparkles, Plug, Unplug, CheckCircle2, LibraryBig } from 'lucide-react';
 import type { CampaignStructure, AdImage } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { showErrorToast } from '@/lib/client-errors';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -74,7 +75,7 @@ export default function CampaignCreator() {
         if (imagesResult.status === 'success') setAdImages(imagesResult.data!);
       } else {
         setConnectionStatus(prev => ({ ...prev, isTesting: false }));
-        toast({ variant: "destructive", title: "Connection Failed", description: result.message });
+        showErrorToast(toast, 'Connection Failed', result, 'Meta connection failed.');
       }
     });
   };
@@ -89,7 +90,7 @@ export default function CampaignCreator() {
         if (result.status === 'success') {
           setCampaignData(result.data!);
         } else {
-           toast({ variant: "destructive", title: "Generation Failed", description: result.message });
+           showErrorToast(toast, 'Generation Failed', result, 'Campaign generation failed.');
         }
     });
   };

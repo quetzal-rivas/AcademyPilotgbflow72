@@ -1,4 +1,5 @@
 const { getFirestore } = require('./firebase-admin');
+const { logger, parseEventPayload, getRequestId, serializeError } = require('../logger');
 
 const VALID_TOKEN = process.env.AUTH_TOKEN || '123456789';
 
@@ -9,7 +10,13 @@ const VALID_TOKEN = process.env.AUTH_TOKEN || '123456789';
  * to ensure that only leads belonging to the specified tenant are modified.
  */
 exports.handler = async (event) => {
-  console.log('--- MARK PROCESSED SERVICE ---');
+  const body = parseEventPayload(event);
+  const requestId = getRequestId(event, body);
+
+  logger.info('Mark processed service request received', {
+    requestId,
+    scope: 'service.mark-processed',
+  });
 
   try {
     // 1. Authorization
@@ -17,23 +24,32 @@ exports.handler = async (event) => {
     const token = authHeader?.replace('Bearer ', '').trim();
 
     if (!token || token !== VALID_TOKEN) {
-      console.warn('Unauthorized request. Ignoring.');
-      return { statusCode: 200, body: JSON.stringify({ success: true, message: 'Ignored' }) };
+      logger.warn('Unauthorized request ignored', {
+        requestId,
+        scope: 'service.mark-processed',
+      });
+      return { statusCode: 200, body: JSON.stringify({ success: true, message: 'Ignored', requestId }) };
     }
 
     // 2. Parse Payload & Validate Tenant
-    const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
     const { tenantSlug, lead_ids, metadata } = body;
 
     if (!tenantSlug) {
-      console.error('Security Alert: Attempted to mark leads processed without a tenantSlug.');
+      logger.error('Security alert: attempted to mark leads processed without tenantSlug', {
+        requestId,
+        scope: 'service.mark-processed',
+      });
       // Returning 200 to ElevenLabs, but logging the security issue
-      return { statusCode: 200, body: JSON.stringify({ success: false, error: 'tenantSlug is required' }) };
+      return { statusCode: 200, body: JSON.stringify({ success: false, error: 'tenantSlug is required', requestId }) };
     }
 
     if (!lead_ids || !Array.isArray(lead_ids) || lead_ids.length === 0) {
-      console.error('Invalid payload: missing or empty lead_ids array');
-      return { statusCode: 400, body: JSON.stringify({ success: false, error: 'lead_ids array is required' }) };
+      logger.error('Invalid payload: missing or empty lead_ids array', {
+        requestId,
+        scope: 'service.mark-processed',
+        tenantSlug,
+      });
+      return { statusCode: 400, body: JSON.stringify({ success: false, error: 'lead_ids array is required', requestId }) };
     }
 
     const db = getFirestore();
@@ -71,21 +87,35 @@ exports.handler = async (event) => {
 
     if (validLeadsCount > 0) {
         await batch.commit();
-        console.log(`Successfully marked ${validLeadsCount} leads as processed for tenant: ${tenantSlug}.`);
+        logger.info('Leads marked as processed', {
+          requestId,
+          scope: 'service.mark-processed',
+          tenantSlug,
+          count: validLeadsCount,
+        });
     } else {
-        console.log(`No valid leads to process for tenant: ${tenantSlug}.`);
+        logger.info('No valid leads to process', {
+          requestId,
+          scope: 'service.mark-processed',
+          tenantSlug,
+        });
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, count: validLeadsCount })
+      body: JSON.stringify({ success: true, count: validLeadsCount, requestId })
     };
 
   } catch (error) {
-    console.error(`Mark Processed Service Error (Tenant: ${event.tenantSlug || 'Unknown'}):`, error);
+    logger.error('Mark processed service error', {
+      requestId,
+      scope: 'service.mark-processed',
+      tenantSlug: body.tenantSlug || 'Unknown',
+      error: serializeError(error),
+    });
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: false, error: 'Internal Server Error', details: error.message })
+      body: JSON.stringify({ success: false, error: 'Internal Server Error', details: error.message, requestId })
     };
   }
 };

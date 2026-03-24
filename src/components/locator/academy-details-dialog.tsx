@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { showErrorToast } from '@/lib/client-errors';
 import { MapPin, Phone, Star, Globe, ExternalLink, Send, CheckCircle2, Zap, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useUser, useAuth, initiateAnonymousSignIn } from "@/firebase";
@@ -114,11 +115,7 @@ export function AcademyDetailsDialog({ academy, onClose }: AcademyDetailsDialogP
       }, 3000);
 
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "PROTOCOL FAILURE",
-        description: error.message || "An unexpected error occurred during initialization.",
-      });
+      showErrorToast(toast, 'PROTOCOL FAILURE', error, 'An unexpected error occurred during initialization.');
     } finally {
       setIsSubmitting(false);
     }

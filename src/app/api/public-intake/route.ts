@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createRequestId, logger, serializeError } from '@/lib/logger';
 
 /**
  * Public Intake API Route
@@ -8,6 +9,8 @@ import { NextResponse } from 'next/server';
  * restricting the types of actions that can be performed without a JWT.
  */
 export async function POST(req: Request) {
+  const requestId = req.headers.get('x-request-id') || createRequestId();
+
   try {
     const body = await req.json();
     const { action, payload } = body;
@@ -16,17 +19,30 @@ export async function POST(req: Request) {
     const ALLOWED_PUBLIC_ACTIONS = ['ADD_LEAD'];
     
     if (!action || !ALLOWED_PUBLIC_ACTIONS.includes(action)) {
-      console.warn(`Security Alert: Attempted unauthorized public action: ${action}`);
-      return NextResponse.json({ error: 'Action not permitted' }, { status: 403 });
+      logger.warn('Security alert: attempted unauthorized public action', {
+        requestId,
+        scope: 'api.public-intake',
+        action,
+      });
+      return NextResponse.json({ error: 'Action not permitted', requestId }, { status: 403 });
     }
 
     // 2. Validate Required Tenant Context
     if (!payload || !payload.tenantSlug) {
-       console.error('Security Alert: Public intake request missing tenantSlug.');
-       return NextResponse.json({ error: 'Bad Request: tenantSlug is required.' }, { status: 400 });
+       logger.error('Security alert: public intake request missing tenantSlug', {
+        requestId,
+        scope: 'api.public-intake',
+        action,
+       });
+       return NextResponse.json({ error: 'Bad Request: tenantSlug is required.', requestId }, { status: 400 });
     }
 
-    console.log(`Processing public intake action '${action}' for tenant '${payload.tenantSlug}'...`);
+    logger.info('Processing public intake action', {
+      requestId,
+      scope: 'api.public-intake',
+      action,
+      tenantSlug: payload.tenantSlug,
+    });
 
     // 3. Proxy to the Tactical Backend (AWS Lambda)
     // We use the same service-to-service auth token as the secure orchestrator,
@@ -35,24 +51,32 @@ export async function POST(req: Request) {
     const ORCHESTRATOR_AUTH_TOKEN = process.env.ORCHESTRATOR_AUTH_TOKEN;
 
     if (!ORCHESTRATOR_URL || !ORCHESTRATOR_AUTH_TOKEN) {
-      console.error("Server Configuration Error: Missing Orchestrator environment variables.");
-      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+      logger.error('Server configuration error: missing orchestrator environment variables', {
+        requestId,
+        scope: 'api.public-intake',
+      });
+      return NextResponse.json({ error: 'Internal Server Error', requestId }, { status: 500 });
     }
 
     const response = await fetch(ORCHESTRATOR_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${ORCHESTRATOR_AUTH_TOKEN}`
+        'Authorization': `Bearer ${ORCHESTRATOR_AUTH_TOKEN}`,
+        'x-request-id': requestId,
       },
       body: JSON.stringify({ action, payload })
     });
 
     const data = await response.json();
-    return NextResponse.json(data, { status: response.status });
+    return NextResponse.json({ ...data, requestId }, { status: response.status });
 
   } catch (error: any) {
-    console.error("Public Intake Proxy Error:", error);
-    return NextResponse.json({ error: 'Failed to process request', details: error.message }, { status: 500 });
+    logger.error('Public intake proxy error', {
+      requestId,
+      scope: 'api.public-intake',
+      error: serializeError(error),
+    });
+    return NextResponse.json({ error: 'Failed to process request', details: error.message, requestId }, { status: 500 });
   }
 }

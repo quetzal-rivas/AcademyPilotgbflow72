@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { showErrorToast } from '@/lib/client-errors';
 import { Loader2, Search, Activity } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -32,7 +33,7 @@ export default function CampaignsViewer() {
     startTransition(async () => {
       const result = await getCampaignsAction(data);
       if (result.status === 'success') setCampaigns(result.data!);
-      else toast({ variant: "destructive", title: "Fetch Failed" });
+      else showErrorToast(toast, 'Fetch Failed', result, 'Campaign fetch failed.');
     });
   };
 

@@ -8,6 +8,7 @@ import { useTransition } from "react";
 import type { AgentProfile } from "@/lib/synth-types";
 import { makeOutboundCallAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import { showErrorToast } from '@/lib/client-errors';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,7 +50,7 @@ export default function OutboundCallTester({ agent }: OutboundCallTesterProps) {
       );
       
       if (result.error) {
-        toast({ variant: "destructive", title: "Call Failed", description: result.error });
+        showErrorToast(toast, 'Call Failed', result, 'Outbound call failed.');
       } else {
         toast({ title: "Tactical Dispatch Initiated", description: result.message });
       }

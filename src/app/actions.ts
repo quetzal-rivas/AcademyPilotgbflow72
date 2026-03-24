@@ -16,6 +16,7 @@ import type { AgentProfile } from "@/lib/synth-types";
 import { geocodeAddress, findFranchise } from '@/lib/academies';
 import { unstable_cache as cache } from 'next/cache';
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
+import { createRequestId, logger, serializeError } from '@/lib/logger';
 import axios from 'axios';
 
 const ORCHESTRATOR_URL = process.env.ORCHESTRATOR_URL || 'https://2cgrii72ke.execute-api.us-east-1.amazonaws.com/orchestrate';
@@ -25,6 +26,8 @@ const ORCHESTRATOR_AUTH_TOKEN = process.env.ORCHESTRATOR_AUTH_TOKEN || '12345678
  * High-authority directive to initiate a tactical magic link login via AWS SES.
  */
 export async function initiateTacticalLoginAction(email: string) {
+  const requestId = createRequestId();
+
   try {
     const admin = getFirebaseAdmin();
     
@@ -45,12 +48,17 @@ export async function initiateTacticalLoginAction(email: string) {
         loginUrl: loginLink,
         name: email.split('@')[0].toUpperCase(),
       }
-    });
+    }, requestId);
 
     return result;
   } catch (error: any) {
-    console.error('[AUTH ERROR] Handshake initialization failure:', error);
-    return { error: error.message };
+    logger.error('Auth handshake initialization failure', {
+      requestId,
+      scope: 'server-action.initiateTacticalLogin',
+      email,
+      error: serializeError(error),
+    });
+    return { error: error.message, requestId };
   }
 }
 
@@ -58,22 +66,40 @@ export async function initiateTacticalLoginAction(email: string) {
  * Universal Adapter for the AWS Tactical Orchestrator.
  * Funnels mission-critical requests to the centralized AWS gateway.
  */
-export async function dispatchOrchestratorAction(action: string, payload: any) {
+export async function dispatchOrchestratorAction(action: string, payload: any, requestId = createRequestId()) {
   try {
+    logger.info('Dispatching orchestrator action', {
+      requestId,
+      scope: 'server-action.dispatchOrchestratorAction',
+      action,
+    });
+
     const response = await axios.post(ORCHESTRATOR_URL, {
       action,
       payload
     }, {
       headers: {
         'Authorization': `Bearer ${ORCHESTRATOR_AUTH_TOKEN}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-request-id': requestId,
       }
     });
 
-    return response.data;
+    return {
+      ...response.data,
+      requestId: response.data?.requestId || requestId,
+    };
   } catch (error: any) {
-    console.error(`[ORCHESTRATOR ERROR] Action ${action} failed:`, error.response?.data || error.message);
-    throw new Error(error.response?.data?.error || 'Operational link failure');
+    logger.error('Orchestrator action failed', {
+      requestId,
+      scope: 'server-action.dispatchOrchestratorAction',
+      action,
+      error: serializeError(error),
+      upstream: error.response?.data,
+    });
+
+    const message = error.response?.data?.error || 'Operational link failure';
+    throw new Error(`${message} (requestId: ${requestId})`);
   }
 }
 
@@ -85,6 +111,8 @@ export async function createCampaignAction(data: {
   imageURIs: string[];
   isAutopilot: boolean;
 }): Promise<{ status: "success" | "error", message: string, data?: CampaignStructure }> {
+  const requestId = createRequestId();
+
   try {
     const result = await generateCampaignStructure({
         businessInformation: data.businessInformation,
@@ -97,7 +125,11 @@ export async function createCampaignAction(data: {
       data: result,
     };
   } catch (error) {
-    console.error(error);
+    logger.error('Campaign generation failed', {
+      requestId,
+      scope: 'server-action.createCampaignAction',
+      error: serializeError(error),
+    });
     return {
       status: "error",
       message: "Failed to generate campaign structure.",
@@ -169,6 +201,8 @@ export async function chatAssistantAction(input: ChatAssistantInput) {
 }
 
 export async function generateSystemPromptAction(description: string) {
+  const requestId = createRequestId();
+
   if (!description || description.trim().length < 10) {
     return { error: "Please provide a more detailed description (at least 10 characters)." };
   }
@@ -176,7 +210,11 @@ export async function generateSystemPromptAction(description: string) {
     const result = await generateSystemPrompt({ description });
     return { systemPrompt: result.systemPrompt };
   } catch (error) {
-    console.error("Error generating system prompt:", error);
+    logger.error('System prompt generation failed', {
+      requestId,
+      scope: 'server-action.generateSystemPromptAction',
+      error: serializeError(error),
+    });
     return { error: "An unexpected error occurred while generating the prompt." };
   }
 }
