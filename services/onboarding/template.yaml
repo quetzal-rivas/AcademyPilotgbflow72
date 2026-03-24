@@ -16,6 +16,13 @@ Parameters:
     Type: String
     Default: 'prod'
     Description: Environment name (e.g., dev, staging, prod)
+  InboundMailParserFunctionArn:
+    Type: String
+    Default: ''
+    Description: ARN of the Inbound Mail Parser Lambda function (optional, for S3 event notifications)
+
+Conditions:
+  HasInboundMailParserArn: !Not [!Equals [!Ref InboundMailParserFunctionArn, '']]
 
 Resources:
   # 1. The S3 Bucket for Incoming Emails
@@ -34,8 +41,11 @@ Resources:
               SSEAlgorithm: AES256
       NotificationConfiguration:
         LambdaConfigurations:
-          - Event: s3:ObjectCreated:*
-            Function: !ImportValue InboundMailParserFunctionArn
+          - !If
+            - HasInboundMailParserArn
+            - Event: s3:ObjectCreated:*
+              Function: !Ref InboundMailParserFunctionArn
+            - !Ref AWS::NoValue
 
   # 2. S3 Bucket Policy granting SES permission to write incoming emails
   TenantIncomingEmailsBucketPolicy:

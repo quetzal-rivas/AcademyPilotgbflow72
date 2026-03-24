@@ -16,13 +16,13 @@ fi
 
 echo "Deploying to region: $AWS_REGION"
 
-# 1. Deploy the Onboarding Service (Creates the S3 Bucket first)
+# 1. Deploy the Onboarding Service (Creates the S3 Bucket first, without Lambda notification initially)
 echo "\n--- [1/7] Deploying Onboarding Service (S3 Infrastructure) ---"
 cd services/onboarding
 npm install
 sam build
-# Added --region flag to explicitly force SAM to deploy to us-east-2
-sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-onboarding-service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+# First deployment: S3 bucket without the inbound-mail-parser listener yet
+sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-onboarding-service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides InboundMailParserFunctionArn=""
 
 # Capture the exact S3 bucket name created by CloudFormation
 S3_BUCKET_NAME=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-onboarding-service --query "Stacks[0].Outputs[?OutputKey=='IncomingEmailsBucketName'].OutputValue" --output text)
@@ -35,6 +35,17 @@ cd services/inbound-mail-parser
 npm install
 sam build
 sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-inbound-mail-parser --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides IncomingEmailsBucketName=$S3_BUCKET_NAME
+cd ../..
+
+# Capture the Inbound Mail Parser Lambda ARN and update Onboarding service with it
+echo "\n--- [2.5/7] Updating Onboarding Service with Inbound Mail Parser ARN ---"
+INBOUND_MAIL_PARSER_ARN=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-inbound-mail-parser --query "Stacks[0].Outputs[?OutputKey=='InboundMailParserFunctionArn'].OutputValue" --output text)
+echo "Inbound Mail Parser ARN: $INBOUND_MAIL_PARSER_ARN"
+
+# Redeploy onboarding with the inbound-mail-parser ARN
+cd services/onboarding
+sam build
+sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-onboarding-service --resolve-s3 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides InboundMailParserFunctionArn=$INBOUND_MAIL_PARSER_ARN
 cd ../..
 
 # 3. Deploy Standalone Services
