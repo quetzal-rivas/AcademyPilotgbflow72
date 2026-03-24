@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -14,22 +15,13 @@ import {
   Shield, 
   ArrowRight, 
   History, 
-  UserCircle
+  UserCircle,
+  Phone,
+  Mail,
+  MapPin
 } from 'lucide-react';
 import { PhotoGrid } from '@/components/photo-grid';
-
-interface AcademyTemplateProps {
-  slug: string;
-  branchName: string;
-  headline?: string;
-  subheadline?: string;
-  callToAction?: string;
-  contactPhone?: string;
-  contactEmail?: string;
-  address?: string;
-  heroImage?: string;
-  photos: string[];
-}
+import type { LandingPageData } from '@/lib/types';
 
 export function AcademyTemplate({ 
   slug,
@@ -42,9 +34,10 @@ export function AcademyTemplate({
   address,
   heroImage,
   photos 
-}: AcademyTemplateProps) {
+}: LandingPageData & { photos: string[] }) {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-black">
+      {/* Tactical Header */}
       <header className="fixed top-0 w-full z-50 bg-background/20 backdrop-blur-xl border-b-2 border-border shadow-sm">
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -56,8 +49,8 @@ export function AcademyTemplate({
               />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-headline text-2xl font-black uppercase italic text-primary">GB {branchName.toUpperCase()}</span>
-              <span className="font-headline text-[10px] font-bold tracking-[0.2em] uppercase text-foreground">Official Branch</span>
+              <span className="font-headline text-2xl font-black uppercase italic text-primary tracking-tighter">GB {branchName || "ACADEMY"}</span>
+              <span className="font-headline text-[10px] font-bold tracking-[0.2em] uppercase text-foreground">Official Tactical Branch</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -65,14 +58,13 @@ export function AcademyTemplate({
               mode="student" 
               trigger={
                 <Button variant="outline" className="hidden sm:inline-flex font-black uppercase tracking-widest text-[10px] border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-none h-10 px-6">
-                  <UserCircle className="mr-2 h-4 w-4" /> Student Portal
+                  <UserCircle className="mr-2 h-4 w-4" /> Unit Portal
                 </Button>
               } 
             />
-            {/* The FreeTrialDialog needs to know WHICH tenant it belongs to */}
             <FreeTrialDialog tenantSlug={slug}>
               <Button className="bg-primary hover:bg-primary/90 text-white font-black uppercase italic tracking-widest px-8 rounded-none h-10">
-                Free Trial
+                {callToAction || 'FREE TRIAL'}
               </Button>
             </FreeTrialDialog>
           </div>
@@ -80,8 +72,8 @@ export function AcademyTemplate({
       </header>
 
       <main className="flex-grow pt-20">
+        {/* Hero Section */}
         <section className="relative h-[85vh] flex items-center overflow-hidden bg-black">
-          {/* Use the specific hero image if provided, otherwise fallback to the photo grid */}
           {heroImage ? (
             <div className="absolute inset-0 z-0">
                <img src={heroImage} alt={`${branchName} Hero`} className="w-full h-full object-cover opacity-60" />
@@ -94,21 +86,13 @@ export function AcademyTemplate({
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-2xl space-y-6">
               <div className="inline-block bg-primary px-4 py-1 text-white text-[10px] font-black uppercase tracking-[0.3em] italic">
-                {branchName} Tactical Unit Deployed
+                {branchName || "GRACIE BARRA"} Tactical Unit Deployed
               </div>
               <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-white tracking-tighter">
-                {headline ? (
-                  // Simple split to try and highlight the last word if it's a custom headline
-                  <>
-                    {headline.split(' ').slice(0, -1).join(' ')} <br />
-                    <span className="text-primary">{headline.split(' ').slice(-1)}</span>
-                  </>
-                ) : (
-                  <>Jiu-Jitsu <br /> For <span className="text-primary">Everyone</span></>
-                )}
+                {headline || "Jiu-Jitsu For Everyone"}
               </h1>
               <p className="text-xl text-white/80 max-w-lg font-bold uppercase italic tracking-tight leading-relaxed">
-                {subheadline || `Join ${branchName}, part of the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art today.`}
+                {subheadline || `Join the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art at our ${branchName || "localized"} academy.`}
               </p>
               
               <FreeTrialDialog tenantSlug={slug}>
@@ -122,25 +106,27 @@ export function AcademyTemplate({
 
         <Marquee variant="black" />
 
+        {/* Programs Matrix */}
         <section id="programs" className="py-24 bg-white">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
               <div className="space-y-4 border-l-8 border-primary pl-8">
                 <h2 className="font-headline text-xs font-black uppercase tracking-[0.4em] text-primary">Operational Matrix</h2>
-                <h3 className="font-headline text-6xl font-black uppercase tracking-tighter italic text-black leading-none">{branchName} Programs</h3>
+                <h3 className="font-headline text-6xl font-black uppercase tracking-tighter italic text-black leading-none">{branchName || "Academy"} Programs</h3>
               </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-0 border-4 border-black">
-              <ProgramCard title="GB1 Fundamentals" desc="The foundation of our mission." />
-              <ProgramCard title="GB2 Advanced" desc="Advanced tactical development." featured />
-              <ProgramCard title="Little Champions" desc="Future legacy initialization." />
+              <ProgramCard title="GB1 Fundamentals" desc="The foundation of our mission. Designed for beginner units." />
+              <ProgramCard title="GB2 Advanced" desc="Advanced tactical development. Maximum strategic engagement." featured />
+              <ProgramCard title="Little Champions" desc="Future legacy initialization. Youth enrollment active." />
             </div>
           </div>
         </section>
 
         <Marquee variant="red" />
 
+        {/* Contact/CTA Reveal */}
         <section className="py-32 bg-secondary text-white relative overflow-hidden min-h-[600px] flex items-center border-y-4 border-border">
           <BackgroundPhotoRotation photoUrls={photos} />
           <div className="container mx-auto px-4 relative z-10">
@@ -149,9 +135,16 @@ export function AcademyTemplate({
                 <Badge className="bg-primary text-white font-black uppercase italic tracking-widest rounded-none px-4 border border-white/20">Establish Presence</Badge>
                 <h2 className="font-headline text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-none text-white">
                   Join the <br />
-                  <span className="text-primary">{branchName} Team</span>
+                  <span className="text-primary">{branchName || "Gracie Barra"} Team</span>
                 </h2>
               </div>
+              
+              <div className="grid grid-cols-1 gap-4 text-sm font-bold uppercase italic tracking-widest text-white/80">
+                {address && <div className="flex items-center gap-3"><MapPin className="h-5 w-5 text-primary" /> {address}</div>}
+                {contactPhone && <div className="flex items-center gap-3"><Phone className="h-5 w-5 text-primary" /> {contactPhone}</div>}
+                {contactEmail && <div className="flex items-center gap-3"><Mail className="h-5 w-5 text-primary" /> {contactEmail}</div>}
+              </div>
+
               <FreeTrialDialog tenantSlug={slug}>
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-white rounded-full font-black uppercase italic tracking-tighter w-36 h-36 flex flex-col items-center justify-center text-center leading-none shadow-2xl border-4 border-white/10 transition-transform hover:scale-110">
                   FREE<br/>TRIAL
@@ -172,22 +165,11 @@ export function AcademyTemplate({
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="font-headline text-2xl font-black tracking-tighter uppercase italic">GB {branchName.toUpperCase()}</span>
+            <span className="font-headline text-2xl font-black tracking-tighter uppercase italic">GB {branchName?.toUpperCase() || "PILOT"}</span>
           </div>
           
-          {/* Display contact info if available */}
-          {(contactPhone || contactEmail || address) && (
-             <div className="flex flex-col items-center justify-center gap-2 text-sm font-bold text-white/60">
-                {address && <p>{address}</p>}
-                <div className="flex gap-4">
-                  {contactPhone && <p>{contactPhone}</p>}
-                  {contactEmail && <p>{contactEmail}</p>}
-                </div>
-             </div>
-          )}
-
           <div className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em]">
-            © 2024 GRACIE BARRA AI PILOT SYSTEM // SECTOR: {branchName.toUpperCase()}
+            © 2024 GRACIE BARRA AI PILOT SYSTEM // SECTOR: {branchName?.toUpperCase() || "HQ"}
           </div>
         </div>
       </footer>

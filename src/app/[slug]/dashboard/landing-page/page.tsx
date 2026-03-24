@@ -9,22 +9,27 @@ import {
   ExternalLink, 
   Save, 
   Loader2, 
-  Eye, 
-  EyeOff,
   Layout,
-  MousePointer2
+  MousePointer2,
+  Phone,
+  Mail,
+  MapPin,
+  Type,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { slugify } from '@/lib/utils';
 import Link from 'next/link';
+import type { LandingPageData } from '@/lib/types';
 
 export default function LandingPageManager() {
   const { toast } = useToast();
@@ -32,43 +37,50 @@ export default function LandingPageManager() {
   const db = useFirestore();
   const [isSaving, startTransition] = useTransition();
   
-  const [branchName, setBranchName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [isPublic, setIsPublic] = useState(false);
+  const [formData, setFormData] = useState<Partial<LandingPageData>>({
+    branchName: '',
+    slug: '',
+    headline: 'Jiu-Jitsu For Everyone',
+    subheadline: '',
+    callToAction: 'START YOUR MISSION',
+    contactPhone: '',
+    contactEmail: '',
+    address: '',
+    heroImage: '',
+    isPublished: false,
+  });
 
-  // Retrieve existing configuration if any
-  const userLandingPageRef = useMemoFirebase(() => {
+  const landingPageRef = useMemoFirebase(() => {
     if (!db || !user) return null;
     return doc(db, 'user_profiles', user.uid, 'landing_page', 'config');
   }, [db, user]);
   
-  const { data: config, isLoading } = useDoc(userLandingPageRef);
+  const { data: config, isLoading } = useDoc(landingPageRef);
 
   useEffect(() => {
     if (config) {
-      setBranchName(config.branchName || '');
-      setSlug(config.slug || '');
-      setIsPublic(config.isPublic || false);
+      setFormData(prev => ({ ...prev, ...config }));
     }
   }, [config]);
 
-  const handleSlugChange = (val: string) => {
-    setSlug(slugify(val));
+  const handleInputChange = (field: keyof LandingPageData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'branchName' && !formData.slug) {
+      setFormData(prev => ({ ...prev, slug: slugify(value) }));
+    }
   };
 
   const handleDeploy = () => {
-    if (!branchName || !slug || !user || !db) {
-      toast({ variant: "destructive", title: "Incomplete Parameters", description: "Branch name and slug are required for deployment." });
+    if (!formData.branchName || !formData.slug || !user || !db) {
+      toast({ variant: "destructive", title: "Incomplete Parameters", description: "Branch name and slug are required." });
       return;
     }
 
     startTransition(async () => {
       try {
         const payload = {
+          ...formData,
           userId: user.uid,
-          branchName,
-          slug,
-          isPublic,
           updatedAt: new Date().toISOString(),
         };
 
@@ -76,9 +88,9 @@ export default function LandingPageManager() {
         await setDoc(doc(db, 'user_profiles', user.uid, 'landing_page', 'config'), payload, { merge: true });
 
         // 2. Deploy to public registry matrix
-        await setDoc(doc(db, 'landing_pages', slug), payload, { merge: true });
+        await setDoc(doc(db, 'landing_pages', formData.slug!), payload, { merge: true });
 
-        toast({ title: "MISSION DEPLOYED", description: `Landing page is now ${isPublic ? 'LIVE' : 'SECURED'} at /${slug}` });
+        toast({ title: "MISSION DEPLOYED", description: `Landing page is now ${formData.isPublished ? 'LIVE' : 'SECURED'} at /${formData.slug}` });
       } catch (error: any) {
         toast({ variant: "destructive", title: "DEPLOYMENT FAILURE", description: error.message });
       }
@@ -87,51 +99,121 @@ export default function LandingPageManager() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex flex-col items-center justify-center h-96 gap-4">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="font-headline font-black uppercase italic tracking-widest text-primary text-sm">Interfacing with Registry...</p>
       </div>
     );
   }
 
-  const publicUrl = typeof window !== 'undefined' ? `${window.location.origin}/${slug}` : `/${slug}`;
+  const publicUrl = typeof window !== 'undefined' ? `${window.location.origin}/${formData.slug}` : `/${formData.slug}`;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in duration-700">
+    <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in duration-700">
       <div className="border-l-4 border-primary pl-6">
-        <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter leading-none text-foreground">Landing Generation</h1>
+        <h1 className="font-headline text-4xl font-black uppercase italic tracking-tighter leading-none text-foreground">Storefront Engineering</h1>
         <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-2">Intelligence: Deploying Branch-Specific Operational Environments</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
           <Card className="rounded-none border-2 border-border bg-card shadow-md overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
             <CardHeader className="bg-secondary/5 border-b-2 border-border p-8">
               <CardTitle className="font-headline text-2xl font-black uppercase italic tracking-tighter">Operational Parameters</CardTitle>
               <CardDescription className="text-[10px] font-bold uppercase tracking-widest">Customize your branch's tactical link</CardDescription>
             </CardHeader>
-            <CardContent className="p-8 space-y-6 bg-background/50">
-              <div className="space-y-4">
+            <CardContent className="p-8 space-y-10 bg-background/50">
+              {/* Basic Identity */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest">Branch Tactical Name</Label>
                   <Input 
                     placeholder="e.g. WEST COVINA" 
-                    value={branchName} 
-                    onChange={e => setBranchName(e.target.value.toUpperCase())}
+                    value={formData.branchName} 
+                    onChange={e => handleInputChange('branchName', e.target.value.toUpperCase())}
                     className="rounded-none border-2 h-12 font-black italic uppercase"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest">URL Matrix Slug</Label>
-                  <div className="flex gap-2">
-                    <div className="bg-muted border-2 border-r-0 border-border px-4 flex items-center text-[10px] font-bold opacity-50">/</div>
+                  <Input 
+                    placeholder="west-covina" 
+                    value={formData.slug} 
+                    onChange={e => handleInputChange('slug', slugify(e.target.value))}
+                    className="rounded-none border-2 h-12 font-mono text-sm"
+                  />
+                </div>
+              </div>
+
+              <Separator className="bg-border" />
+
+              {/* Content Engineering */}
+              <div className="space-y-6">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
+                  <Type className="h-4 w-4" /> Content Matrix
+                </h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest">Mission Headline</Label>
                     <Input 
-                      placeholder="west-covina" 
-                      value={slug} 
-                      onChange={e => handleSlugChange(e.target.value)}
-                      className="rounded-none border-2 h-12 font-mono text-sm"
+                      value={formData.headline} 
+                      onChange={e => handleInputChange('headline', e.target.value)}
+                      className="rounded-none border-2 h-12 font-bold"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest">Strategic Subheadline</Label>
+                    <Textarea 
+                      value={formData.subheadline} 
+                      onChange={e => handleInputChange('subheadline', e.target.value)}
+                      className="rounded-none border-2 min-h-[80px]"
+                      placeholder="Join the world's most successful team..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest">Call to Action Directive</Label>
+                    <Input 
+                      value={formData.callToAction} 
+                      onChange={e => handleInputChange('callToAction', e.target.value.toUpperCase())}
+                      className="rounded-none border-2 h-12 font-black italic uppercase"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="bg-border" />
+
+              {/* Contact Intelligence */}
+              <div className="space-y-6">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary flex items-center gap-2">
+                  <Phone className="h-4 w-4" /> Intelligence Assets
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest">Comm Phone</Label>
+                    <Input 
+                      value={formData.contactPhone} 
+                      onChange={e => handleInputChange('contactPhone', e.target.value)}
+                      className="rounded-none border-2 h-12 font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest">Tactical Email</Label>
+                    <Input 
+                      value={formData.contactEmail} 
+                      onChange={e => handleInputChange('contactEmail', e.target.value)}
+                      className="rounded-none border-2 h-12 font-bold"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest">Operational Address</Label>
+                  <Input 
+                    value={formData.address} 
+                    onChange={e => handleInputChange('address', e.target.value)}
+                    className="rounded-none border-2 h-12 font-bold"
+                  />
                 </div>
               </div>
 
@@ -143,8 +225,8 @@ export default function LandingPageManager() {
                   <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Toggle live mission status in the theater of operations</p>
                 </div>
                 <Switch 
-                  checked={isPublic} 
-                  onCheckedChange={setIsPublic}
+                  checked={formData.isPublished} 
+                  onCheckedChange={val => handleInputChange('isPublished', val)}
                   className="data-[state=checked]:bg-primary"
                 />
               </div>
@@ -152,11 +234,11 @@ export default function LandingPageManager() {
             <CardFooter className="bg-secondary/5 border-t-2 border-border p-6">
               <Button 
                 onClick={handleDeploy} 
-                disabled={isSaving || !branchName || !slug}
+                disabled={isSaving || !formData.branchName || !formData.slug}
                 className="w-full bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic tracking-widest h-14 shadow-xl"
               >
                 {isSaving ? <Loader2 className="animate-spin mr-3" /> : <Zap className="mr-3" />}
-                DEPLOY TACTICAL LANDING
+                DEPLOY TACTICAL STOREFRONT
               </Button>
             </CardFooter>
           </Card>
@@ -190,7 +272,7 @@ export default function LandingPageManager() {
             </CardContent>
           </Card>
 
-          {slug && (
+          {formData.slug && (
             <Card className="rounded-none border-2 border-primary bg-primary/5 shadow-md animate-in zoom-in-95">
               <CardHeader className="py-4 border-b border-primary/20">
                 <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
@@ -203,7 +285,7 @@ export default function LandingPageManager() {
                   <Input readOnly value={publicUrl} className="bg-background border-border text-[10px] font-mono rounded-none h-10" />
                 </div>
                 <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white rounded-none font-black uppercase italic tracking-widest h-10 text-[9px]">
-                  <Link href={`/${slug}`} target="_blank">
+                  <Link href={`/${formData.slug}`} target="_blank">
                     INSPECT LIVE ENVIRONMENT <ExternalLink className="ml-2 h-3 w-3" />
                   </Link>
                 </Button>

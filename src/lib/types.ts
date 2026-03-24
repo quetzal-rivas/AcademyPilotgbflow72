@@ -36,6 +36,13 @@ export interface LandingPageData {
   slug: string;
   userId: string;
   branchName: string;
-  isPublic: boolean;
+  headline?: string;
+  subheadline?: string;
+  callToAction?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  address?: string;
+  heroImage?: string;
+  isPublished: boolean;
   updatedAt: string;
 }

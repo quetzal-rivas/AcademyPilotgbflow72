@@ -1,9 +1,42 @@
+
 const AWS = require('aws-sdk');
 const lambda = new AWS.Lambda();
 const { getFirestore } = require('./firebase-admin'); // We need firestore for role lookups
 const admin = require('firebase-admin');
 
-const AUTH_TOKEN = process.env.AUTH_TOKEN || '123456789';
+const ssm = new AWS.SSM({ region: process.env.AWS_REGION || 'us-east-2' });
+
+let AUTH_TOKEN = null;
+
+/**
+ * Tactical Credential Resolution
+ * Fetches the AUTH_TOKEN from SSM if the env var points to a secure path.
+ */
+async function resolveAuthToken() {
+  if (AUTH_TOKEN) return AUTH_TOKEN;
+
+  const tokenPath = process.env.AUTH_TOKEN || '/app/auth-token';
+  
+  // If it doesn't look like a path, use it as a literal
+  if (!tokenPath.startsWith('/')) {
+    AUTH_TOKEN = tokenPath;
+    return AUTH_TOKEN;
+  }
+
+  try {
+    console.log(`Resolving Orchestrator Auth Token from SSM: ${tokenPath}`);
+    const response = await ssm.getParameter({
+      Name: tokenPath,
+      WithDecryption: true
+    }).promise();
+
+    AUTH_TOKEN = response.Parameter.Value;
+    return AUTH_TOKEN;
+  } catch (err) {
+    console.error("Critical Error: Failed to resolve Auth Token from SSM.", err);
+    throw err;
+  }
+}
 
 /**
  * Universal Tactical Orchestrator (Multi-Tenant & RBAC)
@@ -17,10 +50,11 @@ exports.handler = async (event) => {
   
   try {
     // 1. Service-to-Service Authorization (Verify Next.js Proxy)
+    const activeToken = await resolveAuthToken();
     const authHeader = event.headers?.authorization || event.headers?.Authorization || '';
     const token = authHeader.replace('Bearer ', '').trim();
     
-    if (token !== AUTH_TOKEN) {
+    if (token !== activeToken) {
       console.error('Handshake Failure: Unauthorized Access from untrusted source.');
       return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized Backend Access' }) };
     }
@@ -39,8 +73,8 @@ exports.handler = async (event) => {
         return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized: Missing user token' }) };
     }
 
-    // Initialize Firebase Admin (uses the SSM parameter we set up earlier)
-    const firestoreDb = getFirestore();
+    // Initialize Firebase Admin
+    const firestoreDb = await getFirestore();
     let decodedToken;
 
     try {
@@ -64,10 +98,11 @@ exports.handler = async (event) => {
     const authorizedTenant = userProfile?.tenantSlug;
 
     // --- Authorization Logic based on Action ---
-    // If the payload contains a tenantSlug, we MUST verify they own it to prevent IDOR.
     if (payload && payload.tenantSlug) {
-        if (action === 'GET_LEADS' || action === 'MARK_PROCESSED' || action === 'SCHEDULE_CALLBACK' || action === 'SEND_EMAIL') {
-          // These are Academy Owner actions.
+        // Restricted actions for Academy Owners
+        const OWNER_ACTIONS = ['GET_LEADS', 'MARK_PROCESSED', 'SCHEDULE_CALLBACK', 'SEND_EMAIL', 'UPDATE_LANDING_PAGE'];
+        
+        if (OWNER_ACTIONS.includes(action)) {
           if (authorizedRole !== 'academy_owner') {
              console.warn(`Security Alert: User ${uid} attempted owner action '${action}' without owner role.`);
              return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden: Insufficient permissions' }) };
@@ -113,7 +148,6 @@ exports.handler = async (event) => {
 
     console.log(`Invoking Tactical Handler: ${targetFunction}`);
 
-    // We enhance the payload with trusted data from the verified token.
     const securePayload = {
         ...payload,
         _trustedContext: {

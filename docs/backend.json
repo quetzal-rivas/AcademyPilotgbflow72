@@ -31,19 +31,6 @@
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },
-    "AutomationRule": {
-      "title": "AutomationRule",
-      "description": "Autonomous flow logic defined by admin.",
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "userId": { "type": "string" },
-        "name": { "type": "string" },
-        "trigger": { "type": "string" },
-        "status": { "type": "string" },
-        "actions": { "type": "array", "items": { "type": "object" } }
-      }
-    },
     "LandingPage": {
       "title": "LandingPage",
       "description": "Customized branch landing page configuration.",
@@ -52,10 +39,17 @@
         "slug": { "type": "string" },
         "userId": { "type": "string" },
         "branchName": { "type": "string" },
-        "isPublic": { "type": "boolean" },
+        "headline": { "type": "string" },
+        "subheadline": { "type": "string" },
+        "callToAction": { "type": "string" },
+        "contactPhone": { "type": "string" },
+        "contactEmail": { "type": "string" },
+        "address": { "type": "string" },
+        "heroImage": { "type": "string", "format": "uri" },
+        "isPublished": { "type": "boolean" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["slug", "userId", "branchName", "isPublic"]
+      "required": ["slug", "userId", "branchName", "isPublished"]
     }
   },
   "auth": {
@@ -65,14 +59,6 @@
     "/user_profiles/{userId}": {
       "schema": { "$ref": "#/backend/entities/UserProfile" },
       "description": "Root profile for the unit."
-    },
-    "/user_profiles/{userId}/leads/{leadId}": {
-      "schema": { "$ref": "#/backend/entities/Lead" },
-      "description": "Recruitment registry for the academy."
-    },
-    "/user_profiles/{userId}/automation_rules/{ruleId}": {
-      "schema": { "$ref": "#/backend/entities/AutomationRule" },
-      "description": "Autonomous mission protocols."
     },
     "/landing_pages/{slug}": {
       "schema": { "$ref": "#/backend/entities/LandingPage" },
