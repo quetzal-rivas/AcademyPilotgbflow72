@@ -32,6 +32,10 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !ImportValue InboundMailParserFunctionArn
 
   # 2. S3 Bucket Policy granting SES permission to write incoming emails
   TenantIncomingEmailsBucketPolicy:

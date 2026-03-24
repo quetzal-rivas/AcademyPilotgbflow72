@@ -8,7 +8,7 @@ Description: >
 Globals:
   Function:
     Timeout: 30
-    MemorySize: 512 
+    MemorySize: 512
     Runtime: nodejs18.x
 
 Parameters:
@@ -42,14 +42,22 @@ Resources:
         Variables:
           FIREBASE_SERVICE_ACCOUNT: '/app/firebase-service-account'
           ROOT_DOMAIN: 'graciebarra.ai'
-      Events:
-        NewEmailEvent:
-          Type: S3
-          Properties:
-            Bucket: !Ref IncomingEmailsBucketName
-            Events: s3:ObjectCreated:*
+
+  InboundMailParserFunctionS3Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt InboundMailParserFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub "arn:aws:s3:::${IncomingEmailsBucketName}"
+      SourceAccount: !Ref AWS::AccountId
 
 Outputs:
   InboundMailParserFunctionName:
     Description: "The name of the Inbound Mail Parser Lambda function"
     Value: !Ref InboundMailParserFunction
+  InboundMailParserFunctionArn:
+    Description: "The ARN of the Inbound Mail Parser Lambda function"
+    Value: !GetAtt InboundMailParserFunction.Arn
+    Export:
+      Name: InboundMailParserFunctionArn
