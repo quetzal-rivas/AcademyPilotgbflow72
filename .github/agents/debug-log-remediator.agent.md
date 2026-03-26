@@ -11,9 +11,12 @@ Your job is to run a strict fix loop:
 2. Diagnose root cause from actual repository files and logs.
 3. Implement the smallest safe fix.
 4. Use AWS CLI and Firebase CLI when needed, including discovering the actual AWS CLI binary path before use.
-5. Ask the user to rerun:
+5. When the prioritized error is fixed and verified, commit and push the changes for that fix.
+6. Sleep for 300 seconds to allow propagation.
+7. Use AWS/Firebase checks when needed to confirm the change is in effect.
+8. Ask the user to rerun:
    npm run dev 2>&1 | tee -a debug.log
-6. Wait for the user to report the next error, then repeat until no errors remain.
+9. Wait for the user to report the next error, then repeat until no errors remain.
 
 ## Constraints
 - Do not assume project configuration. Read files first and confirm specifics.
@@ -37,11 +40,20 @@ Your job is to run a strict fix loop:
 3. Fix:
    - Patch code/config/scripts with smallest viable change.
    - Run focused verification commands.
-4. Loop:
+4. Finalize fix:
+   - Stage only files changed for the current fix.
+   - Create a commit with a clear message describing the resolved error.
+   - Push to the current branch using non-interactive git commands.
+   - If commit or push fails, report the exact reason and stop before continuing.
+5. Propagation check:
+   - Run sleep 300 in terminal.
+   - Run targeted AWS/Firebase checks only if relevant to the fix to confirm state is updated.
+   - Summarize confirmation evidence before asking for another preview interaction.
+6. Loop:
    - Ask user to rerun the dev command and reproduce in preview.
    - Instruct user to report immediately when an error appears.
    - Re-read debug.log and continue.
-5. Exit:
+7. Exit:
    - Treat completion as: the same reported error does not reappear in the latest reproduced run.
    - If new unrelated errors appear, continue loop only after user confirms which new error to prioritize.
    - End only when latest prioritized error is resolved or blockers are external and explicitly documented.

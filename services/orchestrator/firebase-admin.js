@@ -5,6 +5,26 @@ const ssm = new AWS.SSM({ region: process.env.AWS_REGION || 'us-east-2' });
 
 let firestore = null;
 
+function normalizeServiceAccount(input) {
+  if (!input || typeof input !== 'object') {
+    return input;
+  }
+
+  const normalized = {
+    ...input,
+    project_id: input.project_id || input.projectId,
+    private_key: input.private_key || input.privateKey,
+    client_email: input.client_email || input.clientEmail,
+  };
+
+  // Common issue when secrets are stored with escaped newlines.
+  if (typeof normalized.private_key === 'string') {
+    normalized.private_key = normalized.private_key.replace(/\\n/g, '\n');
+  }
+
+  return normalized;
+}
+
 /**
  * Initializes the Firebase Admin SDK and returns a Firestore instance.
  *
@@ -50,6 +70,8 @@ async function getFirestore() {
     console.error('FIREBASE_SERVICE_ACCOUNT must be valid JSON:', e.message);
     throw e;
   }
+
+  serviceAccount = normalizeServiceAccount(serviceAccount);
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
