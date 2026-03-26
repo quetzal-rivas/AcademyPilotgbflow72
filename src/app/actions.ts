@@ -19,7 +19,7 @@ import { getFirebaseAdmin } from "@/lib/firebase-admin";
 import { createRequestId, logger, serializeError } from '@/lib/logger';
 import axios from 'axios';
 
-const ORCHESTRATOR_URL = process.env.ORCHESTRATOR_URL || 'https://2cgrii72ke.execute-api.us-east-1.amazonaws.com/orchestrate';
+const ORCHESTRATOR_URL = process.env.ORCHESTRATOR_URL || 'https://hmir4kw9lg.execute-api.us-east-2.amazonaws.com/Prod/orchestrate/';
 const ORCHESTRATOR_AUTH_TOKEN = process.env.ORCHESTRATOR_AUTH_TOKEN || '123456789';
 
 /**

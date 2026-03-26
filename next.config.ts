@@ -2,6 +2,12 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    serverActions: {
+      // Allow GitHub Codespaces/Web Preview forwarded hosts during local development.
+      allowedOrigins: ['localhost:9002', '*.app.github.dev'],
+    },
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
