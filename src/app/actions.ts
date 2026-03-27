@@ -15,12 +15,26 @@ import type { CampaignStructure, Campaign, PublishResult, AdImage } from "@/lib/
 import type { AgentProfile } from "@/lib/synth-types";
 import { geocodeAddress, findFranchise } from '@/lib/academies';
 import { unstable_cache as cache } from 'next/cache';
+import { headers } from 'next/headers';
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
 import { createRequestId, logger, serializeError } from '@/lib/logger';
 import axios from 'axios';
 
 const ORCHESTRATOR_URL = process.env.ORCHESTRATOR_URL || 'https://hmir4kw9lg.execute-api.us-east-2.amazonaws.com/Prod/orchestrate/';
 const ORCHESTRATOR_AUTH_TOKEN = process.env.ORCHESTRATOR_AUTH_TOKEN || '123456789';
+
+async function resolveAppBaseUrl() {
+  const requestHeaders = await headers();
+  const forwardedProto = requestHeaders.get('x-forwarded-proto');
+  const forwardedHost = requestHeaders.get('x-forwarded-host');
+  const host = forwardedHost || requestHeaders.get('host');
+
+  if (host) {
+    return `${forwardedProto || 'https'}://${host}`;
+  }
+
+  return process.env.NEXT_PUBLIC_APP_URL || 'https://graciebarra.ai';
+}
 
 /**
  * High-authority directive to initiate a tactical magic link login via AWS SES.
@@ -30,11 +44,12 @@ export async function initiateTacticalLoginAction(email: string) {
 
   try {
     const admin = getFirebaseAdmin();
+    const appBaseUrl = await resolveAppBaseUrl();
     
     // 1. Generate the secure tactical link
     const actionCodeSettings = {
       // Direct link back to the pilot dashboard
-      url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://graciebarra.ai'}/dashboard?email=${encodeURIComponent(email)}`,
+      url: `${appBaseUrl}/dashboard?email=${encodeURIComponent(email)}`,
       handleCodeInApp: true,
     };
     
