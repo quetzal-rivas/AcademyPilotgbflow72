@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const params = useParams<{ slug?: string }>();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -39,7 +40,13 @@ function CheckoutContent() {
   const assetId = searchParams.get("assetId");
   const basePrice = searchParams.get("price") || "150";
   const displayPrice = isCouponApplied ? "0" : basePrice;
-  const [academySlug, setAcademySlug] = useState(searchParams.get("slug") || "");
+  const routeSlug = typeof params?.slug === 'string' ? params.slug : '';
+  const [academySlug, setAcademySlug] = useState(searchParams.get("slug") || routeSlug || "");
+
+  useEffect(() => {
+    const slugFromQuery = searchParams.get('slug') || '';
+    setAcademySlug(slugFromQuery || routeSlug || '');
+  }, [searchParams, routeSlug]);
 
   useEffect(() => {
     async function loadPhotos() {
