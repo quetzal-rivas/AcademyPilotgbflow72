@@ -66,7 +66,7 @@ function CheckoutContent() {
     } else if (isSuccess && countdown === 0) {
         // Redirection protocol: Forwarding unit to the Academy Dashboard
         const dashboardUrl = academySlug 
-          ? `/${academySlug}/dashboard/landing-page`
+          ? `/${academySlug}/dashboard`
           : "/student/dashboard";
         router.push(dashboardUrl);
     }

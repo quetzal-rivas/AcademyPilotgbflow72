@@ -1,15 +1,74 @@
 "use client";
 
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Mic, MessageSquare, CalendarCheck, Zap, FileText, CreditCard, Layout } from "lucide-react";
+import { LayoutDashboard, Users, Megaphone, Settings, LogOut, Mic, MessageSquare, CalendarCheck, Zap, FileText, CreditCard, Layout, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname, useParams, useRouter } from "next/navigation";
 import { GlobalChat } from "@/components/chat/global-chat";
+import { useUser, useFirestore } from "@/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { useState, useEffect } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
+  const router = useRouter();
   const slug = params?.slug as string;
+  const { user, isUserLoading } = useUser();
+  const db = useFirestore();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isFetchingProfile, setIsFetchingProfile] = useState(true);
+
+  // Verify tenant access
+  useEffect(() => {
+    const verifyTenantAccess = async () => {
+      if (isUserLoading) return;
+
+      if (!user) {
+        // User not authenticated, redirect to sign-in
+        router.push("/auth/signin");
+        return;
+      }
+
+      try {
+        // Fetch user profile to get their tenantSlug
+        const userProfileRef = doc(db!, "user_profiles", user.uid);
+        const userProfileSnap = await getDoc(userProfileRef);
+
+        if (!userProfileSnap.exists()) {
+          // User profile not found
+          router.push("/auth/signin");
+          return;
+        }
+
+        const userTenantSlug = userProfileSnap.data()?.tenantSlug as string | undefined;
+
+        if (!userTenantSlug) {
+          // User doesn't have a tenant assigned
+          router.push("/onboarding");
+          return;
+        }
+
+        // Check if the requested slug matches the user's tenant
+        if (slug !== userTenantSlug) {
+          // User trying to access a different tenant's dashboard
+          // Redirect to their correct tenant dashboard
+          router.push(`/${userTenantSlug}/dashboard`);
+          return;
+        }
+
+        // User is authorized
+        setIsAuthorized(true);
+      } catch (error) {
+        console.error("Error verifying tenant access:", error);
+        router.push("/auth/signin");
+      } finally {
+        setIsFetchingProfile(false);
+      }
+    };
+
+    verifyTenantAccess();
+  }, [user, isUserLoading, slug, db, router]);
 
   // Tenant-aware base path
   const basePath = `/${slug}/dashboard`;
@@ -29,6 +88,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   const isActive = (href: string) => pathname === href || (href !== basePath && pathname.startsWith(href));
+
+  // Show loading state while checking authorization
+  if (isUserLoading || isFetchingProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="font-headline font-black uppercase italic tracking-widest text-sm text-muted-foreground">
+            Verifying Tactical Clearance...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authorized, don't render the dashboard
+  if (!isAuthorized) {
+    return null;
+  }
 
   return (
     <SidebarProvider>

@@ -19,7 +19,15 @@
         "AWS_REGION": "us-east-2",
         "FASTMCP_LOG_LEVEL": "ERROR"
       }
+    },
+     "ElevenLabs": {
+      "command": "npx",
+      "args": ["-y", "elevenlabs-mcp-enhanced"],
+      "env": {
+        "ELEVENLABS_API_KEY": "sk_908ed7e1b24e4327f378d08426b9751127808b99a4e641a7"
+      }
     }
 	},
 	"inputs": []
 }
+

@@ -4,26 +4,155 @@
 
    ▲ Next.js 15.5.9 (Turbopack)
    - Local:        http://localhost:9002
-   - Network:      http://10.0.0.249:9002
+   - Network:      http://10.0.1.89:9002
    - Environments: .env.local, .env
    - Experiments (use with caution):
      · serverActions
 
  ✓ Starting...
- ✓ Ready in 1702ms
+ ✓ Ready in 2.9s
  ○ Compiling / ...
 
 warn - The class `duration-[800ms]` is ambiguous and matches multiple utilities.
 warn - If this is content and not a class, replace it with `duration-&lsqb;800ms&rsqb;` to silence this warning.
- ✓ Compiled / in 36.3s
- GET / 200 in 41980ms
- ○ Compiling /favicon.ico ...
- ✓ Compiled /favicon.ico in 1951ms
- GET /favicon.ico?favicon.7ed73651.ico 200 in 2276ms
-{"level":"info","message":"Dispatching orchestrator action","timestamp":"2026-03-26T22:43:46.239Z","requestId":"d7973839-c996-4cf7-bdbf-e86ac63f79f4","scope":"server-action.dispatchOrchestratorAction","action":"SEND_EMAIL"}
-(node:206045) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-{"level":"error","message":"Orchestrator action failed","timestamp":"2026-03-26T22:43:48.804Z","requestId":"d7973839-c996-4cf7-bdbf-e86ac63f79f4","scope":"server-action.dispatchOrchestratorAction","action":"SEND_EMAIL","error":{"name":"AxiosError","message":"Request failed with status code 500","stack":"AxiosError: Request failed with status code 500\n    at settle (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_axios_lib_895191e1._.js:1931:16)\n    at IncomingMessage.handleStreamEnd (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_axios_lib_895191e1._.js:3210:179)\n    at IncomingMessage.emit (node:events:520:35)\n    at endReadableNT (node:internal/streams/readable:1701:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)\n    at Axios.request (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_axios_lib_895191e1._.js:4378:49)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async dispatchOrchestratorAction (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/[root-of-the-server]__0f54c87c._.js:1717:26)\n    at async initiateTacticalLoginAction (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/[root-of-the-server]__0f54c87c._.js:1688:24)\n    at async executeActionAndPrepareForRender (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:3117)\n    at async /workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:958\n    at async handleAction (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:32:22931)\n    at async renderToHTMLOrFlightImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:39:39993)\n    at async doRender (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_next_e75671a4._.js:9116:28)\n    at async AppPageRouteModule.handleResponse (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:41:57383)\n    at async handleResponse (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_next_e75671a4._.js:9265:32)\n    at async handler (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_next_e75671a4._.js:9645:20)\n    at async DevServer.renderToResponseWithComponentsImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:1422:9)\n    at async DevServer.renderPageComponent (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:1474:24)\n    at async DevServer.renderToResponseImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:1514:32)\n    at async DevServer.pipeImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:1025:25)\n    at async NextNodeServer.handleCatchallRenderRequest (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/next-server.js:393:17)\n    at async DevServer.handleRequestImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:916:17)\n    at async /workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/dev/next-dev-server.js:399:20\n    at async Span.traceAsyncFn (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/trace/trace.js:157:20)\n    at async DevServer.handleRequest (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/dev/next-dev-server.js:395:24)\n    at async invokeRender (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/lib/router-server.js:240:21)\n    at async handleRequest (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/lib/router-server.js:437:24)\n    at async requestHandlerImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/lib/router-server.js:485:13)\n    at async Server.requestListener (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/lib/start-server.js:226:13)"},"upstream":{"error":"Internal Matrix Error","details":"Service account object must contain a string \"private_key\" property.","requestId":"d7973839-c996-4cf7-bdbf-e86ac63f79f4"}}
-{"level":"error","message":"Auth handshake initialization failure","timestamp":"2026-03-26T22:43:48.805Z","requestId":"d7973839-c996-4cf7-bdbf-e86ac63f79f4","scope":"server-action.initiateTacticalLogin","email":"prehispanicaztecgod@gmail.com","error":{"name":"Error","message":"Internal Matrix Error (requestId: d7973839-c996-4cf7-bdbf-e86ac63f79f4)","stack":"Error: Internal Matrix Error (requestId: d7973839-c996-4cf7-bdbf-e86ac63f79f4)\n    at dispatchOrchestratorAction (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/[root-of-the-server]__0f54c87c._.js:1740:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async initiateTacticalLoginAction (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/[root-of-the-server]__0f54c87c._.js:1688:24)\n    at async executeActionAndPrepareForRender (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:3117)\n    at async /workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:958\n    at async handleAction (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:32:22931)\n    at async renderToHTMLOrFlightImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:39:39993)\n    at async doRender (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_next_e75671a4._.js:9116:28)\n    at async AppPageRouteModule.handleResponse (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:41:57383)\n    at async handleResponse (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_next_e75671a4._.js:9265:32)\n    at async handler (/workspaces/AcademyPilotgbflow72/.next/server/chunks/ssr/node_modules_next_e75671a4._.js:9645:20)\n    at async DevServer.renderToResponseWithComponentsImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:1422:9)\n    at async DevServer.renderPageComponent (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:1474:24)\n    at async DevServer.renderToResponseImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:1514:32)\n    at async DevServer.pipeImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:1025:25)\n    at async NextNodeServer.handleCatchallRenderRequest (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/next-server.js:393:17)\n    at async DevServer.handleRequestImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/base-server.js:916:17)\n    at async /workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/dev/next-dev-server.js:399:20\n    at async Span.traceAsyncFn (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/trace/trace.js:157:20)\n    at async DevServer.handleRequest (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/dev/next-dev-server.js:395:24)\n    at async invokeRender (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/lib/router-server.js:240:21)\n    at async handleRequest (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/lib/router-server.js:437:24)\n    at async requestHandlerImpl (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/lib/router-server.js:485:13)\n    at async Server.requestListener (/workspaces/AcademyPilotgbflow72/node_modules/next/dist/server/lib/start-server.js:226:13)"}}
- POST / 200 in 6158ms
-[?25h
+ ✓ Compiled / in 34s
+ GET / 200 in 36846ms
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 2.8s
+ GET /prehispanic 200 in 6897ms
+ ○ Compiling /api/public-intake ...
+ ✓ Compiled /api/public-intake in 1193ms
+{"level":"info","message":"Processing public intake action","timestamp":"2026-03-27T20:10:28.326Z","requestId":"dc6a71a6-62f6-40b0-96b2-56cd9a5271b3","scope":"api.public-intake","action":"ADD_LEAD","tenantSlug":"prehispanic"}
+ POST /api/public-intake 200 in 6172ms
+ ✓ Compiled /api/elevenlabs-outbound in 230ms
+{"level":"info","message":"ElevenLabs outbound call started","timestamp":"2026-03-27T20:10:34.038Z","requestId":"b67c87dd-5433-49c6-a658-ba449eb26462","scope":"api.elevenlabs-outbound","tenantSlug":"prehispanic","conversationId":"conv_8701kmreq0qkfx7sn30ceg558hj9"}
+ POST /api/elevenlabs-outbound 200 in 1119ms
+{"level":"info","message":"Processing public intake action","timestamp":"2026-03-27T20:12:56.952Z","requestId":"b81dcfd6-346c-4314-91d5-12f38f78535b","scope":"api.public-intake","action":"ADD_LEAD","tenantSlug":"prehispanic"}
+ POST /api/public-intake 200 in 1483ms
+{"level":"info","message":"ElevenLabs outbound call started","timestamp":"2026-03-27T20:12:58.962Z","requestId":"88e8a355-5529-48e7-b144-d27fe4ba0b99","scope":"api.elevenlabs-outbound","tenantSlug":"prehispanic","conversationId":"conv_7501kmreve9vf09vjq0rx8qbw7zr"}
+ POST /api/elevenlabs-outbound 200 in 657ms
+ ○ Compiling /[slug]/checkout ...
+ ✓ Compiled /[slug]/checkout in 4s
+ GET /prehispanic/checkout?plan=Plan+Anual&price=1800&details=Inversi%C3%B3n+Total%3A+%241%2C800.+Forma+de+Pago%3A+2+exhibiciones+de+%24900.+Regalo%3A+1+Kimono+%2B+Uniforme+No-Gi. 200 in 5382ms
+ GET /prehispanic/checkout?plan=Plan+Anual&price=1800&details=Inversi%C3%B3n+Total%3A+%241%2C800.+Forma+de+Pago%3A+2+exhibiciones+de+%24900.+Regalo%3A+1+Kimono+%2B+Uniforme+No-Gi. 200 in 415ms
+ POST /prehispanic/checkout?plan=Plan%20Anual&price=1800&details=Inversi%C3%B3n%20Total%3A%20%241%2C800.%20Forma%20de%20Pago%3A%202%20exhibiciones%20de%20%24900.%20Regalo%3A%201%20Kimono%20%2B%20Uniforme%20No-Gi. 200 in 162ms
+ POST /prehispanic/checkout?plan=Plan%20Anual&price=1800&details=Inversi%C3%B3n%20Total%3A%20%241%2C800.%20Forma%20de%20Pago%3A%202%20exhibiciones%20de%20%24900.%20Regalo%3A%201%20Kimono%20%2B%20Uniforme%20No-Gi. 200 in 226ms
+ ✓ Compiled in 3.2s
+
+> nextn@0.1.0 dev
+> next dev --turbopack -p 9002
+
+   ▲ Next.js 15.5.9 (Turbopack)
+   - Local:        http://localhost:9002
+   - Network:      http://10.0.1.89:9002
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 1930ms
+ ○ Compiling / ...
+
+warn - The class `duration-[800ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;800ms&rsqb;` to silence this warning.
+ ✓ Compiled / in 32.8s
+ GET / 200 in 38330ms
+ ○ Compiling /[slug] ...
+ ✓ Compiled /[slug] in 2.9s
+ GET /prehispanic 200 in 11706ms
+ ○ Compiling /api/public-intake ...
+ ✓ Compiled /api/public-intake in 1115ms
+{"level":"info","message":"Processing public intake action","timestamp":"2026-03-27T21:32:33.578Z","requestId":"9a0b1b1e-476e-40a8-ac86-c23e9fe5cfe6","scope":"api.public-intake","action":"ADD_LEAD","tenantSlug":"prehispanic"}
+ POST /api/public-intake 200 in 5990ms
+ ✓ Compiled /api/elevenlabs-outbound in 227ms
+{"level":"info","message":"ElevenLabs outbound call started","timestamp":"2026-03-27T21:32:39.168Z","requestId":"aeda3a86-350c-422a-a50c-92b6ef1ceb47","scope":"api.elevenlabs-outbound","tenantSlug":"prehispanic","conversationId":"conv_6901kmrkdah0fczta06fhwfc8rc8"}
+ POST /api/elevenlabs-outbound 200 in 1155ms
+ ✓ Compiled /api/elevenlabs-call-status in 169ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 667ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 365ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 384ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 415ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 372ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 402ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 401ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 364ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 378ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 369ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 346ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 352ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 361ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 361ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 342ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 350ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 330ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 386ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 370ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 411ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 334ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 334ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 351ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 360ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 342ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 436ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 339ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 351ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 349ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 353ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 345ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 333ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 339ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 351ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 326ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 407ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 337ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 343ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 325ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 399ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 367ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 333ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 357ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 549ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 321ms
+ GET /api/elevenlabs-call-status?conversationId=conv_6901kmrkdah0fczta06fhwfc8rc8 200 in 344ms
+ ○ Compiling /[slug]/checkout ...
+ ✓ Compiled /[slug]/checkout in 4.5s
+ GET /prehispanic/checkout?plan=Plan+Anual&price=1800&details=Inversi%C3%B3n+Total%3A+%241%2C800.+Forma+de+Pago%3A+2+exhibiciones+de+%24900.+Regalo%3A+1+Kimono+%2B+Uniforme+No-Gi. 200 in 7539ms
+ POST /prehispanic/checkout?plan=Plan%20Anual&price=1800&details=Inversi%C3%B3n%20Total%3A%20%241%2C800.%20Forma%20de%20Pago%3A%202%20exhibiciones%20de%20%24900.%20Regalo%3A%201%20Kimono%20%2B%20Uniforme%20No-Gi. 200 in 172ms
+ POST /prehispanic/checkout?plan=Plan%20Anual&price=1800&details=Inversi%C3%B3n%20Total%3A%20%241%2C800.%20Forma%20de%20Pago%3A%202%20exhibiciones%20de%20%24900.%20Regalo%3A%201%20Kimono%20%2B%20Uniforme%20No-Gi. 200 in 211ms
+{"level":"info","message":"Processing public intake action","timestamp":"2026-03-27T21:34:30.891Z","requestId":"6b4bcf40-91f3-4094-82fc-ed61b48035bf","scope":"api.public-intake","action":"ADD_LEAD","tenantSlug":"prehispanic"}
+ POST /api/public-intake 200 in 1318ms
+{"level":"info","message":"ElevenLabs outbound call started","timestamp":"2026-03-27T21:34:32.650Z","requestId":"ca25a9fc-49a6-41fd-ab82-0fdc72f49023","scope":"api.elevenlabs-outbound","tenantSlug":"prehispanic","conversationId":"conv_8701kmrkgsc8egpr5zp1cbzk5at9"}
+ POST /api/elevenlabs-outbound 200 in 785ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 363ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 343ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 382ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 351ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 354ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 453ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 343ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 364ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 345ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 357ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 332ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 335ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 481ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 331ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 325ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 338ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 320ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 331ms
+ GET /api/elevenlabs-call-status?conversationId=conv_8701kmrkgsc8egpr5zp1cbzk5at9 200 in 341ms
+ GET /prehispanic/checkout?plan=Plan+Anual&price=1800&details=Inversi%C3%B3n+Total%3A+%241%2C800.+Forma+de+Pago%3A+2+exhibiciones+de+%24900.+Regalo%3A+1+Kimono+%2B+Uniforme+No-Gi. 200 in 177ms
+ POST /prehispanic/checkout?plan=Plan%20Anual&price=1800&details=Inversi%C3%B3n%20Total%3A%20%241%2C800.%20Forma%20de%20Pago%3A%202%20exhibiciones%20de%20%24900.%20Regalo%3A%201%20Kimono%20%2B%20Uniforme%20No-Gi. 200 in 258ms
+ POST /prehispanic/checkout?plan=Plan%20Anual&price=1800&details=Inversi%C3%B3n%20Total%3A%20%241%2C800.%20Forma%20de%20Pago%3A%202%20exhibiciones%20de%20%24900.%20Regalo%3A%201%20Kimono%20%2B%20Uniforme%20No-Gi. 200 in 145ms
+ GET / 200 in 301ms
+ ○ Compiling /checkout ...
+ ✓ Compiled /checkout in 1660ms
+ GET /checkout?mode=admin&step=1 200 in 1849ms
+ POST /checkout?mode=admin&step=1 200 in 204ms
+ POST /checkout?mode=admin&step=1 200 in 96ms
+ ○ Compiling /[slug]/dashboard/landing-page ...
+ ✓ Compiled /[slug]/dashboard/landing-page in 4s
+ GET /lapuente/dashboard/landing-page 200 in 5593ms
+ ✓ Compiled in 1470ms
+ ✓ Compiled in 891ms
