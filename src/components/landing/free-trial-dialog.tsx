@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { showErrorToast } from '@/lib/client-errors';
 import { Loader2, PhoneOutgoing } from "lucide-react";
+import { useConversation } from '@elevenlabs/react';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -39,10 +40,42 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
+  const [isAgentOnLine, setIsAgentOnLine] = useState(false);
+  const [hasBrowserConnected, setHasBrowserConnected] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [typedPhone, setTypedPhone] = useState("");
   const [fullPhone, setFullPhone] = useState("");
+  const [leadName, setLeadName] = useState('');
+  const [leadEmail, setLeadEmail] = useState('');
   const { toast } = useToast();
+
+  const conversation = useConversation({
+    onConnect: () => {
+      setHasBrowserConnected(true);
+      setIsAgentOnLine(true);
+      toast({
+        title: 'AGENT ON THE LINE',
+        description: 'Connected in-browser with your tactical AI agent.',
+      });
+    },
+    onDisconnect: () => {
+      if (hasBrowserConnected) {
+        const plan = "Plan Anual";
+        const price = "1800";
+        const details = "Inversión Total: $1,800. Forma de Pago: 2 exhibiciones de $900. Regalo: 1 Kimono + Uniforme No-Gi.";
+        router.push(`/${tenantSlug}/checkout?plan=${encodeURIComponent(plan)}&price=${price}&details=${encodeURIComponent(details)}`);
+      }
+    },
+    onError: () => {
+      toast({
+        variant: 'destructive',
+        title: 'VOICE LINK ERROR',
+        description: 'Could not establish browser conversation.',
+      });
+    },
+  });
+
+  const browserAgentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || '';
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,7 +91,7 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
     let countdownInterval: NodeJS.Timeout;
     let typingInterval: NodeJS.Timeout;
 
-    if (isCalling) {
+    if (isCalling && !isAgentOnLine) {
       // Countdown Protocol: 60s to mission zero
       countdownInterval = setInterval(() => {
         setCountdown((prev) => {
@@ -99,11 +132,34 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
       clearInterval(countdownInterval);
       clearInterval(typingInterval);
     };
-  }, [isCalling, fullPhone, router, tenantSlug]);
+  }, [isCalling, isAgentOnLine, fullPhone, router, tenantSlug]);
+
+  async function handleBrowserAnswer() {
+    try {
+      if (!browserAgentId) {
+        throw new Error('Browser agent is not configured. Set NEXT_PUBLIC_ELEVENLABS_AGENT_ID.');
+      }
+
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      await conversation.startSession({
+        agentId: browserAgentId,
+        dynamicVariables: {
+          tenant_slug: tenantSlug,
+          lead_name: leadName,
+          lead_email: leadEmail,
+          lead_phone: fullPhone,
+        },
+      } as any);
+    } catch (error: any) {
+      showErrorToast(toast, 'BROWSER LINK FAILURE', error, 'Could not connect browser call fallback.');
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     setFullPhone(values.phone);
+    setLeadName(values.name);
+    setLeadEmail(values.email);
     
     try {
       const response = await fetch('/api/public-intake', {
@@ -126,8 +182,26 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
         throw new Error(errorData?.requestId ? `${errorData.error || 'Failed to submit tactical data.'} (requestId: ${errorData.requestId})` : errorData?.error || 'Failed to submit tactical data.');
       }
 
+      const outboundResponse = await fetch('/api/elevenlabs-outbound', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-request-id': crypto.randomUUID() },
+        body: JSON.stringify({
+          tenantSlug,
+          name: values.name,
+          phone: values.phone,
+          email: values.email,
+        }),
+      });
+
+      if (!outboundResponse.ok) {
+        const outboundError = await outboundResponse.json().catch(() => null);
+        throw new Error(outboundError?.error || 'Outbound call could not be started.');
+      }
+
       setIsSubmitting(false);
-      setIsCalling(true); 
+      setIsCalling(true);
+      setIsAgentOnLine(false);
+      setHasBrowserConnected(false);
       
       toast({
         title: "PROTOCOL INITIALIZED",
@@ -145,6 +219,8 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
         setIsOpen(val);
         if (!val) {
             setIsCalling(false);
+          setIsAgentOnLine(false);
+          setHasBrowserConnected(false);
             form.reset();
         }
     }}>
@@ -245,10 +321,14 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
 
             {/* AI Dispatch Matrix UI */}
             <div className="flex flex-col items-center gap-2 relative z-10">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic">Establishing Tactical Link</span>
-                <div className="bg-primary text-white px-6 py-2 font-black text-4xl shadow-xl italic rotate-1">
-                    0:{countdown.toString().padStart(2, '0')}
-                </div>
+                <span className={`text-[10px] font-black uppercase tracking-[0.4em] italic ${isAgentOnLine ? 'text-emerald-500' : 'text-primary'}`}>
+                  {isAgentOnLine ? 'Agent On The Line' : 'Establishing Tactical Link'}
+                </span>
+                {!isAgentOnLine && (
+                  <div className="bg-primary text-white px-6 py-2 font-black text-4xl shadow-xl italic rotate-1">
+                      0:{countdown.toString().padStart(2, '0')}
+                  </div>
+                )}
             </div>
 
             <div className="relative z-10">
@@ -266,14 +346,29 @@ export function FreeTrialDialog({ children, tenantSlug }: { children: React.Reac
                         <span className="w-1 h-8 bg-primary ml-1 animate-pulse" />
                     </div>
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-primary animate-pulse italic">
-                    STANDBY FOR AI VOICE HANDSHAKE...
+                <p className={`text-[10px] font-bold uppercase tracking-widest italic ${isAgentOnLine ? 'text-emerald-500' : 'text-primary animate-pulse'}`}>
+                    {isAgentOnLine ? 'LIVE VOICE SESSION ACTIVE' : 'STANDBY FOR AI VOICE HANDSHAKE...'}
                 </p>
             </div>
 
+            {!isAgentOnLine && (
+              <Button
+                variant="secondary"
+                onClick={handleBrowserAnswer}
+                className="rounded-none border-2 border-emerald-600 bg-emerald-600/10 text-emerald-700 font-black uppercase italic tracking-widest text-[10px] h-12 px-8 hover:bg-emerald-600 hover:text-white transition-all relative z-10"
+              >
+                ANSWER IN BROWSER
+              </Button>
+            )}
+
             <Button 
                 variant="outline" 
-                onClick={() => setIsCalling(false)}
+                onClick={async () => {
+                  setIsCalling(false);
+                  if (conversation.status === 'connected') {
+                    await conversation.endSession();
+                  }
+                }}
                 className="rounded-none border-2 font-black uppercase italic tracking-widest text-[10px] h-12 px-10 hover:bg-destructive hover:text-white hover:border-destructive transition-all relative z-10"
             >
                 ABORT DISPATCH
