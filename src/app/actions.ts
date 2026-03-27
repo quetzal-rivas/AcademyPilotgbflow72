@@ -45,8 +45,8 @@ export async function initiateTacticalLoginAction(email: string) {
       userEmail: email,
       templateType: 'magic-link',
       userData: {
-        loginUrl: loginLink,
-        name: email.split('@')[0].toUpperCase(),
+        magic_link: loginLink,
+        user_name: email.split('@')[0].toUpperCase(),
       }
     }, requestId);
 

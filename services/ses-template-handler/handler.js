@@ -53,7 +53,19 @@ exports.handler = async (event, context) => {
     try {
       templateDetails = await ses.getTemplate({ TemplateName: templateName }).promise();
     } catch (err) {
-      console.error(`Matrix Error: Template '${templateName}' not found in SES registry`);
+      console.error(`Matrix Error: Failed to load SES template '${templateName}'`, err);
+
+      if (err.code === 'AccessDenied' || err.code === 'AccessDeniedException' || err.code === 'UnauthorizedOperation') {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({
+            error: `SES access denied while loading template '${templateName}'`,
+            details: err.message,
+            code: err.code
+          })
+        };
+      }
+
       return {
         statusCode: 404,
         body: JSON.stringify({
