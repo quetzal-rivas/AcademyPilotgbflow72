@@ -174,7 +174,7 @@ export function MembershipDangerZone({ academyName, slug }: MembershipDangerZone
           <p className="text-xs text-muted-foreground">
             {mode === 'pause'
               ? 'Your account is paused. Contact support to resume at any time.'
-              : 'Your data has been archived in secure storage for 30 days. Redirecting...'}
+              : 'Your data has been archived in secure storage for 31 days. Redirecting...'}
           </p>
         </CardContent>
       </Card>
@@ -273,7 +273,7 @@ export function MembershipDangerZone({ academyName, slug }: MembershipDangerZone
           <CardDescription className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">
             {mode === 'pause'
               ? 'Your account will be locked. All data remains in Firebase and can be resumed.'
-              : 'This is permanent. All data will be archived for 30 days then permanently deleted.'}
+              : 'This is permanent. All data will be archived for 31 days then permanently deleted.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
@@ -287,7 +287,7 @@ export function MembershipDangerZone({ academyName, slug }: MembershipDangerZone
                 <li>• All voice call sessions</li>
               </ul>
               <p className="text-[9px] text-muted-foreground mt-2">
-                A secure backup is stored in S3 for 30 days. Academy slug <strong>{slug}</strong> will be permanently reserved.
+                A secure backup is stored in S3 for 31 days. Academy slug <strong>{slug}</strong> will be permanently reserved.
               </p>
             </div>
           )}
@@ -364,7 +364,7 @@ export function MembershipDangerZone({ academyName, slug }: MembershipDangerZone
           </CardTitle>
           <CardDescription className="text-[9px] uppercase font-bold tracking-widest text-muted-foreground">
             Permanently close your academy. All Firestore data and your Firebase account will be deleted.
-            A secure backup is kept for 30 days then auto-deleted. The academy slug <strong>{slug}</strong> will be reserved.
+            A secure backup is kept for 31 days then auto-deleted. The academy slug <strong>{slug}</strong> will be reserved.
           </CardDescription>
         </CardHeader>
         <CardFooter className="p-5 pt-0">

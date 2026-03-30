@@ -18,6 +18,7 @@ import { unstable_cache as cache } from 'next/cache';
 import { headers } from 'next/headers';
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
 import { createRequestId, logger, serializeError } from '@/lib/logger';
+import { completeCheckoutOnboarding } from '@/lib/checkout-onboarding';
 import axios from 'axios';
 
 const ORCHESTRATOR_URL = process.env.ORCHESTRATOR_URL || 'https://hmir4kw9lg.execute-api.us-east-2.amazonaws.com/Prod/orchestrate/';
@@ -112,194 +113,11 @@ export async function completeCheckoutOnboardingAction(input: CompleteCheckoutOn
   const requestId = createRequestId();
 
   try {
-    const email = normalizeCheckoutEmail(input.email || '');
-    const tenantSlug = normalizeTenantSlug(input.tenantSlug || '');
-    const fullName = (input.fullName || '').trim();
-    const phoneNumber = (input.phoneNumber || '').trim();
-
-    if (!email || !tenantSlug || !fullName) {
-      return { error: 'Missing required onboarding fields.', requestId };
-    }
-
-    const admin = getFirebaseAdmin();
-    const db = admin.firestore();
     const appBaseUrl = await resolveAppBaseUrl();
-
-    const slugConflict = await db
-      .collection('user_profiles')
-      .where('tenantSlug', '==', tenantSlug)
-      .limit(1)
-      .get();
-
-    const landingConflict = await db.collection('landing_pages').doc(tenantSlug).get();
-
-    if (!slugConflict.empty || landingConflict.exists) {
-      return {
-        error: `The academy slug '${tenantSlug}' is already in use.`,
-        requestId,
-      };
-    }
-
-    let existingUser = null;
-    try {
-      existingUser = await admin.auth().getUserByEmail(email);
-    } catch (error: any) {
-      if (error?.code !== 'auth/user-not-found') {
-        throw error;
-      }
-    }
-
-    if (existingUser) {
-      return {
-        error: 'An account with this email already exists. Please sign in instead.',
-        requestId,
-      };
-    }
-
-    const temporaryPassword = generateTemporaryPassword();
-    const createdUser = await admin.auth().createUser({
-      email,
-      password: temporaryPassword,
-      displayName: fullName,
-      emailVerified: false,
-      disabled: false,
-    });
-
-    const onboardingPath = `/${tenantSlug}/dashboard/settings?tab=account&onboarding=1`;
-    const onboardingUrl = `${appBaseUrl}${onboardingPath}`;
-
-    const actionCodeSettings = {
-      url: `${onboardingUrl}&email=${encodeURIComponent(email)}`,
-      handleCodeInApp: true,
-    };
-
-    const [magicLoginLink, verifyEmailLink] = await Promise.all([
-      admin.auth().generateSignInWithEmailLink(email, actionCodeSettings),
-      admin.auth().generateEmailVerificationLink(email, actionCodeSettings),
-    ]);
-
-    const now = admin.firestore.FieldValue.serverTimestamp();
-    const bootstrapBatch = db.batch();
-
-    const profileRef = db.collection('user_profiles').doc(createdUser.uid);
-    const landingRef = db.collection('landing_pages').doc(tenantSlug);
-    const tenantRef = db.collection('tenants').doc(tenantSlug);
-    const scheduleRef = db.collection('tenants').doc(tenantSlug).collection('settings').doc('schedule');
-
-    bootstrapBatch.set(
-      profileRef,
-      {
-        id: createdUser.uid,
-        uid: createdUser.uid,
-        email,
-        name: fullName,
-        role: 'academy_owner',
-        tenantSlug,
-        phoneNumber,
-        onboardingCompleted: false,
-        securitySetupRequired: true,
-        hasPassword: true,
-        googleConnected: false,
-        emailVerified: false,
-        schemaVersion: 1,
-        bootstrapCompletedAt: now,
-        createdAt: now,
-        updatedAt: now,
-      },
-      { merge: true }
-    );
-
-    bootstrapBatch.set(
-      landingRef,
-      {
-        slug: tenantSlug,
-        userId: createdUser.uid,
-        ownerUid: createdUser.uid,
-        branchName: fullName,
-        headline: `Welcome to ${fullName}`,
-        isPublic: false,
-        isPublished: false,
-        contactPhone: phoneNumber || null,
-        schemaVersion: 1,
-        createdAt: now,
-        updatedAt: now,
-      },
-      { merge: true }
-    );
-
-    bootstrapBatch.set(
-      tenantRef,
-      {
-        slug: tenantSlug,
-        ownerUid: createdUser.uid,
-        status: 'active',
-        schemaVersion: 1,
-        createdAt: now,
-        updatedAt: now,
-      },
-      { merge: true }
-    );
-
-    bootstrapBatch.set(
-      scheduleRef,
-      {
-        ...getDefaultWeeklySchedule(),
-        schemaVersion: 1,
-        createdAt: now,
-        updatedAt: now,
-      },
-      { merge: true }
-    );
-
-    await bootstrapBatch.commit();
-
-    let emailWarning: string | null = null;
-    try {
-      await dispatchOrchestratorAction(
-        'SEND_EMAIL',
-        {
-          userEmail: email,
-          templateType: 'account-created',
-          userData: {
-            user_name: fullName,
-            company_name: tenantSlug,
-            login_url: magicLoginLink,
-            // Backward-compatible aliases for future template updates.
-            name: fullName,
-            loginUrl: magicLoginLink,
-            magic_link: magicLoginLink,
-            verifyEmailUrl: verifyEmailLink,
-            verify_email_url: verifyEmailLink,
-            welcomeMessage: `Gracias por crear tu cuenta en graciebarra.ai para ${input.planTitle || 'tu nueva academia'}.`,
-            welcome_message: 'Confirma tu email para activar todos los accesos de dashboard.',
-            academySlug: tenantSlug,
-            location: tenantSlug,
-          },
-          redirectUrl: onboardingPath,
-        },
-        requestId
-      );
-    } catch (error: any) {
-      emailWarning = error?.message || 'Unable to send account email at this time.';
-      logger.error('Account-created template dispatch failed', {
-        requestId,
-        scope: 'server-action.completeCheckoutOnboardingAction',
-        email,
-        tenantSlug,
-        error: serializeError(error),
-      });
-    }
-
-    return {
-      success: true,
+    return completeCheckoutOnboarding(input, {
+      appBaseUrl,
       requestId,
-      uid: createdUser.uid,
-      email,
-      temporaryPassword,
-      redirectPath: onboardingPath,
-      verifyEmailLink,
-      emailWarning,
-    };
+    });
   } catch (error: any) {
     logger.error('Checkout onboarding failed', {
       requestId,
@@ -321,14 +139,19 @@ export async function completeCheckoutOnboardingAction(input: CompleteCheckoutOn
 /**
  * High-authority directive to initiate a tactical magic link login via AWS SES.
  */
-export async function initiateTacticalLoginAction(email: string) {
+export async function initiateTacticalLoginAction(email: string, mode: 'admin' | 'student' = 'admin') {
   const requestId = createRequestId();
 
   try {
     const admin = getFirebaseAdmin();
     const appBaseUrl = await resolveAppBaseUrl();
     const tenantSlug = await resolveTenantSlugForEmail(email);
-    const continuePath = tenantSlug ? `/${tenantSlug}/dashboard` : '/dashboard';
+    const continueBasePath = tenantSlug
+      ? `/${tenantSlug}/dashboard`
+      : mode === 'admin'
+        ? '/checkout?mode=admin&step=1'
+        : '/dashboard';
+    const continuePath = `${continueBasePath}${continueBasePath.includes('?') ? '&' : '?'}authMode=${mode}`;
     
     // 1. Generate the secure tactical link
     const actionCodeSettings = {

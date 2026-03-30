@@ -28,6 +28,9 @@ import { Shield, Zap, Mail, Loader2, UserPlus, Lock, Chrome } from 'lucide-react
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { useAuth, signInWithEmailPasswordAsync, signInWithGoogle } from '@/firebase';
+import { useRouter, useParams } from 'next/navigation';
+import { useFirestore } from '@/firebase';
+import { resolvePostAuthDestination } from '@/lib/post-auth-routing';
 import {
   magicLinkSchema,
   passwordLoginSchema,
@@ -44,6 +47,10 @@ interface AuthModalProps {
 
 export function AuthModal({ mode, trigger }: AuthModalProps) {
   const auth = useAuth();
+  const db = useFirestore();
+  const router = useRouter();
+  const params = useParams<{ slug?: string }>();
+  const preferredTenantSlug = typeof params?.slug === 'string' ? params.slug : null;
   const [authMethod, setAuthMethod] = useState<AuthMethod>('magic-link');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -87,7 +94,7 @@ export function AuthModal({ mode, trigger }: AuthModalProps) {
     setIsLoading(true);
 
     try {
-      const result = await initiateTacticalLoginAction(data.email);
+      const result = await initiateTacticalLoginAction(data.email, mode);
       if (result.error) {
         throw new Error(result.error);
       }
@@ -114,7 +121,11 @@ export function AuthModal({ mode, trigger }: AuthModalProps) {
 
     try {
       await signInWithEmailPasswordAsync(auth, data.email, data.password);
+      const { destination } = await resolvePostAuthDestination(db, auth.currentUser!, preferredTenantSlug, mode);
       toast({ title: 'ACCESS GRANTED', description: 'Authentication successful.' });
+      if (mode === 'admin') {
+        router.push(destination);
+      }
     } catch (error: any) {
       const code = error?.code as string | undefined;
       const friendlyMessage =
@@ -137,6 +148,10 @@ export function AuthModal({ mode, trigger }: AuthModalProps) {
 
     try {
       await signInWithGoogle(auth);
+      if (mode === 'admin' && auth.currentUser) {
+        const { destination } = await resolvePostAuthDestination(db, auth.currentUser, preferredTenantSlug, mode);
+        router.push(destination);
+      }
       toast({ title: 'ACCESS GRANTED', description: 'Google authentication successful.' });
     } catch (error: any) {
       showErrorToast(toast, 'GOOGLE AUTH FAILED', error, 'Could not sign in with Google. Try another method.');
@@ -174,33 +189,37 @@ export function AuthModal({ mode, trigger }: AuthModalProps) {
         </DialogHeader>
 
         <div className="p-8 space-y-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleGoogleLogin}
-            disabled={isGoogleLoading || isLoading}
-            className="w-full rounded-none border-2 border-border h-12 font-black uppercase tracking-widest text-[10px] hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-3"
-          >
-            {isGoogleLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                <Chrome className="h-4 w-4" />
-                Continuar con Google
-              </>
-            )}
-          </Button>
+          {mode === 'admin' && (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGoogleLogin}
+                disabled={isGoogleLoading || isLoading}
+                className="w-full rounded-none border-2 border-border h-12 font-black uppercase tracking-widest text-[10px] hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-3"
+              >
+                {isGoogleLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <Chrome className="h-4 w-4" />
+                    Continuar con Google
+                  </>
+                )}
+              </Button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="bg-border" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-background px-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">
-                O inicia sesión con
-              </span>
-            </div>
-          </div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator className="bg-border" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-background px-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                    O inicia sesión con
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="flex border-b-2 border-border">
             <button type="button" className={tabClass('magic-link')} onClick={() => handleTabChange('magic-link')}>

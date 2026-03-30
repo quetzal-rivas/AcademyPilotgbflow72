@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { CreditCard, Calendar, User, ShieldCheck, Mail, Phone } from "lucide-react";
+import { useMemo } from "react";
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 10 }, (_, i) => (currentYear + i).toString().slice(-2));
@@ -49,16 +50,27 @@ const optionalNormalizedEmailField = z
     message: "Invalid tactical email",
   });
 
-const paymentMethodSchema = z.object({
-  cardholderName: z.string().trim().min(2, { message: "Required (Min 2 chars)" }),
-  email: optionalNormalizedEmailField,
-  phoneNumber: normalizedPhoneField,
-  cardNumber: z.string().min(13).max(19).regex(/^\d+$/),
-  expiryMonth: z.string().min(1),
-  expiryYear: z.string().min(1),
-  cvv: z.string().min(3).max(4).regex(/^\d+$/),
-  cardType: z.enum(["visa", "mastercard", "amex", "discover", "other"]).optional(),
-});
+function buildPaymentMethodSchema(
+  requireCardDetails: boolean,
+  requireEmail: boolean
+) {
+  return z.object({
+    cardholderName: z.string().trim().min(2, { message: "Required (Min 2 chars)" }),
+    email: requireEmail ? normalizedEmailField : optionalNormalizedEmailField,
+    phoneNumber: normalizedPhoneField,
+    cardNumber: requireCardDetails
+      ? z.string().min(13).max(19).regex(/^\d+$/)
+      : z.string().optional(),
+    expiryMonth: requireCardDetails ? z.string().min(1) : z.string().optional(),
+    expiryYear: requireCardDetails ? z.string().min(1) : z.string().optional(),
+    cvv: requireCardDetails
+      ? z.string().min(3).max(4).regex(/^\d+$/)
+      : z.string().optional(),
+    cardType: z.enum(["visa", "mastercard", "amex", "discover", "other"]).optional(),
+  });
+}
+
+const paymentMethodSchema = buildPaymentMethodSchema(true, false);
 
 export type PaymentMethodFormData = z.infer<typeof paymentMethodSchema>;
 
@@ -68,11 +80,26 @@ interface PaymentMethodFormProps {
   initialData?: any;
   isEditing?: boolean;
   hideEmail?: boolean;
+  collectCardDetails?: boolean;
+  submitLabel?: string;
 }
 
-export function PaymentMethodForm({ onSubmit, onCancel, initialData, isEditing = false, hideEmail = false }: PaymentMethodFormProps) {
+export function PaymentMethodForm({
+  onSubmit,
+  onCancel,
+  initialData,
+  isEditing = false,
+  hideEmail = false,
+  collectCardDetails = true,
+  submitLabel,
+}: PaymentMethodFormProps) {
+  const schema = useMemo(
+    () => buildPaymentMethodSchema(collectCardDetails, !hideEmail),
+    [collectCardDetails, hideEmail]
+  );
+
   const form = useForm<PaymentMethodFormData>({
-    resolver: zodResolver(paymentMethodSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       cardholderName: initialData?.cardholderName || "",
       email: initialData?.email || "",
@@ -140,77 +167,81 @@ export function PaymentMethodForm({ onSubmit, onCancel, initialData, isEditing =
           </div>
         </div>
 
-        <Separator className="bg-border h-0.5" />
+        {collectCardDetails && (
+          <>
+            <Separator className="bg-border h-0.5" />
 
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="cardNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                  <CreditCard className="h-3 w-3" /> Primary Card Number
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="XXXX XXXX XXXX XXXX" {...field} className="rounded-none border-2 font-mono h-10 text-xs focus-visible:ring-primary" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid grid-cols-3 gap-4">
-            <FormField
-              control={form.control}
-              name="expiryMonth"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">EXP Month</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="cardNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                      <CreditCard className="h-3 w-3" /> Primary Card Number
+                    </FormLabel>
                     <FormControl>
-                      <SelectTrigger className="rounded-none border-2 h-10 text-xs"><SelectValue placeholder="MM" /></SelectTrigger>
+                      <Input placeholder="XXXX XXXX XXXX XXXX" {...field} className="rounded-none border-2 font-mono h-10 text-xs focus-visible:ring-primary" />
                     </FormControl>
-                    <SelectContent className="rounded-none border-2 border-border">
-                      {months.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="expiryYear"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">EXP Year</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="rounded-none border-2 h-10 text-xs"><SelectValue placeholder="YY" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="rounded-none border-2 border-border">
-                      {years.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="cvv"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest">CVV</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="***" {...field} className="rounded-none border-2 font-mono h-10 text-xs focus-visible:ring-primary" />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="expiryMonth"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[10px] font-black uppercase tracking-widest">EXP Month</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="rounded-none border-2 h-10 text-xs"><SelectValue placeholder="MM" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="rounded-none border-2 border-border">
+                          {months.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="expiryYear"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[10px] font-black uppercase tracking-widest">EXP Year</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="rounded-none border-2 h-10 text-xs"><SelectValue placeholder="YY" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="rounded-none border-2 border-border">
+                          {years.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="cvv"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[10px] font-black uppercase tracking-widest">CVV</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="***" {...field} className="rounded-none border-2 font-mono h-10 text-xs focus-visible:ring-primary" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button type="button" variant="outline" onClick={onCancel} className="rounded-none font-black uppercase italic tracking-widest border-2 text-[10px] h-12 flex-1">Abort</Button>
-          <Button type="submit" className="rounded-none font-black uppercase italic tracking-widest bg-primary hover:bg-primary/90 text-white text-[10px] h-12 flex-[2] shadow-lg">Secure Link</Button>
+          <Button type="submit" className="rounded-none font-black uppercase italic tracking-widest bg-primary hover:bg-primary/90 text-white text-[10px] h-12 flex-[2] shadow-lg">{submitLabel || 'Secure Link'}</Button>
         </div>
       </form>
     </Form>

@@ -7,18 +7,17 @@ import { useState, useEffect, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PaymentMethodForm } from "@/components/leads/payment-method-form";
+import { StripeEmbeddedCheckout } from "@/components/checkout/stripe-embedded-checkout";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldCheck, Zap, CreditCard, ArrowLeft, CheckCircle2, X, ChevronDown, Mail } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { completeCheckoutOnboardingAction, getAcademyPhotos } from "@/app/actions";
+import { getAcademyPhotos } from "@/app/actions";
 import { BackgroundPhotoRotation } from "@/components/landing/background-photo-rotation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import type { PaymentMethodFormData } from "@/components/leads/payment-method-form";
 
 function CheckoutContent() {
@@ -38,12 +37,18 @@ function CheckoutContent() {
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [agreementScrollRef, setAgreementScrollRef] = useState<HTMLDivElement | null>(null);
   const [postCheckoutRedirectPath, setPostCheckoutRedirectPath] = useState<string | null>(null);
-  const auth = useAuth();
+  const [checkoutStatusHandled, setCheckoutStatusHandled] = useState(false);
+  const [membershipFullName, setMembershipFullName] = useState("");
+  const [membershipPhoneNumber, setMembershipPhoneNumber] = useState("");
+  const [embeddedClientSecret, setEmbeddedClientSecret] = useState<string | null>(null);
+  const [isInitializingEmbedded, setIsInitializingEmbedded] = useState(false);
 
   const planTitle = searchParams.get("plan") || "Strategic Plan";
   const planDetails = searchParams.get("details") || "Mission initialization details pending.";
   const itemType = searchParams.get("itemType") || "membership";
   const assetId = searchParams.get("assetId");
+  const checkoutStatus = searchParams.get("checkoutStatus");
+  const sessionId = searchParams.get("session_id");
   const basePrice = searchParams.get("price") || "150";
   const displayPrice = isCouponApplied ? "0" : basePrice;
   const routeSlug = typeof params?.slug === 'string' ? params.slug : '';
@@ -61,6 +66,94 @@ function CheckoutContent() {
     }
     loadPhotos();
   }, []);
+
+  useEffect(() => {
+    if (itemType !== 'membership' || checkoutStatusHandled) {
+      return;
+    }
+
+    if (checkoutStatus === 'cancelled') {
+      setCheckoutStatusHandled(true);
+      toast({
+        variant: 'destructive',
+        title: 'CHECKOUT CANCELLED',
+        description: 'Payment was cancelled. You can retry when ready.',
+      });
+      return;
+    }
+
+    if (checkoutStatus !== 'processing' || !sessionId) {
+      return;
+    }
+
+    setCheckoutStatusHandled(true);
+    setIsProcessing(true);
+
+    let stopped = false;
+    let attempts = 0;
+    const maxAttempts = 30;
+
+    const pollStatus = async () => {
+      if (stopped) {
+        return;
+      }
+
+      attempts += 1;
+
+      try {
+        const response = await fetch(`/api/stripe/checkout-status?session_id=${encodeURIComponent(sessionId)}`);
+        const result = await response.json();
+
+        if (result?.status === 'provisioned') {
+          setPostCheckoutRedirectPath(result?.redirectPath || null);
+          setCountdown(3);
+          setIsSuccess(true);
+          setIsProcessing(false);
+          return;
+        }
+
+        if (result?.status === 'failed') {
+          setIsProcessing(false);
+          toast({
+            variant: 'destructive',
+            title: 'PROVISIONING FAILED',
+            description: result?.error || 'Payment succeeded but account provisioning failed.',
+          });
+          return;
+        }
+
+        if (attempts >= maxAttempts) {
+          setIsProcessing(false);
+          toast({
+            variant: 'destructive',
+            title: 'PROVISIONING DELAYED',
+            description: 'We are still confirming your payment. Please refresh this page shortly.',
+          });
+          return;
+        }
+
+        setTimeout(pollStatus, 2500);
+      } catch (error) {
+        if (attempts >= maxAttempts) {
+          setIsProcessing(false);
+          toast({
+            variant: 'destructive',
+            title: 'CHECKOUT STATUS ERROR',
+            description: 'Could not confirm payment status. Please refresh and try again.',
+          });
+          return;
+        }
+
+        setTimeout(pollStatus, 2500);
+      }
+    };
+
+    pollStatus();
+
+    return () => {
+      stopped = true;
+    };
+  }, [itemType, checkoutStatus, sessionId, checkoutStatusHandled, toast]);
 
   // Tactical Redirection Countdown logic
   useEffect(() => {
@@ -86,6 +179,15 @@ function CheckoutContent() {
     : PlaceHolderImages.find(img => img.id === 'hero-bjj');
 
   const handleRedeem = () => {
+    if (itemType === 'membership') {
+      toast({
+        variant: 'destructive',
+        title: 'COUPON DISABLED',
+        description: 'Membership checkout is handled directly by Stripe sandbox.',
+      });
+      return;
+    }
+
     if (coupon === "BYPASS-123") {
       setIsCouponApplied(true);
       toast({
@@ -115,9 +217,9 @@ function CheckoutContent() {
     }
   };
 
-  const handlePaymentSubmit = async (data: PaymentMethodFormData) => {
+  const handleMembershipEmbeddedStart = async () => {
     // Require agreement acceptance for academy owner accounts
-    if (itemType === 'membership' && !isAgreementAccepted) {
+    if (!isAgreementAccepted) {
       setIsAgreementOpen(true);
       toast({
         variant: "destructive",
@@ -127,7 +229,7 @@ function CheckoutContent() {
       return;
     }
 
-    if (itemType === 'membership' && !tenantEmail.trim()) {
+    if (!tenantEmail.trim()) {
       toast({
         variant: "destructive",
         title: "EMAIL REQUIRED",
@@ -136,7 +238,7 @@ function CheckoutContent() {
       return;
     }
 
-    if (itemType === 'membership' && !academySlug.trim()) {
+    if (!academySlug.trim()) {
       toast({
         variant: "destructive",
         title: "ACADEMY SLUG REQUIRED",
@@ -145,50 +247,69 @@ function CheckoutContent() {
       return;
     }
 
+    if (!membershipFullName.trim()) {
+      toast({
+        variant: "destructive",
+        title: "FULL NAME REQUIRED",
+        description: "Enter your legal full name before opening Stripe checkout.",
+      });
+      return;
+    }
+
+    if (!membershipPhoneNumber.trim()) {
+      toast({
+        variant: "destructive",
+        title: "PHONE REQUIRED",
+        description: "Enter your phone number before opening Stripe checkout.",
+      });
+      return;
+    }
+
+    setIsInitializingEmbedded(true);
+
+    try {
+      const normalizedEmail = tenantEmail.trim().toLowerCase();
+      const response = await fetch('/api/stripe/checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          fullName: membershipFullName.trim(),
+          phoneNumber: membershipPhoneNumber.trim(),
+          tenantSlug: academySlug,
+          planTitle,
+          uiMode: 'embedded',
+        }),
+      });
+      const result = await response.json();
+
+      if (!response.ok || result?.error || !result?.clientSecret) {
+        throw new Error(result?.error || 'Could not initialize embedded Stripe checkout.');
+      }
+
+      setEmbeddedClientSecret(result.clientSecret);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "CHECKOUT FAILED",
+        description: error?.message || "Could not initialize academy checkout.",
+      });
+    } finally {
+      setIsInitializingEmbedded(false);
+    }
+  };
+
+  const handlePaymentSubmit = async (data: PaymentMethodFormData) => {
     setIsProcessing(true);
 
     try {
-      if (itemType === 'membership') {
-        const normalizedEmail = (itemType === 'membership' ? tenantEmail : data.email ?? '').trim().toLowerCase();
-        const result = await completeCheckoutOnboardingAction({
-          email: normalizedEmail,
-          fullName: data.cardholderName,
-          phoneNumber: data.phoneNumber,
-          tenantSlug: academySlug,
-          planTitle,
-        });
-
-        if (result?.error) {
-          throw new Error(result.error);
-        }
-
-        if (result?.temporaryPassword && auth) {
-          try {
-            await signInWithEmailAndPassword(auth, normalizedEmail, result.temporaryPassword);
-          } catch (error) {
-            // Non-blocking: user still gets magic link + verify link in email.
-            console.warn('Auto sign-in after checkout failed', error);
-          }
-        }
-
-        if (result?.redirectPath) {
-          setPostCheckoutRedirectPath(result.redirectPath);
-        }
-
-        toast({
-          title: "ENROLLMENT SECURED",
-          description: result?.emailWarning
-            ? "Academy created. We could not dispatch the template email automatically."
-            : "Academy created. Check your inbox to confirm your email.",
-        });
-      } else {
-        // Fallback for non-membership checkout paths.
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-        toast({
-          title: "ENROLLMENT SECURED",
-          description: `OSS! Tactical link established for ${planTitle.toUpperCase()}. Welcome to the team.`,
-        });
-      }
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      toast({
+        title: "ENROLLMENT SECURED",
+        description: `OSS! Tactical link established for ${planTitle.toUpperCase()}. Welcome to the team.`,
+      });
 
       setIsSuccess(true);
     } catch (error: any) {
@@ -411,7 +532,7 @@ function CheckoutContent() {
                 </p>
               </div>
             </div>
-          ) : isProcessing ? (
+          ) : isProcessing || isInitializingEmbedded ? (
             <div className="flex flex-col items-center justify-center text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
               <div className="relative">
                 <div className="h-24 w-24 md:h-32 md:w-32 border-8 border-primary/20 border-t-primary rounded-none rotate-45 animate-spin" />
@@ -477,14 +598,65 @@ function CheckoutContent() {
                     </div>
                   </div>
                 )}
-                
-                <div className="bg-background border-2 border-border p-6 md:p-8 shadow-xl">
-                  <PaymentMethodForm 
-                    onSubmit={handlePaymentSubmit} 
-                    onCancel={() => router.push(itemType === 'uniform' ? '/store' : '/')}
-                    hideEmail={itemType === 'membership'}
-                  />
-                </div>
+
+                {itemType === 'membership' ? (
+                  <div className="bg-background border-2 border-border p-6 md:p-8 shadow-xl space-y-4">
+                    {!embeddedClientSecret ? (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="membership-name" className="text-[10px] font-black uppercase tracking-widest">
+                            Legal Full Name
+                          </Label>
+                          <Input
+                            id="membership-name"
+                            placeholder="JANE DOE"
+                            value={membershipFullName}
+                            onChange={(e) => setMembershipFullName(e.target.value)}
+                            className="rounded-none border-2 font-bold uppercase h-10 text-xs focus-visible:ring-primary"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="membership-phone" className="text-[10px] font-black uppercase tracking-widest">
+                            Phone (E.164)
+                          </Label>
+                          <Input
+                            id="membership-phone"
+                            placeholder="+14155552671"
+                            value={membershipPhoneNumber}
+                            onChange={(e) => setMembershipPhoneNumber(e.target.value)}
+                            className="rounded-none border-2 font-bold h-10 text-xs focus-visible:ring-primary"
+                          />
+                        </div>
+
+                        <Button
+                          type="button"
+                          onClick={handleMembershipEmbeddedStart}
+                          className="w-full rounded-none font-black uppercase italic tracking-widest bg-primary hover:bg-primary/90 text-white text-[10px] h-12 shadow-lg"
+                        >
+                          Launch Embedded Stripe Gateway
+                        </Button>
+                      </>
+                    ) : (
+                      <div className="space-y-3">
+                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                          Stripe Gateway Embedded: Complete your recurring membership payment below.
+                        </p>
+                        <StripeEmbeddedCheckout clientSecret={embeddedClientSecret} />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-background border-2 border-border p-6 md:p-8 shadow-xl">
+                    <PaymentMethodForm
+                      onSubmit={handlePaymentSubmit}
+                      onCancel={() => router.push('/store')}
+                      hideEmail={false}
+                      collectCardDetails={true}
+                      submitLabel={'Secure Link'}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="text-center">

@@ -8,7 +8,7 @@
  * Modes:
  *   pause  → sets tenants/{slug}.status = 'paused' in Firestore
  *   cancel → exports full snapshot to S3 trash bucket; deletes ALL Firestore docs + Firebase Auth user;
- *            writes deleted_tenants/{slug} tombstone (30-day S3 lifecycle expires objects automatically)
+ *            writes deleted_tenants/{slug} tombstone (31-day S3 lifecycle expires objects automatically)
  *
  * ENV required: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY,
  *               AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
@@ -331,7 +331,7 @@ async function main() {
 
   if (mode === 'cancel') {
     console.log('\n⚠  CANCEL mode: This will PERMANENTLY delete all Firestore data and Firebase Auth for this tenant.');
-    console.log('   Data will be backed up to S3 for 30 days before automatic expiry.');
+    console.log('   Data will be backed up to S3 for 31 days before automatic expiry.');
     // In CLI context we proceed; in production this is gated by 2-step OTP verification
   }
 
@@ -365,7 +365,7 @@ async function main() {
     // Phase 4: Delete all Firestore docs + Auth user
     await deleteAllTenantDocs(db, auth, slug, data);
 
-    console.log(`\n✅ CANCELLED — All data deleted. Snapshot at s3://${s3Path} (expires 30 days from ${deletedAt})`);
+    console.log(`\n✅ CANCELLED — All data deleted. Snapshot at s3://${s3Path} (expires 31 days from ${deletedAt})`);
   }
 
   process.exit(0);

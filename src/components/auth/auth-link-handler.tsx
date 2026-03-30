@@ -4,7 +4,8 @@ import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, useFirestore, completeMagicLinkSignIn } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { doc, getDoc } from 'firebase/firestore';
+import { isSignInWithEmailLink } from 'firebase/auth';
+import { resolvePostAuthDestination } from '@/lib/post-auth-routing';
 
 /**
  * Silent component that monitors the URL for tactical authentication handshakes.
@@ -18,6 +19,7 @@ export function AuthLinkHandler() {
 
   useEffect(() => {
     if (!auth || isProcessing.current) return;
+    if (!isSignInWithEmailLink(auth, window.location.href)) return;
 
     const handleHandshake = async () => {
       try {
@@ -25,25 +27,16 @@ export function AuthLinkHandler() {
         await completeMagicLinkSignIn(auth);
         
         if (auth.currentUser) {
-          let tenantSlug: string | null = null;
-          try {
-            const profileRef = doc(db, 'user_profiles', auth.currentUser.uid);
-            const profileSnap = await getDoc(profileRef);
-            tenantSlug = (profileSnap.data()?.tenantSlug as string | undefined) || null;
-          } catch {
-            tenantSlug = null;
-          }
+          const url = new URL(window.location.href);
+          const authMode = url.searchParams.get('authMode') === 'student' ? 'student' : 'admin';
+          const { destination } = await resolvePostAuthDestination(db, auth.currentUser, null, authMode);
 
           toast({
             title: "HANDSHAKE COMPLETE",
             description: "Tactical link established. Welcome back, operator.",
           });
 
-          if (tenantSlug) {
-            router.push(`/${tenantSlug}/dashboard`);
-          } else {
-            router.push('/dashboard');
-          }
+          router.push(destination);
         }
       } catch (error: any) {
         toast({

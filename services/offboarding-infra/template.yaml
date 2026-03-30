@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Offboarding Infrastructure
+
+  Provisions the shared tenant archive bucket used by cancel/offboarding flows.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: 'prod'
+    Description: Environment label for metadata/tagging.
+
+  TenantTrashBucketName:
+    Type: String
+    Default: 'academypilot-tenant-trash'
+    Description: Shared S3 bucket for tenant cancellation archives.
+
+Resources:
+  TenantTrashBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Ref TenantTrashBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireTenantArchivesAfter31Days
+            Status: Enabled
+            ExpirationInDays: 31
+      VersioningConfiguration:
+        Status: Suspended
+      Tags:
+        - Key: app
+          Value: academypilot
+        - Key: environment
+          Value: !Ref EnvironmentName
+        - Key: purpose
+          Value: tenant-offboarding-archive
+
+  TenantTrashBucketTlsPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref TenantTrashBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !GetAtt TenantTrashBucket.Arn
+              - !Sub '${TenantTrashBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+Outputs:
+  TenantTrashBucketName:
+    Description: Shared S3 bucket for tenant cancellation snapshots.
+    Value: !Ref TenantTrashBucket
+
+  TenantTrashBucketArn:
+    Description: ARN of shared offboarding archive bucket.
+    Value: !GetAtt TenantTrashBucket.Arn

@@ -45,6 +45,10 @@ firebase-debug.log
 firestore-debug.log
 debug.log
 
+# local MCP config
+.vscode/mcp.json
+.idx/mcp.json
+
 # Ignore directories cloned for reference
 Elevenlabscomponent/
 Qrcodecheckinmanager/

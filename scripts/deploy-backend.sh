@@ -17,6 +17,15 @@ fi
 
 echo "Deploying to region: $AWS_REGION"
 
+# 0. Deploy Offboarding Infrastructure (shared tenant archive bucket)
+echo "\n--- [0/8] Deploying Offboarding Infrastructure (Tenant Archive Bucket) ---"
+cd services/offboarding-infra
+sam deploy --region $AWS_REGION --no-confirm-changeset --no-fail-on-empty-changeset --stack-name gracie-offboarding-infra --resolve-s3
+
+TENANT_TRASH_BUCKET_NAME=$(aws cloudformation describe-stacks --region $AWS_REGION --stack-name gracie-offboarding-infra --query "Stacks[0].Outputs[?OutputKey=='TenantTrashBucketName'].OutputValue" --output text)
+echo "✅ Tenant Archive Bucket Provisioned: $TENANT_TRASH_BUCKET_NAME"
+cd ../..
+
 # 1. Deploy the Onboarding Service (Creates the S3 Bucket first, without Lambda notification initially)
 echo "\n--- [1/8] Deploying Onboarding Service (S3 Infrastructure) ---"
 cd services/onboarding
