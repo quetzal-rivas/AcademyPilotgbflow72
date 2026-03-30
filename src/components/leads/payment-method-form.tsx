@@ -40,9 +40,18 @@ const normalizedPhoneField = z
   .transform((value) => value.replace(/[^\d+]/g, ''))
   .refine((value) => /^\+?[1-9]\d{8,14}$/.test(value), { message: 'Use E.164 format (+14155552671)' });
 
+const optionalNormalizedEmailField = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .optional()
+  .refine((value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value), {
+    message: "Invalid tactical email",
+  });
+
 const paymentMethodSchema = z.object({
   cardholderName: z.string().trim().min(2, { message: "Required (Min 2 chars)" }),
-  email: normalizedEmailField,
+  email: optionalNormalizedEmailField,
   phoneNumber: normalizedPhoneField,
   cardNumber: z.string().min(13).max(19).regex(/^\d+$/),
   expiryMonth: z.string().min(1),
@@ -58,9 +67,10 @@ interface PaymentMethodFormProps {
   onCancel: () => void;
   initialData?: any;
   isEditing?: boolean;
+  hideEmail?: boolean;
 }
 
-export function PaymentMethodForm({ onSubmit, onCancel, initialData, isEditing = false }: PaymentMethodFormProps) {
+export function PaymentMethodForm({ onSubmit, onCancel, initialData, isEditing = false, hideEmail = false }: PaymentMethodFormProps) {
   const form = useForm<PaymentMethodFormData>({
     resolver: zodResolver(paymentMethodSchema),
     defaultValues: {
@@ -94,22 +104,24 @@ export function PaymentMethodForm({ onSubmit, onCancel, initialData, isEditing =
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                    <Mail className="h-3 w-3" /> Tactical Email
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="UNIT@EXAMPLE.COM" {...field} className="rounded-none border-2 font-bold h-10 text-xs focus-visible:ring-primary" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <div className={`grid grid-cols-1 ${hideEmail ? '' : 'sm:grid-cols-2'} gap-4`}>
+            {!hideEmail && (
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                      <Mail className="h-3 w-3" /> Tactical Email
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="UNIT@EXAMPLE.COM" {...field} className="rounded-none border-2 font-bold h-10 text-xs focus-visible:ring-primary" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="phoneNumber"

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PaymentMethodForm } from "@/components/leads/payment-method-form";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ShieldCheck, Zap, CreditCard, ArrowLeft, CheckCircle2, X, ChevronDown } from "lucide-react";
+import { Loader2, ShieldCheck, Zap, CreditCard, ArrowLeft, CheckCircle2, X, ChevronDown, Mail } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { completeCheckoutOnboardingAction, getAcademyPhotos } from "@/app/actions";
 import { BackgroundPhotoRotation } from "@/components/landing/background-photo-rotation";
@@ -31,6 +31,7 @@ function CheckoutContent() {
   const [countdown, setCountdown] = useState(3);
   const [photos, setPhotos] = useState<string[]>([]);
   const [coupon, setCoupon] = useState("");
+  const [tenantEmail, setTenantEmail] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
   const [isAgreementAccepted, setIsAgreementAccepted] = useState(false);
@@ -126,6 +127,15 @@ function CheckoutContent() {
       return;
     }
 
+    if (itemType === 'membership' && !tenantEmail.trim()) {
+      toast({
+        variant: "destructive",
+        title: "EMAIL REQUIRED",
+        description: "Enter your academy email on the left side.",
+      });
+      return;
+    }
+
     if (itemType === 'membership' && !academySlug.trim()) {
       toast({
         variant: "destructive",
@@ -139,7 +149,7 @@ function CheckoutContent() {
 
     try {
       if (itemType === 'membership') {
-        const normalizedEmail = data.email.trim().toLowerCase();
+        const normalizedEmail = (itemType === 'membership' ? tenantEmail : data.email ?? '').trim().toLowerCase();
         const result = await completeCheckoutOnboardingAction({
           email: normalizedEmail,
           fullName: data.cardholderName,
@@ -285,6 +295,46 @@ function CheckoutContent() {
                     </p>
                   )}
                 </div>
+
+                {/* Email + Slug fields for membership */}
+                {itemType === 'membership' && (
+                  <div className="mt-4 max-w-xs space-y-4">
+                    <div className="space-y-2 bg-white/10 p-4 border-2 border-white/20 backdrop-blur-sm">
+                      <Label htmlFor="tenant-email" className="text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 text-white">
+                        <Mail className="h-3 w-3 text-primary" /> Academy Email <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="tenant-email"
+                        type="email"
+                        required
+                        placeholder="YOUR@ACADEMY.COM"
+                        value={tenantEmail}
+                        onChange={(e) => setTenantEmail(e.target.value)}
+                        className="rounded-none border-2 border-white/30 h-10 font-bold text-xs bg-black/20 text-white focus-visible:ring-primary placeholder:text-white/30"
+                      />
+                      <p className="text-[8px] font-bold uppercase tracking-tighter text-white/60 italic">
+                        We&apos;ll send your account credentials here.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 bg-white/10 p-4 border-2 border-white/20 backdrop-blur-sm">
+                      <Label htmlFor="left-academy-slug" className="text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 text-white">
+                        <Zap className="h-3 w-3 fill-current text-primary" /> Academy Slug <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="left-academy-slug"
+                        placeholder="E.G., WESTCOVINA"
+                        value={academySlug}
+                        onChange={(e) => setAcademySlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                        required
+                        className="rounded-none border-2 border-white/30 h-10 font-black uppercase italic text-xs bg-black/20 text-white focus-visible:ring-primary placeholder:text-white/30"
+                      />
+                      <p className="text-[8px] font-bold uppercase tracking-tighter text-white/60 italic">
+                        Dashboard URL: /{academySlug || 'your-slug'}/dashboard
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {itemType === 'uniform' && tacticalAsset && (
@@ -387,29 +437,6 @@ function CheckoutContent() {
               </div>
               
               <div className="space-y-6">
-                {/* Academy Slug Input */}
-                {itemType === 'membership' && (
-                  <div className="bg-background border-2 border-border p-6 md:p-8 shadow-xl">
-                    <div className="space-y-3">
-                      <Label htmlFor="slug" className="text-sm font-black uppercase tracking-widest text-foreground flex items-center gap-2">
-                        <span>Academy Slug / Domain</span>
-                        <span className="text-xs text-primary">*</span>
-                      </Label>
-                      <Input
-                        id="slug"
-                        placeholder="e.g., westcovina, downtown, etc."
-                        value={academySlug}
-                        onChange={(e) => setAcademySlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                        required
-                        className="rounded-none border-2 border-border h-12 font-black uppercase italic text-sm bg-black/5 focus-visible:ring-primary"
-                      />
-                      <p className="text-[8px] font-bold uppercase tracking-tighter text-muted-foreground italic">
-                        This will be your dashboard URL: /{academySlug || 'your-slug'}/dashboard
-                      </p>
-                    </div>
-                  </div>
-                )}
-                
                 {/* Agreement Acceptance */}
                 {itemType === 'membership' && (
                   <div className="bg-background border-2 border-border p-6 md:p-8 shadow-xl">
@@ -454,7 +481,8 @@ function CheckoutContent() {
                 <div className="bg-background border-2 border-border p-6 md:p-8 shadow-xl">
                   <PaymentMethodForm 
                     onSubmit={handlePaymentSubmit} 
-                    onCancel={() => router.push(itemType === 'uniform' ? '/store' : '/')} 
+                    onCancel={() => router.push(itemType === 'uniform' ? '/store' : '/')}
+                    hideEmail={itemType === 'membership'}
                   />
                 </div>
               </div>
