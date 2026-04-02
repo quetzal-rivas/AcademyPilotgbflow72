@@ -82,11 +82,11 @@ export default async function LandingPage() {
               <div className="inline-block bg-primary px-4 py-1 text-white text-[10px] font-black uppercase tracking-[0.3em] italic shadow-sm">
                 Organizing the World of Jiu-Jitsu
               </div>
-              <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-slate-900 dark:text-white tracking-tighter">
+              <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-white tracking-tighter drop-shadow-lg">
                 Jiu-Jitsu <br />
                 For <span className="text-primary">Everyone</span>
               </h1>
-              <p className="text-xl text-slate-700 dark:text-white/80 max-w-lg font-bold uppercase italic tracking-tight leading-relaxed">
+              <p className="text-xl text-white dark:text-white/80 max-w-lg font-bold uppercase italic tracking-tight leading-relaxed drop-shadow-md">
                 Join the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art, improve your health, and join our brotherhood.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -155,17 +155,17 @@ export default async function LandingPage() {
             <div className="max-w-xl space-y-8 text-left">
               <div className="space-y-4">
                 <Badge className="bg-primary text-white font-black uppercase italic tracking-widest rounded-none px-4 border border-white/20">Mission: Join the Legacy</Badge>
-                <h2 className="font-headline text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-none text-slate-900 dark:text-white">
+                <h2 className="font-headline text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-none text-white drop-shadow-lg">
                   Establish Your <br />
                   <span className="text-primary drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">Presence</span>
                 </h2>
-                <p className="text-xl text-slate-700 dark:text-white/80 font-bold uppercase italic tracking-tight">
+                <p className="text-xl text-white dark:text-white/80 font-bold uppercase italic tracking-tight drop-shadow-md">
                   Step onto the mats and start your journey with the world's most successful team.
                 </p>
               </div>
               <div className="flex gap-4">
                 <FreeTrialDialog tenantSlug="hq">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white rounded-full font-black uppercase italic tracking-tighter w-36 h-36 flex flex-col items-center justify-center text-center leading-none shadow-2xl border-4 border-white/10 transition-transform hover:scale-110 text-lg text-white">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white rounded-full font-black uppercase italic tracking-tighter w-36 h-36 flex flex-col items-center justify-center text-center leading-none shadow-2xl border-4 border-white/10 transition-transform hover:scale-110 text-lg">
                     FREE<br/>TRIAL
                   </Button>
                 </FreeTrialDialog>

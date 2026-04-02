@@ -89,10 +89,12 @@ export function AcademyTemplate({
               <div className="inline-block bg-primary px-4 py-1 text-white text-[10px] font-black uppercase tracking-[0.3em] italic shadow-sm">
                 {branchName || "GRACIE BARRA"} Tactical Unit Deployed
               </div>
-              <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-slate-900 dark:text-white tracking-tighter">
-                {headline || "Jiu-Jitsu For Everyone"}
+              <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-white tracking-tighter drop-shadow-lg">
+                {headline ? headline : (
+                  <>Jiu-Jitsu <br /> For <span className="text-primary">Everyone</span></>
+                )}
               </h1>
-              <p className="text-xl text-slate-700 dark:text-white/80 max-w-lg font-bold uppercase italic tracking-tight leading-relaxed">
+              <p className="text-xl text-white dark:text-white/80 max-w-lg font-bold uppercase italic tracking-tight leading-relaxed drop-shadow-md">
                 {subheadline || `Join the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art at our ${branchName || "localized"} academy.`}
               </p>
               
@@ -134,13 +136,13 @@ export function AcademyTemplate({
             <div className="max-w-xl space-y-8 text-left">
               <div className="space-y-4">
                 <Badge className="bg-primary text-white font-black uppercase italic tracking-widest rounded-none px-4 border border-white/20">Establish Presence</Badge>
-                <h2 className="font-headline text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-none text-slate-900 dark:text-white">
+                <h2 className="font-headline text-6xl md:text-7xl font-black uppercase italic tracking-tighter leading-none text-white drop-shadow-lg">
                   Join the <br />
-                  <span className="text-primary">{branchName || "Gracie Barra"} Team</span>
+                  <span className="text-primary drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]">{branchName || "Gracie Barra"} Team</span>
                 </h2>
               </div>
               
-              <div className="grid grid-cols-1 gap-4 text-sm font-bold uppercase italic tracking-widest text-slate-700 dark:text-white/80">
+              <div className="grid grid-cols-1 gap-4 text-sm font-bold uppercase italic tracking-widest text-white dark:text-white/80 drop-shadow-md">
                 {address && <div className="flex items-center gap-3"><MapPin className="h-5 w-5 text-primary" /> {address}</div>}
                 {contactPhone && <div className="flex items-center gap-3"><Phone className="h-5 w-5 text-primary" /> {contactPhone}</div>}
                 {contactEmail && <div className="flex items-center gap-3"><Mail className="h-5 w-5 text-primary" /> {contactEmail}</div>}
