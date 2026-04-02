@@ -182,7 +182,7 @@ export default async function LandingPage() {
         <Marquee variant="red" />
 
         {/* Global Reach Section */}
-        <section className="py-24 bg-white dark:bg-zinc-950 text-slate-900 dark:text-white text-center relative overflow-hidden">
+        <section className="py-24 bg-secondary text-white text-center relative overflow-hidden">
           <ScrollRevealImage 
             src="https://graciebarra.com/wp-content/uploads/2025/04/DSC06242bbb_1.png"
             alt="Gracie Barra Team Silhouette"
@@ -194,20 +194,20 @@ export default async function LandingPage() {
             <div className="max-w-3xl mx-auto space-y-4">
               <History className="h-12 w-12 text-primary mx-auto mb-4" />
               <h2 className="font-headline text-5xl font-black uppercase tracking-tighter italic">One Team. One Shield.</h2>
-              <p className="text-xl text-slate-600 dark:text-muted-foreground font-bold uppercase italic tracking-tight">With over 1,000 schools across 6 continents, Academia Pilot brings the Gracie Barra legacy to your neighborhood.</p>
+              <p className="text-xl text-white/80 font-bold uppercase italic tracking-tight">With over 1,000 schools across 6 continents, Academia Pilot brings the Gracie Barra legacy to your neighborhood.</p>
             </div>
             <div className="grid sm:grid-cols-3 gap-12 max-w-5xl mx-auto pt-8">
               <div>
                 <div className="text-6xl font-black text-primary italic mb-2">1,000+</div>
-                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-muted-foreground">Deployed Schools</div>
+                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-white/60">Deployed Schools</div>
               </div>
               <div>
                 <div className="text-6xl font-black text-primary italic mb-2">35+</div>
-                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-muted-foreground">Operational Years</div>
+                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-white/60">Operational Years</div>
               </div>
               <div>
                 <div className="text-6xl font-black text-primary italic mb-2">100k+</div>
-                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-muted-foreground">Active Units</div>
+                <div className="uppercase tracking-[0.3em] text-[10px] font-black text-white/60">Active Units</div>
               </div>
             </div>
           </div>
