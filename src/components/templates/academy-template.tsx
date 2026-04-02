@@ -180,7 +180,7 @@ export function AcademyTemplate({
 
 function ProgramCard({ title, desc, featured = false }: { title: string, desc: string, featured?: boolean }) {
   return (
-    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 border-r-2 last:border-r-0 border-slate-200 ${featured ? 'bg-secondary text-white scale-105 z-10 shadow-2xl relative' : 'bg-white text-slate-900 hover:bg-slate-50'}`}>
+    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 border-r-2 last:border-r-0 border-slate-200 ${featured ? 'bg-secondary text-white scale-105 z-10 shadow-2xl relative' : 'bg-white text-slate-900 hover:bg-slate-50 dark:bg-zinc-100 dark:hover:bg-zinc-200'}`}>
       <h4 className="font-headline text-3xl font-black uppercase italic tracking-tighter leading-none">{title}</h4>
       <p className={`text-sm font-bold uppercase tracking-tight leading-relaxed ${featured ? 'text-white/80' : 'text-slate-500'}`}>{desc}</p>
       <div className="mt-auto pt-8">

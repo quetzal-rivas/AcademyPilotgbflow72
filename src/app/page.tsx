@@ -83,7 +83,8 @@ export default async function LandingPage() {
                 Organizing the World of Jiu-Jitsu
               </div>
               <h1 className="font-headline text-6xl md:text-8xl font-black leading-none uppercase italic text-slate-900 dark:text-white tracking-tighter">
-                Jiu-Jitsu <br /> For <span className="text-primary">Everyone</span>
+                Jiu-Jitsu <br />
+                For <span className="text-primary">Everyone</span>
               </h1>
               <p className="text-xl text-slate-700 dark:text-white/80 max-w-lg font-bold uppercase italic tracking-tight leading-relaxed">
                 Join the largest and most successful Brazilian Jiu-Jitsu team in the world. Master the art, improve your health, and join our brotherhood.
@@ -277,7 +278,7 @@ export default async function LandingPage() {
 
 function ProgramCard({ title, level, description, details, featured = false }: { title: string, level: string, description: string, details: string, featured?: boolean }) {
   return (
-    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 border-r-2 last:border-r-0 border-slate-200 ${featured ? 'bg-secondary text-white scale-105 z-10 shadow-2xl relative' : 'bg-white text-slate-900 hover:bg-slate-50'}`}>
+    <div className={`p-10 space-y-6 flex flex-col transition-all duration-300 border-r-2 last:border-r-0 border-slate-200 ${featured ? 'bg-secondary text-white scale-105 z-10 shadow-2xl relative' : 'bg-white text-slate-900 hover:bg-slate-50 dark:bg-zinc-100 dark:hover:bg-zinc-200'}`}>
       <div className={`text-[10px] font-black uppercase tracking-[0.3em] ${featured ? 'text-white/60' : 'text-primary'}`}>
         {level}
       </div>
