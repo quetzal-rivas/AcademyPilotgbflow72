@@ -9,7 +9,6 @@ import { useGSAP } from "@gsap/react";
 import { ArrowLeft, Zap, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Marquee from "@/components/landing/Marquee";
 import { PhotoGrid } from "@/components/photo-grid";
 import { BackgroundPhotoRotation } from "@/components/landing/background-photo-rotation";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -29,8 +28,6 @@ export default function LocatorAssemble({ photoUrls }: LocatorAssembleProps) {
   const overlaysRef = useRef<HTMLDivElement>(null);
   const registryOverlaysRef = useRef<HTMLDivElement>(null);
   const photoGridRef = useRef<HTMLDivElement>(null);
-  const topMarqueeRef = useRef<HTMLDivElement>(null);
-  const bottomMarqueeRef = useRef<HTMLDivElement>(null);
   const bgPhotoRef = useRef<HTMLDivElement>(null);
   const locatorContainerRef = useRef<HTMLDivElement>(null);
 
@@ -80,7 +77,7 @@ export default function LocatorAssemble({ photoUrls }: LocatorAssembleProps) {
       { scale: 1, opacity: 1, filter: "blur(0px)", z: 0, ease: "power2.out", duration: 1, force3D: true }
     );
 
-    // Fade out titles and initial overlays, manifest grid and marquees
+    // Fade out titles and initial overlays, manifest grid
     tl.to([titleRef.current, overlaysRef.current], {
       scale: (i) => i === 0 ? 10 : 1,
       opacity: 0,
@@ -91,7 +88,7 @@ export default function LocatorAssemble({ photoUrls }: LocatorAssembleProps) {
       force3D: true
     }, "+=0.5");
 
-    tl.to([topMarqueeRef.current, bottomMarqueeRef.current, photoGridRef.current], {
+    tl.to(photoGridRef.current, {
       opacity: 1,
       duration: 0.5,
     }, "<");
@@ -150,15 +147,6 @@ export default function LocatorAssemble({ photoUrls }: LocatorAssembleProps) {
             </Link>
           </Button>
         </div>
-      </div>
-
-      {/* Manifested Tactical Marquees */}
-      <div ref={topMarqueeRef} className="absolute top-0 left-0 w-full z-[90] opacity-0 pointer-events-none">
-        <Marquee variant="black" />
-      </div>
-
-      <div ref={bottomMarqueeRef} className="absolute bottom-0 left-0 w-full z-[90] opacity-0 pointer-events-none">
-        <Marquee variant="black" />
       </div>
 
       {/* Tactical Grid Background (High Density) */}
