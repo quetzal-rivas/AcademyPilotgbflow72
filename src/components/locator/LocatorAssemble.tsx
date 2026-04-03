@@ -1,12 +1,11 @@
 
 "use client";
 
-import React, { useRef, useState } from "react";
-import Image from "next/image";
+import React, { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { ArrowLeft, Zap, Shield } from "lucide-react";
+import { ArrowLeft, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PhotoGrid } from "@/components/photo-grid";
@@ -22,110 +21,82 @@ interface LocatorAssembleProps {
 
 export default function LocatorAssemble({ photoUrls }: LocatorAssembleProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
+  const introWrapperRef = useRef<HTMLDivElement>(null);
   const shieldRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
-  const overlaysRef = useRef<HTMLDivElement>(null);
-  const registryOverlaysRef = useRef<HTMLDivElement>(null);
   const photoGridRef = useRef<HTMLDivElement>(null);
   const bgPhotoRef = useRef<HTMLDivElement>(null);
-  const locatorContainerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     if (!containerRef.current) return;
 
+    // 1. PINNED INTRO TIMELINE
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: containerRef.current,
+        trigger: introWrapperRef.current,
         start: "top top",
-        end: "+=400%", // Cinematic scroll duration
+        end: "+=150%", // Scroll distance for cinematic intro sequence
         pin: true,
-        scrub: 1.2,
-        anticipatePin: 1,
+        scrub: 1,
       },
     });
 
-    // 0. HEADER HIDE
-    tl.to(headerRef.current, {
-      y: -100,
-      opacity: 0,
-      duration: 0.5,
-      ease: "power2.inOut"
-    }, 0);
-
-    // 1. SHIELD LOGO (Fly-through)
+    // Fly-through shield logo
     tl.to(shieldRef.current, {
       scale: 10,
       opacity: 0,
-      z: 1000,
       filter: "blur(30px)",
       ease: "power2.in",
       duration: 1,
-      force3D: true
     }, 0);
 
-    // Fade out the initial rotating background
+    // Transition initial background rotation to tactical mosaic
     tl.to(bgPhotoRef.current, {
       opacity: 0,
       duration: 0.8,
-      ease: "power2.inOut"
-    }, 0.5);
+    }, 0.2);
 
-    // 2. MASTER TITLE ASSEMBLY
+    // Title assembly reveal ("GRACIE BARRA FIND LOCATION")
     tl.fromTo(titleRef.current,
-      { scale: 0.1, opacity: 0, filter: "blur(20px)", z: -1000 },
-      { scale: 1, opacity: 1, filter: "blur(0px)", z: 0, ease: "power2.out", duration: 1, force3D: true }
+      { scale: 0.1, opacity: 0, filter: "blur(20px)" },
+      { scale: 1, opacity: 1, filter: "blur(0px)", ease: "power2.out", duration: 1 },
+      0.5
     );
 
-    // Fade out titles and initial overlays, manifest grid
-    tl.to([titleRef.current, overlaysRef.current], {
-      scale: (i) => i === 0 ? 10 : 1,
+    // Zoom title out and fully reveal mosaic grid
+    tl.to(titleRef.current, {
+      scale: 10,
       opacity: 0,
-      z: (i) => i === 0 ? 1000 : 0,
-      filter: (i) => i === 0 ? "blur(30px)" : "none",
-      ease: "power2.in",
+      filter: "blur(30px)",
       duration: 1,
-      force3D: true
-    }, "+=0.5");
+    }, 1.5);
 
     tl.to(photoGridRef.current, {
       opacity: 1,
       duration: 0.5,
-    }, "<");
+    }, 1.5);
 
-    // 3. LOCATOR CORE REVEAL
-    tl.to(registryOverlaysRef.current, {
-      opacity: 1,
-      duration: 0.8,
-      ease: "power2.out"
-    }, ">");
-
-    tl.fromTo(locatorContainerRef.current,
-      { scale: 0.2, opacity: 0, z: -800, filter: "blur(20px)", y: 100 },
-      { 
-        scale: 1, 
-        opacity: 1, 
-        z: 0, 
-        filter: "blur(0px)", 
-        y: 0,
-        ease: "power3.out", 
-        duration: 1.2, 
-        force3D: true 
+    // 2. HEADER TACTICAL FADE
+    gsap.to(headerRef.current, {
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "100px top",
+        scrub: true,
       },
-      "<"
-    );
+      y: -100,
+      opacity: 0,
+    });
 
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative h-screen w-full bg-[#002B5B] overflow-hidden flex flex-col items-center justify-center perspective-container">
-      {/* Initial Fading Background Photos */}
-      <div ref={bgPhotoRef} className="absolute inset-0 z-0">
-        <BackgroundPhotoRotation photoUrls={photoUrls} />
-      </div>
-
-      {/* Tactical Header */}
-      <div ref={headerRef} className="absolute top-0 left-0 w-full h-24 border-b-4 border-border bg-background/40 backdrop-blur-xl z-[100] flex items-center justify-between px-12">
+    <div ref={containerRef} className="relative bg-[#002B5B]">
+      {/* TACTICAL HEADER PROTOCOL */}
+      <div 
+        ref={headerRef} 
+        className="fixed top-0 left-0 w-full h-24 border-b-4 border-border bg-background/40 backdrop-blur-xl z-[100] flex items-center justify-between px-12"
+      >
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 flex items-center justify-center">
             <img 
@@ -149,64 +120,59 @@ export default function LocatorAssemble({ photoUrls }: LocatorAssembleProps) {
         </div>
       </div>
 
-      {/* Tactical Grid Background (High Density) */}
-      <div ref={photoGridRef} className="absolute inset-0 z-0 opacity-0 pointer-events-none">
-        <PhotoGrid photoUrls={photoUrls} variant="mosaic" />
-      </div>
-
-      {/* Cinematic Intro Overlays */}
-      <div ref={overlaysRef} className="absolute inset-0 z-50 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-95" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
+      {/* PERSISTENT BACKGROUND MATRIX (OLED DEPTH) */}
+      <div className="fixed inset-0 z-0">
+        <div ref={bgPhotoRef} className="absolute inset-0">
+          <BackgroundPhotoRotation photoUrls={photoUrls} />
+        </div>
+        <div ref={photoGridRef} className="absolute inset-0 opacity-0">
+          <PhotoGrid photoUrls={photoUrls} variant="mosaic" />
+        </div>
+        
+        {/* Cinematic Atmospheric Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-90" />
+        <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 opacity-10">
           <div className="h-full w-full bg-[repeating-linear-gradient(90deg,transparent,transparent_40px,rgba(255,255,255,0.05)_40px,rgba(255,255,255,0.05)_41px)]" />
           <div className="h-full w-full absolute top-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_40px,rgba(255,255,255,0.05)_40px,rgba(255,255,255,0.05)_41px)]" />
         </div>
       </div>
 
-      {/* Registry Phase Atmosphere */}
-      <div ref={registryOverlaysRef} className="absolute inset-0 z-10 pointer-events-none opacity-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-95" />
-        <div className="absolute inset-0 bg-[#002B5B]/40" />
-      </div>
-
-      {/* Shield Logo Scene */}
-      <div ref={shieldRef} className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-100 will-change-transform perspective-element">
-        <div className="relative w-96 h-96 drop-shadow-[0_0_50px_rgba(225,29,72,0.4)]">
+      {/* INTRO PHASE (Pinned for sequence) */}
+      <div ref={introWrapperRef} className="relative z-10 h-screen w-full flex items-center justify-center overflow-hidden">
+        {/* Shield Logo Fly-through */}
+        <div ref={shieldRef} className="relative w-64 h-64 md:w-96 md:h-96 z-20">
           <img 
             src="https://graciebarra.com/wp-content/uploads/2025/07/logos-barra-shield.svg" 
-            alt="Gracie Barra Shield" 
-            className="w-full h-full object-contain"
+            alt="Shield" 
+            className="w-full h-full object-contain drop-shadow-[0_0_50px_rgba(225,29,72,0.4)]"
           />
+        </div>
+
+        {/* Title Assembly Overlay */}
+        <div ref={titleRef} className="absolute inset-0 flex items-center justify-center opacity-0 z-30 pointer-events-none">
+          <h1 className="text-center px-4">
+            <span className="block text-[10vw] font-black text-white uppercase italic tracking-tighter leading-none drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]">
+              GRACIE BARRA
+            </span>
+            <span className="block text-[6vw] font-black text-primary uppercase italic tracking-tighter leading-none -mt-4 drop-shadow-[0_0_30px_rgba(225,29,72,0.5)]">
+              FIND LOCATION
+            </span>
+          </h1>
         </div>
       </div>
 
-      {/* Title Scene */}
-      <div ref={titleRef} className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 will-change-transform perspective-element z-[60]">
-        <h1 className="text-center">
-          <span className="block text-[10vw] font-black text-white uppercase italic tracking-tighter leading-none drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]">
-            GRACIE BARRA
-          </span>
-          <span className="block text-[6vw] font-black text-primary uppercase italic tracking-tighter leading-none -mt-4 drop-shadow-[0_0_30px_rgba(225,29,72,0.5)]">
-            FIND LOCATION
-          </span>
-        </h1>
-      </div>
-
-      {/* Locator Core reveal */}
-      <div 
-        ref={locatorContainerRef}
-        className="absolute inset-0 flex flex-col items-center justify-start opacity-0 will-change-transform perspective-element z-[70] pt-24 pb-20 overflow-y-auto"
-      >
-        <div className="container mx-auto px-4 py-16 space-y-16">
+      {/* LOCATOR MISSION PHASE (Standard Flow) */}
+      <div className="relative z-20 pb-32 pt-16">
+        <div className="container mx-auto px-4 space-y-16">
           <div className="max-w-3xl border-l-8 border-primary pl-10 space-y-4">
             <div className="inline-block bg-primary text-white px-4 py-1 text-[10px] font-black uppercase tracking-[0.3em] italic mb-2 shadow-lg">
               MISSION: FIND YOUR TEAM
             </div>
             <h2 className="text-6xl md:text-8xl font-headline font-black uppercase italic tracking-tighter leading-none text-white drop-shadow-lg">
-              Locate the Nearest <br /><span className="text-primary drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]">Jiu-Jitsu</span> Academy
+              Locate the Nearest <br /><span className="text-primary">Jiu-Jitsu</span> Academy
             </h2>
-            <p className="text-xl text-white font-black uppercase italic tracking-tight max-w-xl drop-shadow-md bg-black/20 p-2 inline-block">
+            <p className="text-xl text-white font-black uppercase italic tracking-tight max-w-xl drop-shadow-md bg-black/40 p-4 inline-block">
               Find a certified Gracie Barra training center in your area. Join our global brotherhood and start your journey with a free trial class today.
             </p>
           </div>
@@ -214,6 +180,6 @@ export default function LocatorAssemble({ photoUrls }: LocatorAssembleProps) {
           <AcademyLocator />
         </div>
       </div>
-    </section>
+    </div>
   );
 }
