@@ -41,9 +41,9 @@ export default async function LocatorPage() {
       </header>
 
       <main className="flex-grow relative overflow-hidden bg-slate-50 dark:bg-black">
-        {/* Cinematic Tactical Grid Background - Luminosity Enhanced */}
+        {/* Cinematic Tactical Grid Background - Mosaic Protocol Enabled */}
         <div className="absolute inset-0 z-0">
-          <PhotoGrid photoUrls={photos} />
+          <PhotoGrid photoUrls={photos} variant="mosaic" />
           <div className="absolute inset-0 bg-background/20 backdrop-blur-[2px]" />
         </div>
 
