@@ -15,10 +15,10 @@ export async function PATCH(req: Request) {
     }
 
     const profileRef = db.collection('user_profiles').doc(userId);
-    await profileRef.update({
+    await profileRef.set({
       ...profileUpdates,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
+    }, { merge: true });
 
     logger.info('Unit profile updated', { requestId, userId });
     return NextResponse.json({ success: true, requestId });
